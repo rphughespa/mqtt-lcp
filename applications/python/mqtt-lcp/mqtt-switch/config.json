@@ -1,0 +1,85 @@
+{
+  "config": {
+    "node": {
+      "name": "harris-1"
+    },
+    "logger" : {
+      "file": "/var/log/mqtt-lcp/**node**.log",
+      "level": "INFO"
+    },
+    "io": {
+      "mqtt" : {
+        "broker" : "mqtt-broker.local",
+        "user" : "trains",
+        "password" : "choochoo",
+        "sub-topics" : [
+          {
+            "id" : "self",
+            "topic" : "cmd/trains/node/**node**/#"
+          },
+          {
+            "id" : "shutdown",
+            "topic" : "cmd/trains/node/all/req"
+          },
+          {
+            "id" : "switch",
+            "topic" : "cmd/trains/switch/**node**/+/req"
+          }
+        ],
+        "pub-topics" : [
+          {
+            "id" : "ping",
+            "topic" : "dt/trains/ping/**node**"
+          },
+          {
+            "id" : "sensor",
+            "topic" : "dt/trains/sensor/**node**"
+          }
+        ]
+      },
+      "i2c" : [
+        {
+          "address": "0x3C",
+          "bus": 1,
+          "device-type": "display",
+          "display-type": "ssd1306",
+          "display-size" : "128x64"
+        },
+        {
+          "address" : "0x40",
+          "bus" : 1,
+          "device-type" : "servo-hat",
+          "ports": [
+            {
+              "sub-address" : 0,
+              "device-type" : "servo",
+              "mqtt-port" : "siding-north-east",
+              "mqtt-type" : "sensor"
+            },
+            {
+              "sub-address" : 1,
+              "device-type" : "servo",
+              "mqtt-port" : "siding-north-west",
+              "mqtt-type" : "sensor"
+            },
+            {
+              "sub-address" : 2,
+              "device-type" : "servo",
+              "mqtt-port" : "siding-south-east",
+              "mqtt-type" : "sensor"
+            },
+            {
+              "sub-address" : 3,
+              "device-type" : "servo",
+              "mqtt-port" : "siding-south-west",
+              "mqtt-type" : "sensor"
+            }
+          ]
+        }
+      ]
+    },
+    "options": {
+      "ping" : 10
+    }
+  }
+}

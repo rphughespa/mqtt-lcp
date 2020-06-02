@@ -1,0 +1,32 @@
+{
+  "config": {
+    "servo": {
+      "ports": [
+        {
+          "port" : 0,
+          "center" : 45,
+          "close" : 0,
+          "throw" : 89
+        },
+        {
+          "port" : 1,
+          "center" : 45,
+          "close" : 0,
+          "throw" : 89
+        },
+        {
+          "port" : 2,
+          "center" : 45,
+          "close" : 0,
+          "throw" : 89
+        },
+        {
+          "port" : 3,
+          "center" : 45,
+          "close" : 0,
+          "throw" : 89
+        }
+      ]
+    }
+  }
+}

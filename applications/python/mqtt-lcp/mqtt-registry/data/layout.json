@@ -1,0 +1,837 @@
+{
+	"layout": {
+		"name" : "layout",
+		"description" : "collection of layouts",
+		"cols" : 10,
+		"rows" : 8,
+		"items" : [
+			{
+				"name": "test track",
+				"description": "test track",
+				"rows": [
+					{
+						"row": 1,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "north-west","image" : "blank","type" : "sensor"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 6,"id": "north","image" : "blank","type" : "sensor"},
+							{"col" : 7,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "north-east","image" : "blank","type" : "sensor"},
+							{"col" : 10,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 2,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "north-west","image" : "low-slash","type" : "block"},
+							{"col" : 3,"id": "north-west","image" : "horizontal","type" : "block"},
+							{"col" : 4,"id": "sifing-north-west","image" : "turn-right-down","type" : "turnout"},
+							{"col" : 5,"id": "north","image" : "horizontal","type" : "block"},
+							{"col" : 6,"id": "north","image" : "horizontal","type" : "blank"},
+							{"col" : 7,"id": "siding-north-east","image" : "turn-left-down","type" : "turnout"},
+							{"col" : 8,"id": "north-east","image" : "horizontal","type" : "block"},
+							{"col" : 9,"id": "north-east","image" : "low-back-slash","type" : "block"},
+							{"col" : 10,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 3,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "north-west","image" : "vertical","type" : "block"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "siding-north","image" : "up-back-slash","type" : "block"},
+							{"col" : 5,"id": "siding-north","image" : "horizontal","type" : "block"},
+							{"col" : 6,"id": "siding-north","image" : "horizontal","type" : "block"},
+							{"col" : 7,"id": "siding-north","image" : "up-slash","type" : "block"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "north-east","image" : "vertical","type" : "block"},
+							{"col" : 10,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 4,
+						"cols": [
+							{"col" : 1,"id": "block-5-rfid","image" : "blank","type" : "sensor"},
+							{"col" : 2,"id": "north-west","image" : "vertical","type" : "block"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "north-siding","image" : "blank","type" : "sensor"},
+							{"col" : 6,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 7,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "north-east","image" : "vertical","type" : "block"},
+							{"col" : 10,"id": "block-2-rfid","image" : "blank","type" : "sensor"}
+						]
+					},
+					{
+						"row": 5,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "west","image" : "vertical","type" : "block"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 6,"id": "south-siding","image" : "blank","type" : "sensor"},
+							{"col" : 7,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "east","image" : "vertical","type" : "block"},
+							{"col" : 10,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 6,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "south-west","image" : "vertical","type" : "block"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "siding-south","image" : "low-slash","type" : "block"},
+							{"col" : 5,"id": "siding-south","image" : "horizontal","type" : "block"},
+							{"col" : 6,"id": "siding-south","image" : "horizontal","type" : "block"},
+							{"col" : 7,"id": "siding-south","image" : "low-back-slash","type" : "block"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "south-east", "image" : "vertical","type" : "block"},
+							{"col" : 10,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 7,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "south-west","image" : "up-back-slash","type" : "block"},
+							{"col" : 3,"id": "south-west","image" : "horizontal","type" : "block"},
+							{"col" : 4,"id": "siding-south-west","image" : "turn-left-up","type" : "turnout"},
+							{"col" : 5,"id": "south","image" : "horizontal","type" : "block"},
+							{"col" : 6,"id": "south","image" : "horizontal","type" : "block"},
+							{"col" : 7,"id": "siding-south-east","image" : "turn-right-up","type" : "turnout"},
+							{"col" : 8,"id": "south-east","image" : "horizontal","type" : "block"},
+							{"col" : 9,"id": "south-east","image" : "up-slash","type" : "block"},
+							{"col" : 10,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 8,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "south-west","image" : "blank","type" : "sensor"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "south","image" : "blank","type" : "sensor"},
+							{"col" : 6,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 7,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "south-east","image" : "blank","type" : "sensor"},
+							{"col" : 10,"id": "","image" : "blank","type" : "blank"}
+						]
+					}
+				]
+			},
+			{
+				"name": "lancaster",
+				"description": "east section of layout controled by lancaster tower",
+				"rows": [
+					{
+						"row": 1,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 2,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 6,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "up-back-slash"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 3,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 4,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "turnout","image" : "turn-left-down"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 5,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "cross"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "turnout","image" : "turn-left-down"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 6,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 6,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "vertical"}
+						]
+					},
+					{
+						"row": 7,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "up-slash"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "vertical"}
+						]
+					},
+					{
+						"row": 8,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "up-slash"}
+						]
+					},
+					{
+						"row": 9,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 10,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 11,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					}
+				]
+			},
+			{
+				"name": "state",
+				"description": "east approach to station controled by state tower",
+				"rows": [
+					{
+						"row": 1,
+						"cols": [
+							{"col" : 1,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "turn-left-down"},
+							{"col" : 4,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "track 5","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 2,
+						"cols": [
+							{"col" : 1,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "up-slash"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "siding-1","type" : "turnout","image" : "low-slash"},
+							{"col" : 6,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "track 5","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 3,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 6,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 7,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 8,"id": "siding-1","type" : "turnout","image" : "low-slash"},
+							{"col" : 9,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "track 5","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 4,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 6,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 7,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 9,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 10,"id": "siding-1","type" : "turnout","image" : "low-slash"},
+							{"col" : 11,"id": "track 5","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 5,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "turnout","image" : "turn-left-up"},
+							{"col" : 6,"id": "siding-1","type" : "turnout","image" : "turn-left-down"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "track 3","type" : "turnout","image" : "turn-left-up"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "track 4","type" : "turnout","image" : "turn-left-up"},
+							{"col" : 11,"id": "track 5","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 6,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "turnout","image" : "up-slash"}
+						]
+					},
+					{
+						"row": 7,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "low-back-slash"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "up-back-slash"},
+							{"col" : 5,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 8,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 9,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 10,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "up-back-slash"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 11,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "up-back-slash"},
+							{"col" : 5,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 12,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "up-back-slash"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					}
+				]
+			},
+			{
+				"name": "harris",
+				"description": "west approach to station controled by harris tower",
+				"rows": [
+					{
+						"row": 1,
+						"cols": [
+							{"col" : 1,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 4,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "track 5","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 2,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "up-back-slash"},
+							{"col" : 4,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "track 5","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "track 5","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 3,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "turnout","image" : "low-back-slash"}
+						]
+					},
+					{
+						"row": 4,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "turnout","image" : "low-back-slash"},
+							{"col" : 6,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 7,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "vertical"}
+						]
+					},
+					{
+						"row": 5,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "turnout","image" : "low-back-slash"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 6,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 7,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 8,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "vertical"}
+						]
+					},
+					{
+						"row": 6,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 4,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 10,"id": "siding-1","type" : "turnout","image" : "turn-left-down"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+
+					{
+						"row": 7,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "turn-left-down"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "turnout","image" : "turn-left-up"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 8,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 4,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 5,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "low-slash"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 9,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 3,"id": "siding-1","type" : "turnout","image" : "turn-left-up"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "turnout","image" : "turn-left-up"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 10,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "turnout","image" : "turn-left-down"},
+							{"col" : 2,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 11,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "low-back-slash"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "up-back-slash"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 12,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "low-back-slash"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "vertical"}
+						]
+					},
+					{
+						"row": 13,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 5,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "up-slash"}
+						]
+					}
+				]
+			},
+			{
+				"name": "lewiston",
+				"description": "west side layout controled by lewiston tower",
+				"rows": [
+					{
+						"row": 1,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "low-back-slash"}
+						]
+					},
+					{
+						"row": 2,
+						"cols": [
+							{"col" : 1,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "turnout","image" : "turn-right-up"},
+							{"col" : 7,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "siding-1","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "siding-1","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 3,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 4,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 5,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 7,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 6,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "siding-1","type" : "turnout","image" : "turn-right-down"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "cross"},
+							{"col" : 7,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 7,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 5,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "vertical"}
+						]
+					},
+					{
+						"row": 8,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "vertical"},
+							{"col" : 5,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 6,"id": "siding-1","type" : "block","image" : "up-back-slash"},
+							{"col" : 7,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 9,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 2,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 3,"id": "","image" : "blank","type" : "blank"},
+							{"col" : 4,"id": "siding-1","type" : "block","image" : "up-back-slash"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 0,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 10,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 11,
+						"cols": [
+							{"col" : 1,"id": "","image" : "blank","type" : "blank"}
+						]
+					},
+					{
+						"row": 12,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					},
+					{
+						"row": 13,
+						"cols": [
+							{"col" : 1,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 2,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 3,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 4,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 5,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 6,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 7,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 8,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 9,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 10,"id": "block-4","type" : "block","image" : "horizontal"},
+							{"col" : 11,"id": "block-4","type" : "block","image" : "horizontal"}
+						]
+					}
+				]
+			}
+		]
+	}
+}

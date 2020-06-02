@@ -1,0 +1,110 @@
+{
+  "config": {
+    "node": {
+      "name": "mqtt-sensor2"
+    },
+    "logger": {
+      "file": "/var/log/mqtt-lcp/**node**.log",
+      "level": "INFO"
+    },
+    "io": {
+      "wifi": {
+        "ssid": "i4567",
+        "password": "idingbat",
+        "hostname": "mqtt-esp32-1"
+      },
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "user": "trains",
+        "password": "choochoo",
+        "sub-topics": [
+          {
+            "id": "self",
+            "topic": "cmd/trains/node/**node**/#"
+          },
+          {
+            "id": "fastclock",
+            "topic": "dt/trains/registry/+/fastclock"
+          },
+          {
+            "id": "report",
+            "topic": "cmd/trains/sensor/**node**/+/req"
+          },
+          {
+            "id": "broadcast",
+            "topic": "cmd/trains/node/all/req"
+          }
+        ],
+        "pub-topics": [
+          {
+            "id": "ping",
+            "topic": "dt/trains/ping/**node**"
+          },
+          {
+            "id": "sensor",
+            "topic": "dt/trains/sensor/**node**"
+          }
+        ]
+      },
+      "i2c": [
+        {
+          "address": "0x77",
+          "bus" : 1,
+          "mqtt-type": "rfid",
+          "device-type": "rfid",
+          "mqtt-port": "track-5"
+        },{
+          "address": "0x3F",
+          "bus": 1,
+          "mqtt-type": "rotary",
+          "device-type": "rotary",
+          "mqtt-port": "rotary-1"
+        },{
+          "address": "0x3C",
+          "bus": 1,
+          "device-type": "display",
+          "display-type": "ssd1306",
+          "display-size" : "128x64"
+        },
+        {
+          "address" : "0x70",
+          "bus" : 1,
+          "device-type" : "xx-mux",
+          "ports": [
+            {
+              "sub-address" : 0,
+              "address" : "0x77",
+              "mqtt-port" : "track-0",
+              "device-type": "rfid",
+              "mqtt-type" : "rfid"
+            },
+            {
+              "sub-address" : 3,
+              "address" : "0x77",
+              "mqtt-port" : "track-3",
+              "device-type": "xxrfid",
+              "mqtt-type" : "rfid"
+            },
+            {
+              "sub-address" : 4,
+              "address" : "0x77",
+              "mqtt-port" : "track-4",
+              "device-type": "xxrfid",
+              "mqtt-type" : "rfid"
+            },
+            {
+              "sub-address" : 7,
+              "address" : "0x77",
+              "mqtt-port" : "track-7",
+              "device-type": "rfid",
+              "mqtt-type" : "rfid"
+            }
+          ]
+        }
+      ]
+    },
+    "options": {
+      "ping": 10
+    }
+  }
+}

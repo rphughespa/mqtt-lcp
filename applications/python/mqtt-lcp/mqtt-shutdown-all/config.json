@@ -1,0 +1,24 @@
+{
+  "config": {
+    "node": {
+      "name": "shutdown-all"
+    },
+    "logger" : {
+      "file": "/var/log/mqtt-lcp/**node**.log",
+      "level": "INFO"
+    },
+    "io": {
+        "mqtt" : {
+          "broker" : "mqtt-broker.local",
+          "user" : "trains",
+          "password" : "choochoo",
+          "pub-topics" : [
+            {
+              "id" : "broadcast",
+              "topic" : "cmd/trains/node/all/req"
+            }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "config": {
+    "node": {
+      "name": "mqtt-supervisor"
+    },
+    "logger" : {
+      "file": "/var/log/mqtt-lcp/**node**.log",
+      "level": "WARN"
+    },
+    "io": {
+      "mqtt" : {
+        "broker" : "mqtt-broker.local",
+        "user" : "trains",
+        "password" : "choochoo",
+        "sub-topics" : [
+          {
+            "id" : "self",
+            "topic" : "cmd/trains/node/**node**/#"
+          },
+          {
+            "id" : "broadcast",
+            "topic" : "cmd/trains/node/all/req"
+          }
+        ],
+        "pub-topics" : [
+          {
+            "id" : "ping",
+            "topic" : "dt/trains/ping/**node**"
+          }
+        ]
+      }
+    },
+    "options": {
+      "ping" : 15,
+      "delay" : 15,
+      "shutdown-command" : "sudo halt",
+      "reboot-command" : "sudo reboot"
+    }
+  }
+}

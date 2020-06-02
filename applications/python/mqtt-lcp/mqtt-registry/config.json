@@ -1,0 +1,72 @@
+{
+  "config": {
+    "node": {
+      "name": "mqtt-registry"
+    },
+    "logger" : {
+      "file": "/var/log/mqtt-lcp/**node**.log",
+      "level": "WARN"
+    },
+    "io": {
+      "mqtt" : {
+        "broker" : "mqtt-broker.local",
+        "user" : "trains",
+        "password" : "choochoo",
+        "sub-topics" : [
+          {
+            "id" : "broadcast",
+            "topic" : "cmd/trains/node/all/req"
+          },
+          {
+            "id" : "registry",
+            "topic" : "cmd/trains/registry/**node**/report/req"
+          },
+          {
+            "id" : "fastclock",
+            "topic" : "cmd/trains/registry/**node**/fastclock/req"
+          },
+          {
+            "id" : "ping",
+            "topic" : "dt/trains/ping/#"
+          },
+          {
+            "id" : "backup",
+            "topic" : "dt/trains/backup/#"
+          },
+          {
+            "id" : "sensor",
+            "topic" : "dt/trains/sensor/#"
+          },
+          {
+            "id" : "self",
+            "topic" : "cmd/trains/node/**node**/#"
+          }
+        ],
+        "pub-topics" : [
+          {
+            "id" : "ping",
+            "topic" : "dt/trains/ping/**node**"
+          },
+          {
+            "id": "fastclock",
+            "topic": "dt/trains/registry/**node**/fastclock"
+          },
+          {
+            "id": "dashboard",
+            "topic": "dt/trains/registry/**node**/dashboard"
+          }
+        ]
+      }
+    },
+    "options" : {
+      "ping" : 15,
+      "backup" : "/home/pi/mqtt-lcp/backups",
+      "time" : {
+        "fast" : {
+          "ratio" : 4,
+          "interval" : 10
+        }
+      }
+    }
+  }
+}
