@@ -1,0 +1,308 @@
+Setup RASPBERRY PI or Odroid C4  for MQTT_LCP
+
+These instructions cover setting up a small SBC computer to run MQTT-LCP applications.  These instructions may seem complicated, but you only need to do them once.  After you have a working system you can then clone the sdcard (or emmc) to setup another computer.
+
+Install you choice of OS via the instructions available online.  Generally, you will down load a sdcard image.  Then burn the image onto an sdcard via a program like Etcher.
+
+These instruction apply to Raspbian Buster and Ubuntu 20.04.  In the case Ubuntu, for the Odroid C4 use the version provied by Odroid.
+
+Although the computers will eventually run headless (no monitor or keyboard) it is easier to connect a monitor and keyboard when you first setup the computers.
+
+
+1.  After the first boot, if using Ubuntu 20.04:
+	The install for Ubuntu on C4 there are no dialogs to prompt for
+	information during install like used by Raspbian.
+	Yous hould at least setup your hostname and timezone.
+	If you are using WIFI you need to set that up as well.
+	If your are using a wired ethernet connection, recommended, you can set timezone and host later.
+
+2.  Update your system and add some utilty apps:
+	sudo apt update
+	sudo apt upgrade
+	sudo apt install ip-tools
+
+
+3. Ubuntu 20.04 on small devices seems to need a swap file:
+
+	sudo swapon --show
+		... if nothing is displayed, no swap is in place
+	sudo fallocate -l 4G /swapfile
+	sudo chmod 600 /swapfile
+	sudo mkswap /swapfile
+	sudo swapon /swapfile
+	sudo nano /etc/fstab
+		... append this line to end of file, then save and exit
+		/swapfile swap swap defaults 0 0
+	reboot...
+	sudo swap --show
+		... your swap file should show up
+
+4. On Ubuntu 20.04 add a pi user that operates like the pi user in Raspbian:
+
+	use Control Center and add pi user
+	sudo usermod -aG sudo pi
+	sudo visudo
+		... add the followling line at the end of the file, sav and exit
+		pi ALL=(ALL) NOPASSWD: ALL
+	reboot ...
+	log in as pi (remember to select "mate" before logging in)
+	sudo ls   ... should execute without asking for password
+
+
+5. If desired, give the computer a static IP, varies by OS version:
+
+	... On Raspbian:
+		sudo nano /etc/dhcpcd.conf
+		--- near the bottom of the file, uncomment out three sample lines
+			 for static IP, gateway, and DNS.
+		Save the file and reboot.
+
+	... On Ubuntu desktop (C4):
+		Change the hostname:
+			sudo nano /eyc/hostname
+		Assign static IP
+			use Control Center : Advanced Network Configuration
+		reboot
+
+
+	... Both
+		After reboot, open command line terminal and check IP address
+			ifconfig
+			ping another computer on your network
+			log into another computer and ping the computer you are
+			configurating:  ping "hostname".local)
+
+6. If setting up PI 4 with Raspbian and want to use wired ethernet as primary and WIFI as backup:
+
+	sudo apt-get install ethtool
+	sudo nano /etc/rc.local
+		...  at the end of the file, before the exit(), insert
+		...  this code to check to see if ethernet is present and if so disables wifi
+		...	 if no wired etherener, use wifi
+
+		# Disable WiFi if wired.
+		printf "Checking Network interfaces...\n"
+		if ethtool eth0 | egrep "Link.*yes" && ifconfig eth0 | grep "inet"; then
+	  		logger 'Disabling WiFi...'
+	  	ifconfig wlan0 down
+		else
+	  		printf "WiFi is still enabled: Ethernet is down or ethtool is not installed.\n"
+		fi
+
+7. At this point this computer can talk to other local computer and they can talk to it.
+	Now, lets setup SSH so you can log into the computer from another computer.
+
+	Lets build an SSH key for the computer:
+		ssh-keygen (accept all defaults)
+
+	Now, lets ssh from this computer into another computer on your network:
+		ssh remote-id@remote-computer.local
+		exit
+
+	On a different computer (your dev / server) ssh into the new computer:
+		ssh pi@new-computer.local
+		exit
+	If you think you will doing this ss multiple times you can save the password:
+	From the dev/server do:
+		ssh-copy-id pi@new-computer.local
+	If that works OK:
+		ssh pi@new-computer.local
+		This time you should not be promted for a password.
+
+
+8. I prefer to access headless computer via GUI interface.
+
+	on new computer,
+   		sudo apt install xrdp
+
+	Reboot new computer:
+
+	On remote computer setup the remote client.  I use Remmina on Ubuntu.
+
+
+9. You can use ssh to copy files between computers but I prefer to use FTP protocol.
+	Rasbian comes preloaed with sFTP that is enabled when your turn on SSH.
+	All you need to is to to your remote computer and fire up and FTP client (I use FileZilla)
+	and connect to port 22 on the PI.
+
+	On Ubuntu, you need to install sFTP
+		sudo apt install vsftpd
+
+10. mqtt-lcp needs a MQTT message broker.  You only need one on your network.
+	If this computer is to be your broker:
+		sudo apt install mosquitto
+		sudo reboot
+
+	After rebooting, create  user password file for mqtt.
+	I use user: trains, password: choochoo
+		cd /etc/mosquitto
+		sudo mosquitto_passwd -c passwordfile trains
+	When promted, enter password, choochoo
+	cd /etc/mosquitto/conf.d
+	sudo nano mqtt.conf
+	add these lines, save and exit
+		allow_anonymous false
+		password_file /etc/modquitto/passwordfile
+	rebboot
+
+
+11. On all computer you plan on running mqtt-lcp you can optionally install the mosquitto-clients; mosquitto_pub, and
+ 	mosquitto_sub:
+
+	sudo apt install mosquitto-clients
+
+
+12. Now you can test the broker using the client tools.
+	Open a terminal window and type:
+
+		mosquitto_sub -h your-broker-computer.local -t test/# -u user-you-created -P user-password
+
+	... Note, the "P" must be capitalized
+
+	Open another terminal window on this computer or another:
+
+		mosquitto_pub -h your-broker-computer.local -t test/hello -u user-you-created -P user-password -m "Hello"
+
+	The message "Hello" should appear on the mosquitto_sub window.
+
+
+13. Now install python libraries:
+
+	sudo apt install python3-pip -y
+	sudo pip3 install paho-mqtt
+	sudo pip3 install pillow
+	sudo pip3 install pyserial
+	sudo pip3 install pyusb
+	sudo pip3 install smbus2
+	pip3 install --user pyqt5
+	sudo apt-get install python3-pyqt5
+	sudo apt-get install pyqt5-dev-tools
+	sudo apt-get install qttools5-dev-tools
+	sudo apt install libfreetype6-dev libjpeg8-dev libsdl1.2-dev libopenjp2-7 libtiff5 -y
+	sudo apt install libsdl-dev libportmidi-dev libsdl-ttf2.0-dev libsdl-mixer1.2-dev libsdl-image1.2-dev -y
+	### sudo pip3 install --upgrade ssd1306
+	sudo pip3 install --upgrade luma.oled
+
+14. For I2C
+
+	Raspbian:
+		Enable I2C in raspi-config
+		sudo nano/boot/config, add these lines, save and exit
+			dtparam=i2c_arm_baudrate=10000
+			core_freq=250
+		reboot
+		sudo apt install i2c-tools
+		i2detect 1         --- Note: could be 1 or 0
+			--- should run without errors
+
+	Ubuntu:
+		sudo apt install i2c-tools
+		sudo usermod -a -G i2c  pi
+		sudo chmod 666 /dev/i2c-1   --- Note: i2c-1 could be i2c-0 depending on you system
+		i2detect -y 1         --- Note: could be 1 or 0
+			--- should
+			 run without errors
+
+15.	Install handy app that displays info about your computer:
+
+	sudo apt install hardinfo
+
+16. Setup logging for mqtt-lcp apps
+
+	sudo mkdir /var/log/mqtt-lcp
+	sudo chmod 755 /var/log/mqtt-lcp
+	sudo chown pi /var/log/mqtt-lcp
+	sudo chgrp pi /var/log/mqtt-lcp
+	sudo nano /etc/logrotate.d/mqtt-lcp
+	... add  the following, save and exit
+		/var/log/mqtt-lcp/*.log {
+			rotate 7
+			daily
+			compress
+			size 100k
+			nocreate
+			missingok
+		}
+
+	touch /var/log/mqtt-lcp/test.log
+	logrotate -d /etc/logrotate.d/mqtt-lcp
+
+	--  should run without error...
+
+
+17. Setup supervisor application. This program allows a reboot or clean shutdown of the computer:
+
+	mkdir /home/pi/mqtt-lcp
+	Using FTP upload copy the following from your dev / server computer to the new computer:
+		mqtt-lcp/lib
+		mqtt-lcp/mqtt-supervisor
+	cd /home/pi/mqtt-lcp/mqtt-supervisor
+	nano config.json
+		... Change node name to make it unique.
+		... If you computer name is “mqtt-node1”, suggest node name be “mqtt-node1-supervisor”
+			(limit name to 20 characters)
+		On Raspbian, use "sudo halt", and "sudo reboot" as the shutdown/reboot commands
+		On Ubuntu use "sudo shutdown -h now" and "shutdown -r now" as the commands.
+		... Note: JSON is very fuzzy with syntax.  It is helpful to check JSON files after you
+		... edit them.  Doing a copy/paste of a JSON file into an online JSON validator is helpful.
+
+	Setup shutdown app to start at boot.
+		sudo nano /etc/crontab
+	Append to end of file, save and exit:
+
+		@reboot pi cd /home/pi/mqtt-lcp/mqtt-supervisor && python3 main.py &
+
+	Reboot
+	After computer reboots
+	ps aux | grep python3
+		... you should see an entry for pytho3 main.py
+	ls -al /var/log/mqtt-lcp
+		... you should see mqtt-supervisor.log
+	Test supervisor by doing mqtt-shutdown on another computer. Your new computer will shutdown within a minute.
+
+
+18. At this point I make a backup copy of the new computer sdcard or emmc.
+	Instructions avail on web.
+
+	On ubuntu I use:
+		sudo dd bs=4M if=/dev/mmcblk0 of=backup_sdcard.img
+
+
+
+19. To setup a new computer clone the sdcar backup. I use Ethcer.
+	If you used a static IP address, assign a new one:
+
+	Raspbian:
+		sudo nano /etc/dhcpcd
+
+	Ubuntu Desktop (C4):
+		Use Control Center
+
+	Ubuntu Server (PI4)
+		sudo nano /etc/netplan/50-cloud-init.yaml
+
+	Change computer name:
+
+	Raspbian:
+		use raspi-config
+
+	Ubuntu:
+		sudo nano /etc/hostname
+
+
+
+
+###############################3
+
+ For SparkFun QWIIC
+
+pip3 install sparkfun-qwiic-i2c
+pip3 install sparkfun-qwiic-ccs811
+pip3 install sparkfun-qwiic-bme280
+pip3 install sparkfun-qwiic-proximity
+pip3 install sparkfun_qwiic_micro_oled
+pip3 install sparkfun-qwiic
+
+
+
+
