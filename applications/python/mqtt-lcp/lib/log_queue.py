@@ -54,6 +54,7 @@ class LogQueue:
         return level, message
 
     def convert_log_level(self, log_level_string):
+        """ convert log level """
         level_code = Global.LOG_LEVEL_DEBUG
         level_string_upper = log_level_string.upper()
         if level_string_upper == "CRITICAL":
@@ -74,4 +75,5 @@ class LogQueue:
             log_level_code = log_level
         else:
             log_level_code = self.convert_log_level(log_level)
-        self.queue.put({"level":log_level_code, "message": message})
+        if not self.queue.full():
+            self.queue.put({"level":log_level_code, "message": message})

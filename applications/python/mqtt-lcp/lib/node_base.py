@@ -68,7 +68,7 @@ class NodeBase():
         self.log_file = None
         self.log_level = None
         self.logger = None
-        self.display_queue =  None
+        self.display_queue = None
         self.node_name = None
         self.netservices = None
         self.global_data = {}
@@ -82,15 +82,20 @@ class NodeBase():
             assert (self.config is not None), "Error: config.json!"
         if sys.platform.startswith("esp32_LoBo"):
             self.lcd = GO.lcd
+        self.parse_display_config_data()
 
     def initialize_threads(self):
         """ init threads """
         # see if we hve a display configured
         self.node_name = self.config[Global.CONFIG][Global.NODE][Global.NAME]
-        self.parse_display_config_data()
+        # self.parse_display_config_data()
         self.start_logging()
         if sys.platform.startswith("esp32"):
             self.initialize_network()
+
+    def shutdown_threads(self):
+        """ shutdown threads """
+        pass
 
     def start_logging(self):
         """ use a queue of log messages for threaded routines """
@@ -104,11 +109,12 @@ class NodeBase():
             if Global.LEVEL in self.config[Global.CONFIG][Global.LOGGER]:
                 self.log_level = self.config[Global.CONFIG][Global.LOGGER][Global.LEVEL]
             if sys.platform.startswith("esp32_LoBo"):
-                self.logger = Logger(self.lcd, self.node_name, log_level=self.log_level,
+                self.logger = Logger(self.lcd, self.node_name,
+                        log_level=self.log_level,
                         log_file_name=self.log_file)
                 self.logger.set_colors(self.lcd.WHITE, self.lcd.BLACK, self.lcd.RED)
             else:
-                print(str(self.log_file))
+                # print(str(self.log_file))
                 self.logger = Logger(self.node_name,
                         log_file_name=self.log_file,
                         log_level=self.log_level)
@@ -117,6 +123,7 @@ class NodeBase():
 
     def parse_display_config_data(self):
         """ Parse out display I2C items from config json data to see if a display is defined """
+        # print("^^^ parse display")
         if sys.platform.startswith("esp32_LoBo"):
             # self.display = DisplayGo()
             pass
@@ -126,7 +133,9 @@ class NodeBase():
                 for i2c_node in config_data:
                     if Global.DEVICE_TYPE in i2c_node:
                         dev_type = i2c_node[Global.DEVICE_TYPE]
+                        # print("^^^ device: "+str(dev_type))
                         if dev_type == Global.DISPLAY:
+                            # print("^^^ Found Display")
                             self.display_queue = DisplayQueue()
                         elif dev_type == Global.MUX:
                             # check devices on mux
@@ -165,17 +174,17 @@ class NodeBase():
         """ set dst time """
         year = time.localtime()[0] #get current year
         # print(year)
-        HHMarch = time.mktime((year,3 ,(14-(int(5*year/4+1))%7),1,0,0,0,0,0)) #Time of March change to DST
-        HHNovember = time.mktime((year,10,(7-(int(5*year/4+1))%7),1,0,0,0,0,0)) #Time of November change to EST
+        HHMarch = time.mktime((year, 3, (14-(int(5*year/4+1))%7), 1, 0, 0, 0, 0, 0)) #Time of March change to DST
+        HHNovember = time.mktime((year, 10, (7-(int(5*year/4+1))%7), 1, 0, 0, 0, 0, 0)) #Time of November change to EST
         # print(HHNovember)
-        now=time.time()
-        if now < HHMarch : # we are before last sunday of march
-            dst=time.localtime(now-18000) # EST: UTC-5H
-        elif now < HHNovember : # we are before last sunday of october
-            dst=time.localtime(now-14400) # DST: UTC-4H
+        now = time.time()
+        if now < HHMarch: # we are before last sunday of march
+            dst = time.localtime(now-18000) # EST: UTC-5H
+        elif now < HHNovember: # we are before last sunday of october
+            dst = time.localtime(now-14400) # DST: UTC-4H
         else: # we are after last sunday of october
-            dst=time.localtime(now-18000) # EST: UTC-5H
-        return(dst)
+            dst = time.localtime(now-18000) # EST: UTC-5H
+        return dst
 
     def daylight(self, now, offset):
         """ daylight time """
@@ -194,7 +203,7 @@ class NodeBase():
             nows -= 86400
         nowsMar = nows
         # saving is used between dates
-        if (now > nowsMar) and (now < nowsOct):
+        if nowsMar < now < nowsOct:
             now += (3600 * offset)
         return now
 
@@ -209,4 +218,3 @@ class NodeBase():
         else:
             now_sec = time.mktime(time.localtime())
         return now_sec
-

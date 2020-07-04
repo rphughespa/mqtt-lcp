@@ -35,7 +35,7 @@ else:
 
 from node_base import NodeBase
 from mqtt_client_thread import MqttClientThread
-from mqtt_parsed_message_data import MqttParsedMessageData
+from io_data import IoData
 
 from global_constants import Global
 
@@ -64,7 +64,9 @@ class NodeBaseMqtt(NodeBase):
         self.reboot_command = "sudo reboot"
         self.last_ping_seconds = 0
         self.ping_interval = 15
+        self.delay = 0
         self.global_data = {}
+        self.alt_mqtt_client_name = None
         self.mqtt_in_queue = Queue(100)
         self.mqtt_out_queue = Queue(100)
 
@@ -145,9 +147,10 @@ class NodeBaseMqtt(NodeBase):
                         pub_topics = self.config[Global.CONFIG][Global.IO][Global.MQTT][Global.PUB_TOPICS]
                         for topic in pub_topics:
                             topic_topic_config = topic[Global.TOPIC]
+                            topic_key = topic[Global.ID]
                             topic_topic = topic_topic_config.replace("**"+Global.NODE+"**", self.node_name)
-                            self.log_queue.add_message("info", Global.PUBLISH+": "+ topic_topic)
-                            self.publish_topics[topic[Global.ID]] = topic_topic
+                            self.log_queue.add_message("info", Global.PUBLISH+": "+topic_key+", "+topic_topic)
+                            self.publish_topics[topic_key] = topic_topic
                         if Global.PING in  self.publish_topics:
                             self.topic_ping_pub = self.publish_topics[Global.PING]
                         if Global.SENSOR in self.publish_topics:
@@ -161,38 +164,37 @@ class NodeBaseMqtt(NodeBase):
                             self.log_queue.add_message("debug", Global.OTHER_TOPICS+": "+ topic_topic)
                             self.other_topics[topic[Global.ID]] = topic_topic
 
-    def received_from_mqtt(self, message_topic, message_body_dict):
+    def received_from_mqtt(self, message_topic, io_data):
         """ call back to process received subsctibed messages. override in derived class"""
         pass
 
-    def backup_config_data(self, parsed_data):
+    def backup_config_data(self, io_data):
         """ publish back (config data) out as data """
         now_seconds = self.now_seconds()
         session_id = 'dt:'+str(int(now_seconds))
         state_message = self.format_state_body(self.node_name, Global.BACKUP,
                 session_id, Global.BACKUP, None, metadata=self.config)
-        self.send_to_mqtt(parsed_data.res_topic, state_message)
+        self.send_to_mqtt(io_data.mqtt_resp_topic, state_message)
         self.log_queue.add_message("info", Global.PUBLISH+": "+Global.BACKUP)
         self.write_log_messages()
 
-    def process_common_broadcasts(self, _message_topic, message_body_dict):
+    def process_common_broadcasts(self, _message_topic, io_data):
         """ process some common broadcast eg: shutdown, reboot, backup """
         consume_message = False
         # if True, message is consumed at this level and not forwarded
-        parsed_body = MqttParsedMessageData(message_body_dict)
-        if parsed_body.message_root == Global.COMMAND:
-            if parsed_body.desired == Global.BACKUP:
+        if io_data.mqtt_message_root == Global.COMMAND:
+            if io_data.mqtt_desired == Global.BACKUP:
                 consume_message = True
                 self.log_queue.add_message("critical",
                     Global.MSG_BACKUP_RECEIVED)
-                self.backup_config_data(parsed_body)
-            if parsed_body.desired == Global.SHUTDOWN:
+                self.backup_config_data(io_data)
+            if io_data.mqtt_desired == Global.SHUTDOWN:
                 consume_message = True
                 self.log_queue.add_message("critical",
                     Global.MSG_SHUTDOWN_RECEIVED)
                 self.shutdown_app = True
                 self.powerdown_computer = True
-            if parsed_body.desired == Global.REBOOT:
+            if io_data.mqtt_desired == Global.REBOOT:
                 consume_message = True
                 self.log_queue.add_message("critical",
                     Global.MSG_REBOOT_RECEIVED)
@@ -209,17 +211,23 @@ class NodeBaseMqtt(NodeBase):
             message_body_dict = {}
             next_message = self.get_incomming_mqtt_message_from_queue()
             if next_message is not None:
+                body = next_message['body']
+                topic = next_message['topic']
                 try:
-                    message_body_dict = json.loads(next_message['body'])
-                    topic = next_message['topic']
+                    message_body_dict = json.loads(body)
                 except Exception as _exc:
                     message_body_dict = {}
+                    self.log_queue.add_message("error", Global.MSG_ERROR_JSON_PARSE+" "+body)
+                    self.write_log_messages()
                 consume_message = False
-                if ((topic == self.topic_broadcast_subscribed) or
-                    (topic.startswith(self.topic_self_subscribed))):
-                    consume_message = self.process_common_broadcasts(topic, message_body_dict)
+                io_data = IoData()
+                io_data.parse_mqtt_mesage_body(message_body_dict)
+                if ((topic is not None) and
+                        (topic == self.topic_broadcast_subscribed) or
+                        (topic.startswith(self.topic_self_subscribed))):
+                    consume_message = self.process_common_broadcasts(topic, io_data)
                 if not consume_message:
-                    self.received_from_mqtt(next_message['topic'], message_body_dict)
+                    self.received_from_mqtt(topic, io_data)
 
     def publish_ping_broadcast(self):
         """ Publish a ping message to mqtt"""
@@ -238,13 +246,13 @@ class NodeBaseMqtt(NodeBase):
         """ placeholder for method in derived call"""
         return(None, None)
 
-    def publish_error_reponse(self, error_message, _message_topic, message_body_dict):
+    def publish_error_reponse(self, error_message, _message_topic, io_data):
         """ respond with an error message """
-        parsed_body = MqttParsedMessageData(message_body_dict)
-        message = self.format_state_body(self.node_name, parsed_body.message_root,
-                        parsed_body.session_id, Global.ERROR, parsed_body.desired,
+        message = self.format_state_body(self.node_name, io_data.mqtt_message_root,
+                        io_data.mqtt_session_id, Global.ERROR, io_data.mqtt_desired,
                         metadata={Global.ERROR : error_message})
-        self.send_to_mqtt(parsed_body.res_topic, message)
+        if io_data.mqtt_resp_topic is not None:
+            self.send_to_mqtt(io_data.mqtt_resp_topic, message)
         self.log_queue.add_message("warn", error_message)
         self.write_log_messages()
 
@@ -290,15 +298,15 @@ class NodeBaseMqtt(NodeBase):
             message = self.mqtt_in_queue.get()
         return message
 
-    def initialize_threads(self, alt_mqtt_client_name=None):
+    def initialize_threads(self):
         """ initialize all IO threads"""
         super().initialize_threads()
         if Global.IO in self.config[Global.CONFIG]:
             io_config = self.config[Global.CONFIG][Global.IO]
             if "mqtt" in io_config:
                 client_name = self.node_name
-                if alt_mqtt_client_name is not None:
-                    client_name = alt_mqtt_client_name
+                if self.alt_mqtt_client_name is not None:
+                    client_name = self.alt_mqtt_client_name
                 self.start_mqtt(client_name)
                 if self.mqtt_client is not None:
                     self.parse_mqtt_subscriptions()
@@ -327,3 +335,4 @@ class NodeBaseMqtt(NodeBase):
         if self.mqtt_client is not None:
             # print("shutdown mqtt")
             self.mqtt_client.shutdown()
+        super().shutdown_threads()

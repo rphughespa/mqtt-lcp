@@ -157,6 +157,8 @@ class Warrants():
         self.items = {}
         self.file_path = file_path
         self.log_queue = log_queue
+        self.name = ""
+        self.description = ""
         self.load_data(self.file_path)
 
     def load(self, dash_dict):

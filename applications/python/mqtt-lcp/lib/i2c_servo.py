@@ -37,20 +37,29 @@ if sys.platform.startswith("esp32"):
     from queue_esp32 import Queue
 else:
     from queue_py import Queue
+from global_constants import Global
 
-class I2cServo():
+from io_data import IoData
+from i2c_device import I2cDevice
+
+class I2cServo(I2cDevice):
     """ Class for an I2C connected servo device"""
 
-    def __init__(self, i2c_io_data, center_degrees=None, throw_degrees=None, close_degrees=None):
+    def __init__(self, log_queue, i2c_address, mqtt_port=None, mqtt_type=None, input_queue=None,
+                    i2c_device_type=Global.SERVO, i2c_bus_number=1, mqtt_send_sensor_msg=False,
+                    i2c_mux=None, i2c_sub_address=None):
         """ initialize """
-        self.i2c_io_data = i2c_io_data
-        self.center_degrees = center_degrees
-        self.throw_degrees = throw_degrees
-        self.close_degrees = close_degrees
-        self.desired_degrees = None
-        self.current_degrees = None
-        self.move_degrees = None
-        self.max_moves = None
+        super().__init__(log_queue, i2c_address, input_queue=input_queue,
+                         i2c_device_type=i2c_device_type, i2c_bus_number=i2c_bus_number,
+                         mqtt_port=mqtt_port, mqtt_type=mqtt_type, mqtt_send_sensor_msg=mqtt_send_sensor_msg,
+                         i2c_mux=i2c_mux, i2c_sub_address=i2c_sub_address)
+        self.mode = "input"
+        self.last_value = 0
+        self.init_device()
+        self.center_degrees = 45
+        self.throw_degrees = 89
+        self.close_degrees = 0
+
 
     def read_input(self):
         """ Read input from servo device"""
@@ -59,3 +68,7 @@ class I2cServo():
     def write_output(self, message):
         """ process servo movement message """
         pass
+
+    def add_to_out_queue(self, io_data):
+        if self.i2c_mux is not None:
+            self.i2c_mux.write_output(self, io_data)

@@ -1,32 +1,35 @@
 {
   "config": {
-    "servo": {
-      "ports": [
-        {
-          "port" : 0,
-          "center" : 45,
-          "close" : 0,
-          "throw" : 89
-        },
-        {
-          "port" : 1,
-          "center" : 45,
-          "close" : 0,
-          "throw" : 89
-        },
-        {
-          "port" : 2,
-          "center" : 45,
-          "close" : 0,
-          "throw" : 89
-        },
-        {
-          "port" : 3,
-          "center" : 45,
-          "close" : 0,
-          "throw" : 89
-        }
-      ]
-    }
+    "servos": [
+      {
+        "address" : "0x40",
+        "ports": [
+          {
+            "sub-address" : 0,
+            "center" : 45,
+            "close" : 0,
+            "throw" : 89
+          },
+          {
+            "sub-address" : 1,
+            "center" : 45,
+            "close" : 30,
+            "throw" : 60
+          },
+          {
+            "sub-address" : 2,
+            "center" : 45,
+            "close" : 35,
+            "throw" : 55
+          },
+          {
+            "sub-address" : 3,
+            "center" : 45,
+            "close" : 40,
+            "throw" : 50
+          }
+        ]
+      }
+    ]
   }
 }

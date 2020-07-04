@@ -39,42 +39,49 @@
       },
       "i2c" : [
         {
-          "address": "0x3C",
-          "bus": 1,
-          "device-type": "display",
-          "display-type": "ssd1306",
-          "display-size" : "128x64"
-        },
-        {
           "address" : "0x40",
           "bus" : 1,
-          "device-type" : "servo-hat",
+          "device-type" : "mux",
+          "mux-type" : "servo-hat",
           "ports": [
             {
               "sub-address" : 0,
               "device-type" : "servo",
               "mqtt-port" : "siding-north-east",
-              "mqtt-type" : "sensor"
+              "mqtt-type" : "switch",
+              "mqtt-sensor" : "true"
             },
             {
               "sub-address" : 1,
               "device-type" : "servo",
               "mqtt-port" : "siding-north-west",
-              "mqtt-type" : "sensor"
+              "mqtt-type" : "switch",
+              "mqtt-sensor" : "true"
             },
             {
               "sub-address" : 2,
               "device-type" : "servo",
               "mqtt-port" : "siding-south-east",
-              "mqtt-type" : "sensor"
+              "mqtt-type" : "switch",
+              "mqtt-sensor" : "true"
             },
             {
               "sub-address" : 3,
               "device-type" : "servo",
               "mqtt-port" : "siding-south-west",
-              "mqtt-type" : "sensor"
+              "mqtt-type" : "switch",
+              "mqtt-sensor" : "true"
             }
           ]
+        },
+        {
+          "address": "0x3C",
+          "bus": 1,
+          "device-type": "display",
+          "xx-display-type": "ssd1306",
+          "xx-display-size" : "128x64",
+          "display-type": "ssd1327",
+          "display-size" : "128x128"
         }
       ]
     },

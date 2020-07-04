@@ -42,10 +42,10 @@ from i2c_device import I2cDevice
 class I2cMux(I2cDevice):
     """ Class to define and manipulate a mux device on an I2C bus"""
 
-    def __init__(self, log_queue, i2c_address=0x70, i2c_bus_number=1):
+    def __init__(self, log_queue, i2c_address, mux_type=None, i2c_bus_number=1):
         """ Initialize """
         super().__init__(log_queue, i2c_address,
-                         i2c_device_type="mux", i2c_bus_number=i2c_bus_number)
+                         i2c_device_type="mux", i2c_bus_number=i2c_bus_number, mux_type=mux_type)
 
     def set_bit(self, int_type, offset):
         """ Set a bit in an integer"""

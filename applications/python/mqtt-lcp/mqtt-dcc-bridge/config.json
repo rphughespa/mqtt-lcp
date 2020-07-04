@@ -1,0 +1,84 @@
+                                                                                 {
+  "config": {
+    "node": {
+      "name": "mqtt-dcc-bridge"
+    },"logger" : {
+      "file": "/var/log/mqtt-lcp/**node**.log",
+      "level": "INFO"
+    },
+    "io": {
+      "mqtt" : {
+        "broker" : "mqtt-broker.local",
+        "user" : "trains",
+        "password" : "choochoo",
+        "sub-topics" : [
+          {
+            "id" : "broadcast",
+            "topic" : "cmd/trains/node/all/req"
+          },
+          {
+            "id" : "self",
+            "topic" : "cmd/trains/node/**node**/#"
+          },
+          {
+            "id" : "track",
+            "topic" : "cmd/trains/track/**node**/#"
+          },
+          {
+            "id" : "cab",
+            "topic" : "cmd/trains/cab/**node**/#"
+          },
+          {
+            "id" : "switch",
+            "topic" : "cmd/trains/switch/**node**/#"
+          }
+        ],
+        "pub-topics" : [
+          {
+            "id" : "ping",
+            "topic" : "dt/trains/ping/**node**"
+          },
+          {
+            "id" : "sensor",
+            "topic" : "dt/trains/sensor/**node**"
+          },
+          {
+            "id" : "cab",
+            "topic" : "dt/trains/cab/**node**"
+          },
+          {
+            "id" : "backup",
+            "topic" : "dt/trains/backup/**node**"
+          }
+        ],
+        "other-topics" : [
+          {
+            "id" : "throttle-ping",
+            "topic" : "dt/trains/ping/**throttle**"
+          }
+        ]
+      },
+      "serial": {
+        "baudrate": "115200",
+        "xx-port": "/dev/ttyacm1",
+        "usb-vendor-id" : 9025,
+        "usb-product-id" : 66
+      },
+      "dcc" : [
+        {
+          "address" : 1,
+          "sub-address" : 0,
+          "device-type" : "decoder",
+          "mqtt-port" : "siding-east",
+          "mqtt-type" : "switch",
+          "mqtt-sensor" : "true"
+        }
+      ],
+      "xx-keyboard": "true"
+    },
+    "options":{
+      "ping" : 30,
+      "slots" : 32
+    }
+  }
+}

@@ -94,6 +94,13 @@ class Dashboard():
                 new_item.load(data_item)
                 self.items[new_item.node_id] = new_item
 
+    def get_timestamp(self, node_id):
+        """ get timestamp of a dashboard item """
+        timestamp = 0  # node_id not in dashboard
+        if node_id in self.items:
+            timestamp = self.items[node_id].timestamp
+        return timestamp
+
     def update(self, node_id, timestamp, state):
         """ update data """
         if node_id is not None:

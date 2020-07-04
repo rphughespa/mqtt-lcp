@@ -172,13 +172,13 @@ class Layout():
         else:
             self.description = ""
         if Global.COLS in dash_dict:
-            self.max_cols = dash_dict[Global.COLS]
+            self.col_max = dash_dict[Global.COLS]
         else:
-            self.max_cols = 0
+            self.col_max = 0
         if Global.ROWS in dash_dict:
-            self.max_rows = dash_dict[Global.ROWS]
+            self.row_max = dash_dict[Global.ROWS]
         else:
-            self.max_rows = 0
+            self.row_max = 0
         if Global.ITEMS in dash_dict:
             data_items = dash_dict[Global.ITEMS]
             for data_item in data_items:
@@ -191,8 +191,8 @@ class Layout():
         new_dict = {}
         new_dict[Global.NAME] = self.name
         new_dict[Global.DESCRIPTION] = self.description
-        new_dict[Global.COLS] = self.max_cols
-        new_dict[Global.ROWS] = self.max_rows
+        new_dict[Global.COLS] = self.col_max
+        new_dict[Global.ROWS] = self.row_max
         new_dict_items = []
         for _key, value in self.items.items():
             dict_item = value.dump()

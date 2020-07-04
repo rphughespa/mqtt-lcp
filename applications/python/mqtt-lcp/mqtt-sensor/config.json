@@ -1,7 +1,7 @@
 {
   "config": {
     "node": {
-      "name": "mqtt-sensor2"
+      "name": "mqtt-sensor"
     },
     "logger": {
       "file": "/var/log/mqtt-lcp/**node**.log",
@@ -52,7 +52,7 @@
           "bus" : 1,
           "mqtt-type": "rfid",
           "device-type": "rfid",
-          "mqtt-port": "track-5"
+          "mqtt-port": "track-0"
         },{
           "address": "0x3F",
           "bus": 1,
@@ -63,13 +63,14 @@
           "address": "0x3C",
           "bus": 1,
           "device-type": "display",
-          "display-type": "ssd1306",
-          "display-size" : "128x64"
+          "display-type": "ssd1327",
+          "display-size" : "128x128"
         },
         {
           "address" : "0x70",
           "bus" : 1,
           "device-type" : "xx-mux",
+          "mux-type" : "i2c",
           "ports": [
             {
               "sub-address" : 0,

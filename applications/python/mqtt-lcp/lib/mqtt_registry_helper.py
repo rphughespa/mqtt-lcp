@@ -51,15 +51,14 @@ class MqttRegistryHelper():
             self.parent.log_queue.add_message("error",
                     Global.REGISTRY+" "+Global.REPORT+" "+Global.TYPE+" "+Global.INVALID+": "+str(report_type))
         else:
-            # publish a ping message to mqtt
+            # publish a report request to mqtt
             now_seconds = self.parent.now_seconds()
             session_id = 'dt:'+str(int(now_seconds))
             if self.parent.topic_registry_pub is not None:
                 state_topic = self.parent.topic_registry_pub
                 state_message = self.parent.format_state_body(self.parent.node_name, Global.REGISTRY,
-                        session_id, None, Global.REPORT,
-                        response_topic=self.parent.topic_self_subscribed+"/"+Global.RES,
-                        metadata={Global.TYPE : report_type})
+                        session_id, None, {Global.REPORT:report_type},
+                        response_topic=self.parent.topic_self_subscribed+"/"+Global.RES)
                 self.parent.send_to_mqtt(state_topic, state_message)
                 #self.parent.log_queue.add_message("info",
                 #        Global.PUBLISH+": "+Global.REGISTRY+" "+Global.REPORT+" "+Global+REQUEST+": "+str(report_type))

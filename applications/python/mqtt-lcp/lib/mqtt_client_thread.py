@@ -138,6 +138,7 @@ class MqttClientThread(Thread):
         self.exit = True
         if sys.platform.startswith("esp32"):
             self.mqtt_client_thread.exit()
+        self.join()
 
     def is_connected(self):
         """ Test if connected to mqtt broker """

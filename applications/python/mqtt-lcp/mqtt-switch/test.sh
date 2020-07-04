@@ -6,53 +6,56 @@ mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
  -t 'cmd/trains/switch/harris-1/siding-north-east/req' \
  -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "throw"}}}'
 
-sleep 8
+sleep 4
 
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
   -t 'cmd/trains/switch/harris-1/siding-north-east/req' \
  -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "close"}}}'
 
-sleep 8
+sleep 4
 
 echo "test north-west"
 
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
  -t 'cmd/trains/switch/harris-1/siding-north-west/req' \
- -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "throw"}}}'
+ -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-west", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "throw"}}}'
 
-sleep 8
+sleep 4
 
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
   -t 'cmd/trains/switch/harris-1/siding-north-west/req' \
- -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "close"}}}'
+ -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-west", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "close"}}}'
 
-sleep 8
+sleep 4
 
 echo "test south-east"
 
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
  -t 'cmd/trains/switch/harris-1/siding-south-east/req' \
- -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "throw"}}}'
+ -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-south-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "throw"}}}'
 
-sleep 8
+sleep 4
 
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
   -t 'cmd/trains/switch/harris-1/siding-south-east/req' \
- -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "close"}}}'
+ -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-south-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "close"}}}'
+
+sleep 4
 
 echo "test south-west"
 
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
  -t 'cmd/trains/switch/harris-1/siding-south-west/req' \
- -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "throw"}}}'
+ -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-south-west", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "throw"}}}'
 
-sleep 8
+sleep 4
 
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
   -t 'cmd/trains/switch/harris-1/siding-south-west/req' \
- -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-north-east", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "close"}}}'
+ -m '{"switch": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "siding-south-west", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "close"}}}'
 
 echo "test report"
+
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
  -t 'cmd/trains/sensor/harris-1/siding-south-west/req' \
  -m '{"sensor": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "port-id": "track-5", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "report"}}}'
@@ -68,7 +71,7 @@ sleep 3
 test "test inventory"
 mosquitto_pub -h mqtt-broker.local -u trains -P choochoo \
  -t 'cmd/trains/node/harris-1/inventory/req' \
- -m '{"register": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": "report"}, "metadata": {"type": "inventory"}}}'
+ -m '{"registry": {"version": "1.0", "timestamp": 1577804139, "session-id": "req:1577804139", "node-id": "throttle-1", "res-topic": "cmd/trains/throttle/throttle1/res", "state": {"desired": {"report":"inventory"}}}}'
 
 sleep 3
 

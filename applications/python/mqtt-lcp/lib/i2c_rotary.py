@@ -36,7 +36,7 @@ elif sys.platform.startswith("esp32"):
 else:
     from smbus2 import SMBus
 
-from i2c_io_data import I2cIoData
+from io_data import IoData
 from i2c_device import I2cDevice
 from sparkfun_qwiictwist_smbus import Sparkfun_QwiicTwist
 
@@ -45,11 +45,12 @@ from global_constants import Global
 class I2cRotary(I2cDevice):
     """ Class for an I2C connected Rotary device"""
 
-    def __init__(self, log_queue, input_queue, i2c_address, mqtt_port=None, mqtt_type=None, itype="rotary", i2c_bus_number=1,
+    def __init__(self, log_queue, i2c_address, input_queue=None,
+                mqtt_port=None, mqtt_type=None, i2c_device_type="rotary", i2c_bus_number=1,
                  i2c_mux=None, i2c_sub_address=None):
         """ Initialize """
         super().__init__(log_queue, i2c_address, input_queue=input_queue,
-                         i2c_device_type=itype, i2c_bus_number=i2c_bus_number,
+                         i2c_device_type=i2c_device_type, i2c_bus_number=i2c_bus_number,
                          i2c_mux=i2c_mux, i2c_sub_address=i2c_sub_address)
         self.mode = "input"
         self.mqtt_port = mqtt_port
@@ -76,7 +77,7 @@ class I2cRotary(I2cDevice):
             self.i2c_mux.enable_mux_port(self.i2c_sub_address)
         value, pressed = self.read_i2c_rotary_value()
         if value is not None and value != self.last_value:
-            return_data = I2cIoData()
+            return_data = IoData()
             return_data.i2c_type = "rotary"
             return_data.device_type = "rotary"
             return_data.mqtt_port = self.mqtt_port
@@ -86,11 +87,12 @@ class I2cRotary(I2cDevice):
             self.input_queue.put(return_data)
             self.last_value = value
         if pressed:
-            return_data = I2cIoData()
+            print("pressed")
+            return_data = IoData()
             return_data.i2c_type = "rotary"
             return_data.device_type = "rotary"
-            return_data.port = self.mqtt_port
-            return_data.type = self.mqtt_type
+            return_data.mqtt_port = self.mqtt_port
+            return_data.mqtt_type = self.mqtt_type
             return_data.reported = Global.PRESS
             self.log_queue.add_message("debug", 'Received from rotary ['
                     + str(return_data.reported) + ']')
@@ -106,17 +108,18 @@ class I2cRotary(I2cDevice):
             self.twist.count = 0
             count = 0
         elif count > 128:
-            self.set_twist_color(self.twist, count)  # fix bug where knob color change above 128
+            # self.set_twist_color(self.twist, count)  # fix bug where knob color change above 128
             self.twist.count = 128
             count = 128
         if count != self.last_value:
             self.set_twist_color(self.twist, count)
-        if self.twist.pressed:
-            pressed = True
-            self.log_queue.add_message("debug", "Read i2c: "+str(self.i2c_address)+" .. pressed ..")
+        #if self.twist.pressed:
+        #    pressed = True
+        #    self.log_queue.add_message("debug", "Read i2c: "+str(self.i2c_address)+" .. pressed ..")
         return count, pressed
 
     def gradulated_color(self, percent, start, end):
+        """ calc a gradualtes color between start. end) """
         if start == end:
             color = end
         else:

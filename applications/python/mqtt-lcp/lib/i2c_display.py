@@ -3,6 +3,9 @@
 """
 
 i2c_display.py - helper class to process i2c display devices
+        It support two SSD type I2C connected displays:
+            ssd1306 : 128x64
+            ssd1327 : 128x128
 
     supports ssd1306 oled displays
 
@@ -55,6 +58,8 @@ class I2cDisplay(I2cDevice):
         # print("Display: "+str(self.display_type)+", "+str(self.i2c_address))
         if self.display_type == "ssd1306":
             self.display = Display(self.i2c_bus_number, self.i2c_address, self.display_size)
+        elif self.display_type == "ssd1327":
+            self.display = Display(self.i2c_bus_number, self.i2c_address, self.display_size)
         # print("display: "+str(self.i2c_bus_number)+", "+str(self.i2c_address))
         self.display.clear()
         self.display.splash(title="Ready")
@@ -83,9 +88,7 @@ class I2cDisplay(I2cDevice):
 
     def write_log_message(self, level, message):
         """ write log message """
-
         # print("Display Log: ...  "+str(self.log_level)+".."+level+" : "+message)
-        # self.display.scroll_message(message)
         if level >= self.log_level:
             self.display.scroll_message(message)
 
@@ -96,7 +99,6 @@ class I2cDisplay(I2cDevice):
             level, message = display_queue.get()
             if message is not None:
                 self.write_log_message(level, message)
-
 
     def write_log_messages(self, display_queue):
         """ write multiple log messages to output """

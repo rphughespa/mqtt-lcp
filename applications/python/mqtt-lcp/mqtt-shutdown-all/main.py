@@ -3,7 +3,7 @@
 # main.py for mqtt-shutdown-all
 """
 
-mqtt-shutdwon-all - send a message to all nodes to shutdown.  Applicaion node Apps do a clean exit. 
+mqtt-shutdwon-all - send a message to all nodes to shutdown.  Applicaion node Apps do a clean exit.
         The "mqtt-supervisor" node app actually does an operating system shutdown.
 
 Note: on PI's, only Raspbian is stopped, the power is not actully turned off.

@@ -35,35 +35,35 @@ else:
     from smbus2 import SMBus
 
 # import time
+from global_constants import Global
 
-from i2c_io_data import I2cIoData
+from io_data import IoData
 from i2c_device import I2cDevice
 
 class I2cRfid(I2cDevice):
     """ Class for an I2C connected RFID device"""
 
-    def __init__(self, log_queue, input_queue, i2c_address, mqtt_port=None, mqtt_type=None,
-                    itype="rfid", i2c_bus_number=1,
+    def __init__(self, log_queue, i2c_address, input_queue=None, mqtt_port=None, mqtt_type=None,
+                    i2c_device_type=Global.RFID, i2c_bus_number=1,
                     i2c_mux=None, i2c_sub_address=None):
         """ Initialize """
         super().__init__(log_queue, i2c_address, input_queue=input_queue,
-                         i2c_device_type=itype, i2c_bus_number=i2c_bus_number,
+                         i2c_device_type=i2c_device_type, i2c_bus_number=i2c_bus_number,
+                         mqtt_port=mqtt_port, mqtt_type=mqtt_type,
                          i2c_mux=i2c_mux, i2c_sub_address=i2c_sub_address)
-        self.mode = "input"
-        self.mqtt_port = mqtt_port
-        self.mqtt_type = mqtt_type
-        self.sub_address = i2c_sub_address
+        self.init_device()
+
 
     def read_input(self):
         """ Read input from RFID device"""
         #read rfid tag from reader
         #self.log_queue.add_message("info", 'Read rfid from: ' + str(self.i2c_address))
         if self.i2c_mux is not None:
-            #print("Enable MUX: "_str(self.i2c_mux_port))
-            self.i2c_mux.enable_mux_port(self.sub_address)
+            # print("Enable MUX: "+str(self.i2c_sub_address))
+            self.i2c_mux.enable_mux_port(self.i2c_sub_address)
         tag = self.read_i2c_rfid_tag()
         if tag is not None:
-            return_data = I2cIoData()
+            return_data = IoData()
             return_data.i2c_type = "rfid"
             return_data.mqtt_type = "rfid"
             return_data.mqtt_port = self.mqtt_port
@@ -71,7 +71,8 @@ class I2cRfid(I2cDevice):
             self.log_queue.add_message("debug", 'Received from rfid [' + str(return_data.reported) + ']')
             self.input_queue.put(return_data)
         if self.i2c_mux is not None:
-            self.i2c_mux.disable_mux_port(self.sub_address)
+            # print("Disable MUX: "+str(self.i2c_sub_address))
+            self.i2c_mux.disable_mux_port(self.i2c_sub_address)
 
     def read_i2c_rfid_tag(self):
         """ Read a tag"""
@@ -108,9 +109,8 @@ class I2cRfid(I2cDevice):
             tag_id = tag_complete[:12]
             self.log_queue.add_message("debug", "RFID Tag Read stripped: "+str(tag_id))
             # randon get "8" set.  Remove them
-            tag_id = tag_id.replace("8","0")
+            tag_id = tag_id.replace("8", "0")
             # a tag of all zeros means no tag read
-            if ((tag_id == "000000000000") or
-                    (tag_id == "7fffffffffff")):  # no tag read
+            if tag_id in ("000000000000", "7fffffffffff"):  # no tag read
                 tag_id = None
         return tag_id

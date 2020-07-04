@@ -27,7 +27,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 
 """
-class Local(object):
+class Local():
+    """ local constants """
 
     MSG_SHUTDOWN_PUBLISHED = "Shutdown broadcast published ..."
     MSG_WAIT = "Wait one minute for all nodes to shutdown ..."

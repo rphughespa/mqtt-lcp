@@ -42,7 +42,7 @@ from i2c_client import I2cClientReaderWriter
 class I2cClientThread(Thread):
     """ Runs two separate I2C reader and writer threads"""
 
-    def __init__(self, log_queue, devices, in_queue, out_queue, display_queue, thread_name, i2c_config):
+    def __init__(self, log_queue, devices, mqtt_devices, in_queue, out_queue, display_queue, thread_name, i2c_config):
         """ Initialize"""
         Thread.__init__(self)
         self.thread_name = thread_name
@@ -54,7 +54,7 @@ class I2cClientThread(Thread):
         self.log_queue = log_queue
         self.display_queue = display_queue
         # print("start i2c client")
-        self.i2c_reader_writer = I2cClientReaderWriter(self.log_queue, devices,
+        self.i2c_reader_writer = I2cClientReaderWriter(self.log_queue, devices, mqtt_devices,
                 self.i2c_in_queue, self.i2c_out_queue, self.display_queue)
         self.exit = False
 
@@ -93,6 +93,7 @@ class I2cClientThread(Thread):
             pass
 
     def check_msg(self):
+        """ check for a message """
         if sys.platform.startswith("esp32_LoBo"):
             self.button_reader.check_buttons()
             self.i2c_reader_writer.process_devices()
@@ -118,4 +119,3 @@ class I2cClientThread(Thread):
             # self.console_thread.join()
             #self.i2c_reader_writer.join()
             self.join()
-

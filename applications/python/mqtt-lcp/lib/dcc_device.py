@@ -1,8 +1,9 @@
-# i2c_io_data.py
+# dcc_device.py
 
 """
 
-    I2cIoData - class that is used when passing i2c io data between modules
+    DccDevice - base class for DCC decoder devices
+
 
 The MIT License (MIT)
 
@@ -25,20 +26,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 
-class I2cIoData():
-    """ Data structure used to store i2c device data """
+from queue_py import Queue
 
-    def __init__(self):
-        """ Initialize """
-        self.i2c_type = None
-        self.address = None
-        self.sub_address = None
-        self.mqtt_port = None
-        self.mqtt_type = None
-        self.desired = None
-        self.reported = None
-        self.res_topic = None
-        self.dt_topic = None
-        self.res_session_id = None
-        self.device_type = None
-        self.timestamp = None
+class DccDevice():
+    """ Base class for DCC device classes"""
+
+    def __init__(self, log_queue, dcc_address,
+                 mqtt_port=None, mqtt_type=None, mqtt_send_sensor_msg=False,
+                 dcc_sub_address=None,
+                 dcc_device_type=None):
+        self.log_queue = log_queue
+        self.dcc_address = dcc_address
+        self.dcc_sub_address = dcc_sub_address
+        self.mode = None
+        self.mqtt_port = mqtt_port
+        self.mqtt_type = mqtt_type
+        self.mqtt_send_sensor_msg = mqtt_send_sensor_msg  # send sensor message along with response for switch
+        self.dcc_device_type = dcc_device_type
+        self.log_queue.add_message("info", "I2C Device: "+self.dcc_device_type+". "+str(self.dcc_address))
+
+    def init_device(self):
+        """ Initialize the device"""
+        pass
+
+    def read_input(self):
+        """ read input from device"""
+        pass
+
+    def add_to_out_queue(self, io_data):
+        """ override in derived class"""
+        pass

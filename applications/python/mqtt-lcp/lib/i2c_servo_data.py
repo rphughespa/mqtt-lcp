@@ -1,12 +1,10 @@
-#local_Local.py
+# i2c_servo_data.py
 
 """
 
-    local_constants.py - Constants used in mqtt messaging.
-            To implement mqtt messaging in a language other than english, edit this file
-            and the appropiate config.json files.
+    I2cServoData - class that is used when moving a servo
 
-the MIT License (MIT)
+The MIT License (MIT)
 
 Copyright © 2020 richard p hughes
 
@@ -25,12 +23,14 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FO
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-
 """
 
-class Local():
-    """ local constants """
-    MSG_NEW_SWITCH = "new turnout req received: "
-    MSG_ERROR_BAD_STATE = "error: desired state is not valid: "
-    MSG_ERROR_SERVO_NOT_KNOWN = "error: requested servo name not known: "
-    MSG_ERROR_SERVO_MOVE = "error: servo movement failed: "
+class I2cServoData():
+    """ Data structure used to move I2C servo device """
+
+    def __init__(self):
+        """ Initialize """
+        self.desired_degrees = 0
+        self.current_degrees = 0
+        self.move_degrees = 0
+        self.max_moves = 0

@@ -54,6 +54,10 @@
           {
             "id": "dashboard",
             "topic": "dt/trains/registry/**node**/dashboard"
+          },
+          {
+            "id" : "node",
+            "topic" : "cmd/trains/node"
           }
         ]
       }

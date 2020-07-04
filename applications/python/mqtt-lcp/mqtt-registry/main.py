@@ -57,7 +57,7 @@ from global_constants import Global
 from local_constants import Local
 
 from node_base_mqtt import NodeBaseMqtt
-from mqtt_parsed_message_data import MqttParsedMessageData
+from io_data import IoData
 
 from roster import Roster
 from switches import Switches
@@ -91,6 +91,9 @@ class MqttRegistry(NodeBaseMqtt):
         self.sensors = None
         self.last_fasttime_seconds = 0
         self.topic_ping_sub = None
+        self.topic_sensor_sub = None
+        self.topic_backup_sub = None
+        self.topic_node_pub = None
         self.dashboard_interval = 30
         self.last_dashboard_seconds = 0
         self.backup_path = None
@@ -101,6 +104,7 @@ class MqttRegistry(NodeBaseMqtt):
         self.dashboard_interval = int(self.ping_interval * 2)
         self.topic_fastclock_pub = self.publish_topics[Global.FASTCLOCK]
         self.topic_dashboard_pub = self.publish_topics[Global.DASHBOARD]
+        self.topic_node_pub = self.publish_topics[Global.NODE]
         self.topic_ping_sub = self.subscribed_topics[Global.PING]
         # print("!!! ping sub: "+self.topic_ping_sub)
         self.topic_sensor_sub = self.subscribed_topics[Global.SENSOR]
@@ -126,6 +130,18 @@ class MqttRegistry(NodeBaseMqtt):
         self.dashboard = Dashboard(self.log_queue, file_path=Global.DATA+"/"+Global.DASHBOARD+".json")
         self.sensors = Sensors(self.log_queue, file_path=Global.DATA+"/"+Global.SENSORS+".json")
 
+    def publish_inventory_request(self, io_data):
+        """ request inventory from a none """
+        now_seconds = self.now_seconds()
+        session_id = 'req:'+str(int(now_seconds))
+        topic = self.topic_node_pub + "/" + io_data.mqtt_node + "/" + Global.REPORT + "/" +Global.REQ
+        new_state_message = self.format_state_body(self.node_name,
+                Global.REGISTRY, session_id, None, {Global.REPORT:Global.INVENTORY},
+                response_topic=self.topic_self_subscribed+"/"+Global.RES)
+        self.send_to_mqtt(topic, new_state_message)
+        self.log_queue.add_message("info", Global.PUBLISH+" "+Global.INVENTORY+" "+Global.REQUEST+": "+io_data.mqtt_node)
+        self.write_log_messages()
+
     def publish_dashboard(self):
         """ publish fasttimes broadcast message"""
         now_seconds = self.now_seconds()
@@ -134,7 +150,7 @@ class MqttRegistry(NodeBaseMqtt):
         session_id = Global.DT+str(int(now_seconds))
         self.last_dashboard_seconds = now_seconds
         new_message = self.format_state_body(self.node_name,
-            Global.REGISTRY, session_id, Global.REPORT, Global.REPORT,
+            Global.REGISTRY, session_id, {Global.REPORT:Global.DASHBOARD}, None,
             metadata=self.dashboard.dump())
         dashboard_topic = self.topic_dashboard_pub
         self.send_to_mqtt(dashboard_topic, new_message)
@@ -178,14 +194,13 @@ class MqttRegistry(NodeBaseMqtt):
         fast_topic = self.topic_fastclock_pub
         self.send_to_mqtt(fast_topic, fast_message)
 
-    def process_received_backup_message(self, message_topic, message_body_dict):
+    def process_received_backup_message(self, _message_topic, io_data):
         """ process backup message received, a node wants to backup its config data """
         backup_node_id = None
         backup_node_config = None
-        parsed_body = MqttParsedMessageData(message_body_dict)
-        if parsed_body.message_root == Global.BACKUP:
-            backup_node_id = parsed_body.node_id
-            backup_node_config = parsed_body.metadata
+        if io_data.mqtt_message_root == Global.BACKUP:
+            backup_node_id = io_data.mqtt_node
+            backup_node_config = io_data.mqtt_metadata
             if (backup_node_id is not None) and (backup_node_config is not None):
                 # a backup has been received, save meta config to disk
                 self.log_queue.add_message("info", Local.MSG_BACKUP_DATA_RECEIVED+" "+backup_node_id)
@@ -195,177 +210,194 @@ class MqttRegistry(NodeBaseMqtt):
                     with open(file_path, 'w') as json_file:
                         json.dump(backup_node_config, json_file)
 
-    def process_received_ping_message(self, message_topic, message_body_dict):
+    def process_received_ping_message(self, _message_topic, io_data):
         """ process ping message received"""
         #print("received ping")
         ping_node_id = None
-        parsed_body = MqttParsedMessageData(message_body_dict)
-        if parsed_body.message_root == Global.PING:
-            if parsed_body.reported == Global.PING:
+        if io_data.mqtt_message_root == Global.PING:
+            if io_data.mqtt_reported == Global.PING:
                 # a ping has been received, store it in dashboard
-                #print("ping OK!")
+                # print("ping OK!")
                 timestamp = int(self.now_seconds())
-                state=Global.RUN
-                ping_node_id = parsed_body.node_id
+                state = Global.RUN
+                ping_node_id = io_data.mqtt_node
                 if ping_node_id is not None:
+                    if ping_node_id != self.node_name:
+                        last_ping_time = self.dashboard.get_timestamp(ping_node_id)
+                        if last_ping_time == 0:   # first ping from node, get inventory
+                            self.publish_inventory_request(io_data)
                     #print("Ping from: "+ping_node_id)
                     self.log_queue.add_message("info", Local.MSG_PING_DATA_RECEIVED+": "+ping_node_id)
                     self.dashboard.update(ping_node_id, timestamp, state)
 
-    def process_received_sensor_message(self, message_topic, message_body_dict):
+    def process_received_sensor_message(self, message_topic, io_data):
         """ process sensor message received"""
         self.log_queue.add_message("debug", Global.MSG_REQUEST_MSG_RECEIVED+": "+message_topic)
-        parsed_body = MqttParsedMessageData(message_body_dict)
-        if parsed_body.message_root == Global.SENSOR:
-            reported = parsed_body.reported
+        if io_data.mqtt_message_root == Global.SENSOR:
+            reported = io_data.mqtt_reported
             # a sensor has been received, store it in dashboard
             self.log_queue.add_message("info", Global.RECEIVED+": "+Global.SENSOR)
-            node_id = parsed_body.node_id
-            port_id = parsed_body.port_id
-            stype = parsed_body.type
+            node_id = io_data.mqtt_node
+            port_id = io_data.mqtt_port
+            stype = io_data.mqtt_type
             timestamp = int(self.now_seconds())
             if (node_id is not None) and (port_id is not None):
                 self.sensors.update(node_id, port_id, reported, stype, timestamp)
 
-    def process_fastclock_request(self, _message_topic, message_body_dict):
+    def process_fastclock_request(self, message_topic, io_data):
         """ process a request to mange fastclock"""
-        self.log_queue.add_message("debug", Global.FASTCLOCK +': '+str(message_body_dict))
-        parsed_body = MqttParsedMessageData(message_body_dict)
         new_state = "unknown"
-        if parsed_body.message_root == Global.FASTCLOCK:
-            desired_state = parsed_body.desired
+        request_ok = False
+        if io_data.mqtt_message_root == Global.FASTCLOCK:
+            fastclock_value = io_data.get_desired_value_by_key(Global.FASTCLOCK)
+            desired_state = io_data.mqtt_desired
             self.log_queue.add_message("debug",
-                    Global.FASTCLOCK+': '+Global.STATE+' '+Global.REQ+' : '+desired_state)
-            if desired_state == Global.RESET:
+                    Global.FASTCLOCK+': '+Global.STATE+' '+Global.REQ+' : '+str(desired_state))
+            if fastclock_value == Global.RESET:
                 self.fast_incr = 0
                 new_state = Global.RESET
-            elif desired_state == Global.PAUSE:
+                request_ok = True
+            elif fastclock_value == Global.PAUSE:
                 self.fast_paused = True
                 new_state = Global.PAUSE
-            elif desired_state == Global.RUN:
+                request_ok = True
+            elif fastclock_value == Global.RUN:
                 self.fast_paused = False
                 new_state = Global.RUN
-            state_topic = message_body_dict[Global.FASTCLOCK][Global.RES_TOPIC]
+                request_ok = True
+        if request_ok:
+            state_topic = io_data.mqtt_resp_topic
             state_message = self.format_state_body(self.node_name, Global.FASTCLOCK,
-                    parsed_body.res_topic,
-                    new_state, desired_state)
+                    io_data.mqtt_resp_topic,
+                    {Global.FASTCLOCK:new_state}, desired_state)
             self.send_to_mqtt(state_topic, state_message)
+        else:
+            error_msg = (Global.UNKNOWN + " " +
+                    Global.FASTCLOCK + " "+ Global.STATE+" : ["+ str(io_data.mqtt_desired)+"]")
+            self.publish_error_reponse(error_msg, message_topic, io_data)
 
-    def process_roster_request(self, _message_topic, message_body_dict, parsed_body):
+
+    def process_roster_request(self, _message_topic, io_data):
         """ process request for roster report """
         new_message = self.format_state_body(self.node_name,
-            Global.REGISTRY, parsed_body.session_id, Global.REPORT, Global.REPORT,
+            Global.REGISTRY, io_data.mqtt_session_id, {Global.REPORT:Global.ROSTER}, io_data.mqtt_desired,
             metadata=self.roster.dump())
-        self.send_to_mqtt(parsed_body.res_topic, new_message)
+        self.send_to_mqtt(io_data.mqtt_resp_topic, new_message)
 
-    def process_switches_request(self, _message_topic, message_body_dict, parsed_body):
+    def process_switches_request(self, _message_topic, io_data):
         """ process request for switches report """
         new_message = self.format_state_body(self.node_name,
-            Global.REGISTRY, parsed_body.session_id, Global.REPORT, Global.REPORT,
+            Global.REGISTRY, io_data.mqtt_session_id, {Global.REPORT:Global.SWITCHES}, io_data.mqtt_desired,
             metadata=self.switches.dump())
-        self.send_to_mqtt(parsed_body.res_topic, new_message)
+        self.send_to_mqtt(io_data.mqtt_resp_topic, new_message)
 
-    def process_warrants_request(self, _message_topic, message_body_dict, parsed_body):
+    def process_warrants_request(self, _message_topic, io_data):
         """ process request for warrant report"""
-        response_session_id = message_body_dict[Global.REGISTRY][Global.SESSION_ID]
         new_message = self.format_state_body(self.node_name,
-            Global.REGISTRY, parsed_body.session_id, Global.REPORT, Global.REPORT,
+            Global.REGISTRY, io_data.mqtt_session_id, {Global.REPORT:Global.WARRANTS}, io_data.mqtt_desired,
             metadata=self.warrants.dump())
-        self.send_to_mqtt(parsed_body.res_topic, new_message)
+        self.send_to_mqtt(io_data.mqtt_resp_topic, new_message)
 
-    def process_signals_request(self, _message_topic, message_body_dict, parsed_body):
+    def process_signals_request(self, _message_topic, io_data):
         """ process request for signal report"""
         new_message = self.format_state_body(self.node_name,
-            Global.REGISTRY, parsed_body.session_id, Global.REPORT, Global.REPORT,
+            Global.REGISTRY, io_data.mqtt_session_id, {Global.REPORT:Global.SIGNALS}, io_data.mqtt_desired,
             metadata=self.signals.dump())
-        self.send_to_mqtt(parsed_body.res_topic, new_message)
+        self.send_to_mqtt(io_data.mqtt_resp_topic, new_message)
 
-    def process_layout_request(self, _message_topic, message_body_dict, parsed_body):
+    def process_layout_request(self, _message_topic, io_data,):
         """ process request for layout report"""
         new_message = self.format_state_body(self.node_name,
-            Global.REGISTRY, parsed_body.session_id, Global.REPORT, Global.REPORT,
+            Global.REGISTRY, io_data.mqtt_session_id, {Global.REPORT:Global.LAYOUT}, io_data.mqtt_desired,
             metadata=self.layout.dump())
-        self.send_to_mqtt(parsed_body.res_topic, new_message)
+        self.send_to_mqtt(io_data.mqtt_resp_topic, new_message)
 
-    def process_dashboard_request(self, _message_topic, message_body_dict, parsed_body):
+    def process_dashboard_request(self, _message_topic, io_data):
         """ process request for dashboard report"""
         now_seconds = self.now_seconds()
         self.dashboard.update_states(now_seconds - 3 - self.ping_interval)
         new_message = self.format_state_body(self.node_name,
-            Global.REGISTRY, parsed_body.session_id, Global.REPORT, Global.REPORT,
+            Global.REGISTRY, io_data.mqtt_session_id, {Global.REPORT:Global.DASHBOARD}, io_data.mqtt_desired,
             metadata=self.dashboard.dump())
-        self.send_to_mqtt(parsed_body.res_topic, new_message)
+        self.send_to_mqtt(io_data.mqtt_resp_topic, new_message)
 
-    def process_sensors_request(self, _message_topic, message_body_dict, parsed_body):
+    def process_sensors_request(self, _message_topic, io_data):
         """ process request for sensors report"""
         new_message = self.format_state_body(self.node_name,
-            Global.REGISTRY, parsed_body.session_id, Global.REPORT, Global.REPORT,
+            Global.REGISTRY, io_data.mqtt_session_id, {Global.REPORT:Global.SENSORS}, io_data.mqtt_desired,
             metadata=self.sensors.dump())
-        self.send_to_mqtt(parsed_body.res_topic, new_message)
+        self.send_to_mqtt(io_data.mqtt_resp_topic, new_message)
 
-    def process_report_request(self, message_topic, message_body_dict):
+    def process_report_request(self, message_topic, io_data):
         """ process a request for repoting"""
-        response_message = None
-        parsed_body = MqttParsedMessageData(message_body_dict)
-        if parsed_body.message_root == Global.REGISTRY:
-            response_topic = message_body_dict[Global.REGISTRY][Global.RES_TOPIC]
-            desired_state = parsed_body.desired
+        request_ok = False
+        if io_data.mqtt_message_root == Global.REGISTRY:
+            report_value = io_data.get_desired_value_by_key(Global.REPORT)
+            desired_state = io_data.mqtt_desired
             self.log_queue.add_message("debug",
-                    Global.REGISTRY+': '+Global.STATE+' '+Global.REQ+' : '+desired_state)
-            if desired_state == Global.REPORT:
-                report_type = parsed_body.type
-                if report_type == Global.ROSTER:
-                    self.process_roster_request(message_topic, message_body_dict, parsed_body)
-                elif report_type == Global.SWITCHES:
-                    self.process_switches_request(message_topic, message_body_dict, parsed_body)
-                elif report_type == Global.WARRANTS:
-                    self.process_warrants_request(message_topic, message_body_dict, parsed_body)
-                elif report_type == Global.SIGNALS:
-                    self.process_signals_request(message_topic, message_body_dict, parsed_body)
-                elif report_type == Global.LAYOUT:
-                    self.process_layout_request(message_topic, message_body_dict, parsed_body)
-                elif report_type == Global.DASHBOARD:
-                    self.process_dashboard_request(message_topic, message_body_dict, parsed_body)
-                elif report_type == Global.SENSORS:
-                    self.process_sensors_request(message_topic, message_body_dict, parsed_body)
-            else:
-                session_id = message_body_dict[Global.REGISTRY][Global.REGISTRY]
-                response_message = self.format_state_body(self.node_name,
-                        Global.REGISTRY, parsed_body.session_id, Local.MSG_ERROR_NO_DESIRED, Global.REPORT)
-                self.send_to_mqtt(parsed_message.res_topic, response_message)
+                    Global.REGISTRY+': '+Global.STATE+' '+Global.REQ+' : '+str(desired_state))
+            if report_value is not None:
+                if report_value == Global.ROSTER:
+                    self.process_roster_request(message_topic, io_data)
+                    request_ok = True
+                elif report_value == Global.SWITCHES:
+                    self.process_switches_request(message_topic, io_data)
+                    request_ok = True
+                elif report_value == Global.WARRANTS:
+                    self.process_warrants_request(message_topic, io_data)
+                    request_ok = True
+                elif report_value == Global.SIGNALS:
+                    self.process_signals_request(message_topic, io_data)
+                    request_ok = True
+                elif report_value == Global.LAYOUT:
+                    self.process_layout_request(message_topic, io_data)
+                    request_ok = True
+                elif report_value == Global.DASHBOARD:
+                    self.process_dashboard_request(message_topic, io_data)
+                    request_ok = True
+                elif report_value == Global.SENSORS:
+                    self.process_sensors_request(message_topic, io_data)
+                    request_ok = True
+        if not request_ok:
+            error_msg = (Global.UNKNOWN + " " +
+                    Global.REPORT + " "+ Global.STATE+" : ["+ str(io_data.mqtt_desired)+"]")
+            self.publish_error_reponse(error_msg, message_topic, io_data)
 
-    def process_request_message(self, message_topic, message_body_dict):
+    def process_request_message(self, message_topic, io_data):
         """ prosess a request message"""
         self.log_queue.add_message("info", Global.MSG_REQUEST_MSG_RECEIVED+ message_topic)
         if message_topic != self.topic_broadcast_subscribed:
             # broadcasts handled in parent class, node_mqtt
             if message_topic.endswith("/"+Global.FASTCLOCK+"/"+Global.REQ):
-                self.process_fastclock_request(message_topic, message_body_dict)
+                self.process_fastclock_request(message_topic, io_data)
             elif message_topic.endswith("/"+Global.REPORT+"/"+Global.REQ):
-                self.process_report_request(message_topic, message_body_dict)
+                self.process_report_request(message_topic, io_data)
             else:
                 self.log_queue.add_message("critical", Global.MSG_UNKNOWN_REQUEST+ message_topic)
-                self.publish_error_reponse(Global.MSG_UNKNOWN_REQUEST, message_topic, message_body_dict)
+                self.publish_error_reponse(Global.MSG_UNKNOWN_REQUEST, message_topic, io_data)
 
-    def process_response_message(self, message_topic, _message_body_dict):
+    def process_response_message(self, message_topic, _io_data):
         """ process response message"""
+        # add code to process inventory responses
         self.log_queue.add_message("debug", Global.MSG_RESPONSE_RECEIVED + message_topic)
 
-    def received_from_mqtt(self, message_topic, message_body):
+    def received_from_mqtt(self, message_topic, io_data):
         """ process subscribed messages"""
         self.log_queue.add_message("debug", "mqtt nessage: "+message_topic)
         if message_topic.startswith(Global.CMD+"/"):
             if message_topic.endswith("/"+Global.RES):
-                self.process_response_message(message_topic, message_body)
+                self.process_response_message(message_topic, io_data)
             else:
-                self.process_request_message(message_topic, message_body)
+                self.process_request_message(message_topic, io_data)
         elif message_topic.startswith(self.topic_ping_sub):
             # print("found ping")
-            self.process_received_ping_message(message_topic, message_body)
+            self.process_received_ping_message(message_topic, io_data)
         elif message_topic.startswith(self.topic_backup_sub):
-            self.process_received_backup_message(message_topic, message_body)
+            self.process_received_backup_message(message_topic, io_data)
         elif message_topic.startswith(self.topic_sensor_sub):
-            self.process_received_sensor_message(message_topic, message_body)
+            self.process_received_sensor_message(message_topic, io_data)
+        else:
+            self.log_queue.add_message("critical", Global.MSG_UNKNOWN_REQUEST + message_topic)
 
     def loop(self):
         """ main process loop"""

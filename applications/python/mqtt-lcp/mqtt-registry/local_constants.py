@@ -4,8 +4,8 @@
 """
 
     local_constants.py - Constants used in mqtt messaging.
-			To implement mqtt messaging in a language other than english, edit this file
-			and the appropiate config.json files.
+            To implement mqtt messaging in a language other than english, edit this file
+            and the appropiate config.json files.
 
 the MIT License (MIT)
 
@@ -28,9 +28,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 
 """
-class Local(object):
+class Local():
+    """ local constantants """
 
-	MSG_BACKUP_DATA_RECEIVED = "Backup data received"
-	MSG_PING_DATA_RECEIVED = "Ping data received"
-	MSG_ERROR_NO_DESIRED = "error:desired-missing"
-	MSG_PUB_FASTTIMES = "publish fast time: "
+    MSG_BACKUP_DATA_RECEIVED = "Backup data received"
+    MSG_PING_DATA_RECEIVED = "Ping data received"
+    MSG_ERROR_NO_DESIRED = "error:desired-missing"
+    MSG_PUB_FASTTIMES = "publish fast time: "

@@ -39,7 +39,7 @@ else:
 import time
 
 
-from i2c_io_data import I2cIoData
+from io_data import IoData
 from i2c_mux import I2cMux
 from i2c_rfid import I2cRfid
 from i2c_rotary import I2cRotary
@@ -53,13 +53,14 @@ from global_constants import Global
 class I2cClientReaderWriter():
     """ Class foor reading and writing to I2C devices"""
 
-    def __init__(self, log_queue, devices, in_queue, out_queue, display_queue):
+    def __init__(self, log_queue, devices, mqtt_devices, in_queue, out_queue, display_queue):
         # print("i2c client init")
         self.i2c_in_queue = in_queue
         self.i2c_out_queue = out_queue
         self.log_queue = log_queue
         self.display_queue = display_queue
         self.devices = devices
+        self.mqtt_devices = mqtt_devices
         self.exit = False
         # print("i2c client init done")
 
@@ -83,23 +84,28 @@ class I2cClientReaderWriter():
         try:
             for device in self.devices:
                 self.log_queue.add_message("debug", "Read Input from: "+str(device['dev'].i2c_address))
-                if device['type'] == 'rfid':
+                if device['type'] == Global.RFID:
                     device['dev'].read_input()
-                if device['type'] == 'rotary':
+                if device['type'] == Global.ROTARY:
                     device['dev'].read_input()
-                if device['type'] == 'servo-hat':
-                    device['dev'].read_input()
-                if device['type'] == 'display':
-                    # device['dev'].write_message(str(now_seconds))
+                if device['type'] == Global.MUX:
+                    mux_type = device['dev'].mux_type
+                    # print("mux type: "+str(mux_type))
+                    if mux_type == Global.SERVO_HAT:
+                        device['dev'].read_input()
+                if device['type'] == Global.DISPLAY:
+                    # i2c display can slow down i2c bus.
                     if self.display_queue is not None:
                         device['dev'].write_one_log_messages(self.display_queue)
                 while not self.i2c_out_queue.empty():
                     message = self.i2c_out_queue.get()
                     if message is not None:
-                        for mdevice in self.devices:
-                            if ((mdevice['type'] == 'servo-hat')
-                                    and (message['type'] == 'servo')):
-                                mdevice['dev'].write_output(message)
+                        dmessage = message['message']
+                        mqtt_key = dmessage.mqtt_port+":"+dmessage.mqtt_type
+                        if mqtt_key in self.mqtt_devices:
+                            # print(">>> message/device")
+                            device = self.mqtt_devices[mqtt_key]
+                            device.add_to_out_queue(dmessage)
         except (KeyboardInterrupt, SystemExit):
             raise
         #except Exception as exc:
@@ -116,5 +122,3 @@ class I2cClientReaderWriter():
         """ Add outgoing message to Queue"""
         # self.queue.append ...
         pass
-
-

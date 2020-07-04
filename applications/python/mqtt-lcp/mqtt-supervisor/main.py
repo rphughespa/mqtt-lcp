@@ -40,7 +40,7 @@ from subprocess import call
 
 sys.path[1] = '../lib'
 
-from mqtt_parsed_message_data import MqttParsedMessageData
+from io_data import IoData
 
 from global_constants import Global
 
@@ -80,40 +80,41 @@ class GlobalSupervisor(NodeBaseMqtt):
         time.sleep(self.delay)
         call(self.reboot_command, shell=True)
 
-    def process_inventory_request(self, message_topic, message_body_dict):
-        parsed_body = MqttParsedMessageData(message_body_dict)
+    def process_inventory_request(self, _message_topic, io_data):
+        """ process inventory request message """
         self.log_queue.add_message("info",
                 Global.REPORT+" "+Global.INVENTORY)
         mqtt_body = self.format_state_body(self.node_name, Global.REGISTRY,
-                parsed_body.session_id, Global.REPORT, Global.REPORT)
-        mqtt_topic = parsed_body.res_topic
+                io_data.mqtt_session_id, {Global.REPORT:Global.INVENTORY}, io_data.mqtt_desired)
+        mqtt_topic = io_data.mqtt_resp_topic
         self.send_to_mqtt(mqtt_topic, mqtt_body)
 
 
-    def process_request_message(self, message_topic, message_body_dict):
+    def process_request_message(self, message_topic, io_data):
         """ Process MQTT request messages"""
         self.log_queue.add_message("debug",
                 Global.MSG_RESPONSE_RECEIVED+ message_topic)
         message_type_error = True
-        if message_topic.endswith("/"+Global.INVENTORY+"/"+Global.REQ):
-            self.process_inventory_request(message_topic, message_body_dict)
-            message_type_error = False
+        if io_data.mqtt_message_root == Global.REGISTRY:
+            if io_data.get_desired_value_by_key(Global.REPORT):
+                self.process_inventory_request(message_topic, io_data)
+                message_type_error = False
         if message_type_error:
-                self.log_queue.add_message("critical", Global.MSG_UNKNOWN_REQUEST + message_topic)
-                self.publish_error_reponse(Global.MSG_UNKNOWN_REQUEST, message_topic, message_body_dict)
+            self.log_queue.add_message("critical", Global.MSG_UNKNOWN_REQUEST + message_topic)
+            self.publish_error_reponse(Global.MSG_UNKNOWN_REQUEST, message_topic, io_data)
 
-    def process_response_message(self, message_topic, _message_body_dict):
+    def process_response_message(self, message_topic, _io_data):
         """ Process MQTT response messages"""
         self.log_queue.add_message("debug",
                 Global.MSG_RESPONSE_RECEIVED+ message_topic)
 
-    def received_from_mqtt(self, message_topic, message_body_dict):
+    def received_from_mqtt(self, message_topic, io_data):
         """ Process Subscribed MQTT messages"""
         if message_topic.startswith(Global.CMD+"/"):
             if message_topic.endswith("/"+Global.RES):
-                self.process_response_message(message_topic, message_body_dict)
+                self.process_response_message(message_topic, io_data)
             else:
-                self.process_request_message(message_topic, message_body_dict)
+                self.process_request_message(message_topic, io_data)
         # elif message_topic.startswith(self.topic_state_turnout_sub):
         #   self.process_state_turnout_message(message_topic, message_body)
 

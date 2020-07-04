@@ -75,7 +75,7 @@ class Switch():
             if Global.COMMAND in msg_data:
                 self.message_command = msg_data[Global.COMMAND]
             if Global.SENSOR in msg_data:
-                self.message_state = msg_data[Global.SENSOR]
+                self.message_sensor = msg_data[Global.SENSOR]
 
     def dump(self):
         """ Dump data"""
@@ -90,7 +90,7 @@ class Switch():
         new_dict[Global.BLOCKS] = new_dict_blocks
         new_dict_msg = {}
         new_dict_msg[Global.COMMAND] = self.message_command
-        new_dict_msg[Global.STATE] = self.message_state
+        new_dict_msg[Global.STATE] = self.message_sensor
         new_dict[Global.MESSAGES] = new_dict_msg
         return new_dict
 

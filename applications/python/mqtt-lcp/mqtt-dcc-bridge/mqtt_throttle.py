@@ -1,10 +1,8 @@
-#local_Local.py
+# mqtt_throttle.py
 
 """
 
-    local_constants.py - Constants used in mqtt messaging.
-            To implement mqtt messaging in a language other than english, edit this file
-            and the appropiate config.json files.
+    mqtt_throttle.py - Class representing a throttle on the mqtt network
 
 the MIT License (MIT)
 
@@ -28,9 +26,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 
-class Local():
-    """ local constants """
-    MSG_NEW_SWITCH = "new turnout req received: "
-    MSG_ERROR_BAD_STATE = "error: desired state is not valid: "
-    MSG_ERROR_SERVO_NOT_KNOWN = "error: requested servo name not known: "
-    MSG_ERROR_SERVO_MOVE = "error: servo movement failed: "
+class MqttThrottle():
+    """ Class representing a throttle on the mqtt network """
+
+    def __init__(self, node_id):
+        """ initialize"""
+        self.node_id = node_id
+        self.timestamp = 0
+        self.ping_topic = None
+        self.cabs = {}

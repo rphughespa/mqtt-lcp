@@ -44,25 +44,35 @@ LEVEL_NOTSET = 0
 class Display:
     """ Control SSD1306 display """
 
-    def __init__(self, bus, addr, _size):
+    def __init__(self, bus, addr, size):
         """ Initialize """
         self.log_level = LEVEL_NOTSET
         self.term = None
         self.bus = bus
         self.addr = addr
         self.line = 4
-        self.width = 128
-        self.height = 64
         self.oled = None
         self.msg_list = []
         self.max_msg_lines = 10
         self.display_lines_array = []
         self.font = self.make_font("ProggyTiny.ttf", 18)
         #self.font = self.make_font("tiny.ttf", 16)
-        self.device = self.get_device(['--display', 'ssd1306', '--width',
-            str(self.width), '--height', str(self.height), '--i2c-port',
-            str(self.bus), '--i2c-address', str(self.addr)])
-        self.term = terminal(self.device, self.font, animate=False)
+        if size == "128x64":
+            self.width = 128
+            self.height = 64
+            self.max_lines = 4
+            self.device = self.get_device(['--display', 'ssd1306', '--width',
+                    str(self.width), '--height', str(self.height), '--i2c-port',
+                    str(self.bus), '--i2c-address', str(self.addr)])
+        elif size == "128x128":
+            self.width = 128
+            self.height = 128
+            self.max_lines = 8
+            self.device = self.get_device(['--display', 'ssd1327', '--width',
+                    str(self.width), '--height', str(self.height), '--i2c-port',
+                    str(self.bus), '--i2c-address', str(self.addr)])
+        # self.term = terminal(self.device, self.font, animate=False)
+        self.term = terminal(self.device, None, animate=False)
 
     def make_font(self, name, size):
         """ set font """
