@@ -1,0 +1,61 @@
+{
+  "config": {
+    "node": {
+      "name": "mqtt-pi-throttle"
+    },
+    "logger": {
+      "level": "info",
+      "file": "/var/log/mqtt-lcp/**node**.log"
+    },
+    "io": {
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "port": 1883,
+        "user": "trains",
+        "password": "choochoo",
+        "ping": 10,
+        "sub-topics": {
+          "self": "cmd/trains/node/**node**/#",
+          "broadcast": "cmd/trains/node/all/#",
+          "fastclock": "dt/trains/tower/mqtt-tower/fastclock",
+          "sensor": "dt/trains/sensor/#",
+          "signal": "dt/trains/sensor/#",
+          "switch": "dt/trains/sensor/#",
+          "cab": "dt/trains/cab/+/**node**",
+          "dashboard": "dt/trains/tower/+/dashboard"
+        },
+        "pub-topics": {
+          "broadcast": "cmd/trains/node/all",
+          "ping": "dt/trains/ping/**node**",
+          "sensor": "dt/trains/sensor/**node**",
+          "backup": "dt/trains/backup/**node**",
+          "fastclock": "cmd/trains/tower/mqtt-tower/fastclock",
+          "tower": "cmd/trains/tower/mqtt-tower/report",
+          "power": "cmd/trains/switch/mqtt-dispatcher/power",
+          "dispatcher": "cmd/trains/cab/mqtt-dispatcher/**node**"
+        }
+      }
+    },
+    "powerknob": {
+      "image": {
+        "filename": "img/knob_metal_120.png",
+        "radius": 76,
+        "hotspot_radius": 48
+      }
+    },
+    "options": {
+      "track-power": {
+        "node-id": "mqtt-dcc-command",
+        "port-id": "track",
+        "type": "power"
+      },
+      "track-image": "./img/track",
+      "dashboard-image": "./img/dashboard",
+      "locos-image": "./img/locos",
+      "ping": 10,
+      "screen-size": "large",
+      "loco-image-width": 142,
+      "loco-image-height": 30
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+    "io-device": "rfid",
+    "io-device-type": "sensor",
+    "io-address": 119,
+    "io-mux-address": 112,
+    "io-sub-address": 6,
+    "port-id": "yard-entrance",
+    "description": "Entrance to yard",
+    "io-metadata": {
+        "type": "rfid"
+     }
+}

@@ -1,0 +1,91 @@
+{
+   "io-device": "port-expander",
+   "io-device-type": "multiple",
+   "io-address": 39,
+   "io-sub-devices": [
+      {
+         "io-sub-address": 5,
+         "io-device-type": "switch",
+         "port-id": "lumber-yard-siding",
+         "description": "Lumber Yard Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "active": "low",
+            "xx-active": "high",
+            "switch-type": "duplex",
+            "blocks": {
+               "diverge": "mill-siding",
+               "entry": "main-11",
+               "through": "main-12"
+            }
+         }
+      },
+      {
+         "io-sub-address": 6,
+         "io-device-type": "switch",
+         "port-id": "mill-siding",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "no",
+         "io-metadata": {
+            "active": "low",
+            "xx-active": "high",
+            "pulse": 250,
+            "switch-type": "duplex",
+            "blocks": {
+               "diverge": "mill-siding",
+               "entry": "main-11",
+               "through": "main-12"
+            }
+         }
+      },
+      {
+         "io-sub-address": 15,
+         "io-device-type": "sensor",
+         "port-id": "mill-siding sensor",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "report": {
+               "on": "clicked"
+            }
+         }
+      },
+      {
+         "io-sub-address": 14,
+         "io-device-type": "block",
+         "port-id": "mill-siding block",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "report": {
+               "on": "occupied",
+               "off": "clear"
+            }
+         }
+      },
+      {
+         "io-sub-address": 10,
+         "io-device-type": "signal",
+         "port-id": "mill-siding-signal",
+         "description": "Steel Mill Siding Signal",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "signal-type": "single",
+            "xx-signal-type": "color",
+            "x2-signal-type": "position"
+         }
+      },
+      {
+         "io-sub-address": 1,
+         "io-device-type": "signal",
+         "port-id": "lumber-yard-signal",
+         "description": "Lumber Yard Siding Signal",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "xx-signal-type": "single",
+            "signal-type": "color",
+            "x2-signal-type": "position"
+         }
+      }
+   ]
+}

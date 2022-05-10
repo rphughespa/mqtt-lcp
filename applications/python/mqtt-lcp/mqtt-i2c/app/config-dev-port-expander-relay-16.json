@@ -1,0 +1,114 @@
+{
+   "io-device": "port-expander-relay-16",
+   "io-device-type": "multiple",
+   "io-address": 32,
+   "io-sub-devices": [
+      {
+         "io-sub-address": 0,
+         "io-device-type": "switch",
+         "port-id": "mill-siding-toggle",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "switch-type": "toggle",
+            "x-switch-type": "duplex",
+            "blocks": {
+               "diverge": "mill-siding",
+               "entry": "main-11",
+               "through": "main-12"
+            }
+         }
+      },
+      {
+         "io-sub-address": 1,
+         "io-device-type": "switch",
+         "port-id": "mill-siding-duplex",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "x-switch-type": "toggle",
+            "switch-type": "duplex",
+            "blocks": {
+               "diverge": "mill-siding",
+               "entry": "main-11",
+               "through": "main-12"
+            }
+         }
+      },
+      {
+         "io-sub-address": 3,
+         "io-device-type": "switch",
+         "port-id": "mill-siding-duplex-pulse",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "x-switch-type": "toggle",
+            "switch-type": "duplex",
+            "pulse": 250,
+            "blocks": {
+               "diverge": "mill-siding",
+               "entry": "main-11",
+               "through": "main-12"
+            }
+         }
+      },
+      {
+         "io-sub-address": 6,
+         "io-device-type": "signal",
+         "port-id": "mill-siding-signal-blink",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "no",
+         "io-metadata": {
+            "signal-type": "single",
+            "blink": 500
+         }
+      },
+      {
+         "io-sub-address": 7,
+         "io-device-type": "signal",
+         "port-id": "yard-siding-signal-blink",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "no",
+         "io-metadata": {
+            "signal-type": "single",
+            "blink": 200
+         }
+      },
+      {
+         "io-sub-address": 8,
+         "io-device-type": "signal",
+         "port-id": "mill-siding-single",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "signal-type": "single",
+            "x-signal-type": "color",
+            "x2-signal-type": "position"
+         }
+      },
+      {
+         "io-sub-address": 9,
+         "io-device-type": "signal",
+         "port-id": "mill-siding-color",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "xx-signal-type": "single",
+            "signal-type": "color",
+            "x2-signal-type": "position"
+         }
+      },
+      {
+         "io-sub-address": 12,
+         "io-device-type": "signal",
+         "port-id": "mill-siding-position",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "xx-signal-type": "single",
+            "x2-signal-type": "color",
+            "signal-type": "position"
+         }
+      }
+   ]
+}

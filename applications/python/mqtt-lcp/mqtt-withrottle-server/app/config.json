@@ -1,0 +1,45 @@
+{
+  "config": {
+    "node": {
+      "name": "**host**-withrottle-server"
+    },
+    "logger": {
+      "level": "info",
+      "file": "/var/log/mqtt-lcp/**node**.log"
+    },
+    "io": {
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "port": 1883,
+        "user": "trains",
+        "password": "choochoo",
+        "ping": 10,
+        "sub-topics": {
+          "self": "cmd/trains/node/**node**/#",
+          "broadcast": "cmd/trains/node/all/#",
+          "switch": "dt/trains/sensor/#",
+          "cab": "dt/trains/cab/+/**node**",
+          "fastclock": "dt/trains/tower/+/fastclock"
+        },
+        "pub-topics": {
+          "ping": "dt/trains/ping/**node**",
+          "sensor": "dt/trains/sensor/**node**",
+          "backup": "dt/trains/backup/**node**",
+          "tower": "cmd/trains/tower/mqtt-tower/report",
+          "power": "cmd/trains/switch/mqtt-dispatcher/power",
+          "dispatcher": "cmd/trains/cab/mqtt-dispatcher/**node**"
+        }
+      },
+      "network": {
+        // "self is client side connection"
+        "self": {
+          "host": "**host**.local",
+          "port": 12090,
+          // "leading '_' and trailing '.' required"
+          "service": "_withrottle._tcp.local.",
+          "description": "MQTT-LCP Withrottle"
+        }
+      }
+    }
+  }
+}

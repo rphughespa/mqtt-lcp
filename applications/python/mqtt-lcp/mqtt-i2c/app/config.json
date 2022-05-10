@@ -1,0 +1,49 @@
+{
+   "config": {
+      "node": {
+         "name": "**host**-i2c"
+      },
+      "logger": {
+         "level": "info",
+         "file": "/var/log/mqtt-lcp/**node**.log"
+      },
+      "io": {
+         "mqtt": {
+            "broker": "mqtt-broker.local",
+            "port": 1883,
+            "user": "trains",
+            "password": "choochoo",
+            "ping": 10,
+            "sub-topics": {
+               "self": "cmd/trains/node/**node**/#",
+               "broadcast": "cmd/trains/node/all/req",
+               "switch": "cmd/trains/switch/**node**/#",
+               "signal": "cmd/trains/signal/**node**/#",
+               "sensor": "cmd/trains/sensor/**node**/#"
+            },
+            "pub-topics": {
+               "ping": "dt/trains/ping/**node**",
+               "locator": "dt/trains/locator/**node**",
+               "block": "dt/trains/block/**node**",
+               "sensor": "dt/trains/sensor/**node**",
+               "signal": "dt/trains/signal/**node**",
+               "switch": "dt/trains/switch/**node**",
+               "backup": "dt/trains/backup/**node**",
+               "registry": "cmd/trains/registry/mqtt-registry/reports"
+            }
+         },
+         "i2c": {
+            "i2c-bus-number": 1
+         },
+         "io-devices": [
+            // "json does not like hex numbers, using decimal i2c addresses instead"
+            // : "config-dev-encoder.json",
+            // : "config-dev-rfid.json",
+            // : "config-dev-rfid-2.json",
+            // : "config-dev-servos.json",
+            // : "config-dev-port-expander-relay-16.json",
+            "...": "config-dev-port-expander.json"
+         ]
+      }
+   }
+}

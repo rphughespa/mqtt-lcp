@@ -1,0 +1,72 @@
+{
+   "io-device": "servo-controller",
+   "io-device-type": "multiple",
+   "io-address": 64,
+   "io-sub-devices": [
+      {
+         "io-sub-address": 0,
+         "io-device-type": "switch",
+         "port-id": "mill-siding",
+         "description": "Steel Mill Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "open": 75,
+            "close": 25,
+            "blocks": {
+               "diverge": "mill-siding",
+               "entry": "main-11",
+               "through": "main-12"
+            }
+         }
+      },
+      {
+         "io-device-type": "switch",
+         "io-sub-address": 1,
+         "port-id": "lumber-yard-siding",
+         "description": "Lumber Yard Siding",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "open": 55,
+            "close": 35,
+            "blocks": {
+               "diverge": "lumber-siding",
+               "entry": "main-12",
+               "through": "main-13"
+            }
+         }
+      },
+      {
+         "io-device-type": "switch",
+         "io-sub-address": 2,
+         "port-id": "bainbridge",
+         "description": "Bainbridge Station",
+         "send-sensor-message": "yes",
+         "io-metadata": {
+            "open": 55,
+            "close": 35,
+            "blocks": {
+               "diverge": "bainbridge",
+               "entry": "main-13",
+               "through": "main-14"
+            }
+         }
+      },
+      {
+         "io-device-type": "switch",
+         "io-address": 64,
+         "io-sub-address": 3,
+         "port-id": "york",
+         "description": "York Station",
+         "end-sensor-message": "yes",
+         "io-metadata": {
+            "open": 55,
+            "close": 35,
+            "blocks": {
+               "diverge": "york",
+               "entry": "main-14",
+               "through": "main-15"
+            }
+         }
+      }
+   ]
+}
