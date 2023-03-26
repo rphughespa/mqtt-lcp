@@ -1,0 +1,8 @@
+{
+	"io-device": "display",
+	"io-device-type": "display",
+	"io-address": 60,
+	"io-metadata": {
+		"type": "ssd1306-128x32"
+	}
+}

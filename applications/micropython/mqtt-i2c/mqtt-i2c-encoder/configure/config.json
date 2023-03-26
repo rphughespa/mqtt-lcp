@@ -1,0 +1,34 @@
+{
+  "config": {
+    "node": {
+      "name": "mqtt-i2c-encoder"
+    },
+    "io": {
+      "network": {
+        "wifi": {
+          "ssid": "zz-ssid",
+          "password": "zz-passwd",
+          "hostname": "mqtt-i2c-encoder"
+        }
+      },
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "port": 1883,
+        "user": "trains",
+        "password": "choochoo",
+        "ping": 10,
+        "sub-topics": {
+          "self": "cmd/mqtt-lcp/node/**node**/#",
+          "broadcast": "cmd/mqtt-lcp/node/all/#",
+          "sensor": "cmd/mqtt-lcp/sensor/**node**/#"
+        },
+        "pub-topics": {
+          "ping": "dt/mqtt-lcp/ping/**node**",
+          "roster": "cmd/mqtt-lcp/roster/mqtt-dev-dcc-command/rfid",
+          "sensor": "dt/mqtt-lcp/locator/**node**"
+        }
+      },
+      "io-devices": []
+    }
+  }
+}
