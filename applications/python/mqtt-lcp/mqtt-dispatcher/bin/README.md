@@ -1,6 +1,6 @@
 #### MQTT-LCP Application
 
-# MQTT-PI-DISPATCHER
+# MQTT-DISPATCHER
 
 This application presents an GUI interface to control trackside devices.
 
