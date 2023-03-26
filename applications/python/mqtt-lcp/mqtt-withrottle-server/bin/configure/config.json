@@ -1,0 +1,48 @@
+{
+  "config": {
+    "node": {
+      "name": "mqtt-dev-withrottle-server"
+    },
+    "logger": {
+      "level": "info",
+      "file": "/var/log/mqtt-lcp/**node**.log"
+    },
+    "io": {
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "port": 1883,
+        "user": "trains",
+        "password": "choochoo",
+        "ping": 10,
+        "sub-topics": {
+          "self": "cmd/mqtt-lcp/node/**node**/#",
+          "broadcast": "cmd/mqtt-lcp/node/all/#",
+          "switch": "dt/mqtt-lcp/switch/#",
+          "cab": "dt/mqtt-lcp/cab/+/**node**",
+          "fastclock": "dt/mqtt-lcp/fastclock/#",
+          "roster": "dt/mqtt-lcp/roster/#",
+          "inventory": "dt/mqtt-lcp/tower/+/inventory/#"
+        },
+        "pub-topics": {
+          "ping": "dt/mqtt-lcp/ping/**node**",
+          "sensor": "dt/mqtt-lcp/sensor/**node**",
+          "backup": "dt/mqtt-lcp/backup/**node**",
+          "tower": "cmd/mqtt-lcp/tower/mqtt-dev-tower/inventory",
+          "roster": "cmd/mqtt-lcp/roster/mqtt-dcc-command/roster",
+          "power": "cmd/mqtt-lcp/switch/mqtt-dcc-command/power",
+          "cab": "cmd/mqtt-lcp/cab/mqtt-dcc-command"
+        }
+      },
+      "network": {
+        // "self is client side connection"
+        "self": {
+          "host": "**host**.local",
+          "port": 12090,
+          // "leading '_' and trailing '.' required"
+          "service": "_withrottle._tcp.local.",
+          "description": "MQTT-LCP Dev Withrottle"
+        }
+      }
+    }
+  }
+}

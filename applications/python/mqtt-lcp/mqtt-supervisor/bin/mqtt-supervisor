@@ -1,0 +1,109 @@
+#!/usr/bin/python3
+# main.py
+"""
+
+main.py - Main module for mqtt-supervisor, launches and monitors process for the supervisor application
+
+The MIT License (MIT)
+
+Copyright 2023 richard p hughes
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+and associated documentation files (the "Software"), to deal in the Software without restriction,
+including without limitation the rights to use, copy, modify, merge, publish, distribute,
+sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
+is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all copies
+or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OFSOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+"""
+
+import sys
+
+sys.path.append('../lib')
+
+import time
+import traceback
+from multiprocessing import Queue
+
+from processes.process_utils import ProcessSupervisor
+from processes.log_process import LogProcess
+from processes.mqtt_process import MqttProcess
+from utils.global_constants import Global
+
+from app_process import AppProcess
+
+
+class Supervisor(ProcessSupervisor):
+    """ launch and supervise proceses """
+    def __init__(self):
+        super().__init__()
+        self.queues = {}
+        self.queues.update({Global.LOGGER: Queue()})
+        self.queues.update({Global.MQTT: Queue()})
+        self.queues.update({Global.APPLICATION: Queue()})
+
+    def start_log_process(self):
+        """ start log process """
+        print("supervisor: ... launching ... log process")
+        process_pid = LogProcess(events=self.events, queues=self.queues)
+        process_pid.start()
+        print("supervisor: ... ... launched")  #, pid: " + str(process_pid))
+        self.processes.update(
+            {Global.LOGGER: (self.start_log_process, process_pid)})
+
+    def start_app_process(self):
+        """ start app process """
+        print("supervisor: ... launching ... app process")
+        process_pid = AppProcess(events=self.events, queues=self.queues)
+        process_pid.start()
+        print("supervisor: ... ... launched")  #, pid #: " + str(process_pid))
+        self.processes.update(
+            {Global.APPLICATION: (self.start_app_process, process_pid)})
+
+    def start_mqtt_process(self):
+        """ start mqtt process """
+        print("supervisor: ... launching ... mqtt process")
+        process_pid = MqttProcess(events=self.events, queues=self.queues)
+        process_pid.start()
+        print("supervisor: ... ... launched, pid")  #: " + str(process_pid))
+        self.processes.update(
+            {Global.MQTT: (self.start_mqtt_process, process_pid)})
+
+    def start_all_processes(self):
+        """ start all the processes """
+        print("supervisor: launches worker processes")
+        self.start_log_process()
+        self.start_mqtt_process()
+        # allow time for IO processes to startup
+        time.sleep(2)
+        self.start_app_process()
+        time.sleep(2)
+
+
+if __name__ == "__main__":
+    supervisor = Supervisor()
+
+    #  program normmally start at boot, wait for other services to sta
+    supervisor.perform_wait_countdown(7)
+
+    while not supervisor.shutdown_event.is_set():
+        try:
+            supervisor.start_all_processes()
+            supervisor.monitor_all_processes()
+        except Exception as exc:
+            print("Exception Occurred: " + str(exc))
+            traceback.print_exc()
+            supervisor.shutdown_event.set()
+        finally:
+            supervisor.shutdown_all_processes()
+
+    print(" ... Exiting.")
+    sys.exit(0)

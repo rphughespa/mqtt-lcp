@@ -11,7 +11,7 @@ I2cServoPca9685 - driver for a i2c server controller board
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -151,11 +151,9 @@ class I2cServoPca9685(I2cBaseDevice):
     def __convert_degrees_to_pulse(self, req_degrees):
         """ convert degrees (0-90) to pulse (min-max) """
         req = int(req_degrees)
-        if req < 10:
-            # had a problem with taking servos to zero degrees
-            req = 10
-        if req > 90:
-            req = 90
+        # imit travel to 10-90
+        req = max(req, 10)
+        req = min(req, 90)
         pulse = int(((req/90) * \
             (self.pulse_max - self.pulse_min)) + self.pulse_min)
         return pulse

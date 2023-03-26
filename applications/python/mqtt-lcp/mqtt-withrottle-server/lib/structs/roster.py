@@ -6,7 +6,7 @@
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -302,13 +302,14 @@ class Roster(object):
         self.name = map_body.get(Global.NAME, None)
         self.description = map_body.get(Global.DESCRIPTION, None)
         self.locos = {}
-        locos_map = map_body.get(Global.LOCOS, {})
-        for loco_key, loco_data in locos_map.items():
-            self.locos.update({loco_key: LocoData(loco_data)})
+        # print(">>> roster: " + str(map_body))
+        locos_list = map_body.get(Global.LOCOS, [])
+        for loco_data in locos_list:
+            self.locos.update({loco_data.get(Global.DCC_ID): LocoData(loco_data)})
         self.consists = {}
-        consists_map = map_body.get(Global.CONSISTS, {})
-        for consist_key, consist_data in consists_map.items():
-            self.consists.update({consist_key: ConsistData(consist_data)})
+        consists_list = map_body.get(Global.CONSISTS, [])
+        for consist_data in consists_list:
+            self.consists.update({consist_data.get(Global.DCC_ID): ConsistData(consist_data)})
 
     def encode(self):
         """ encode a map """
@@ -318,13 +319,13 @@ class Roster(object):
         if self.description is not None:
             emap.update({Global.DESCRIPTION: self.description})
         if self.locos is not None:
-            locos_map = {}
-            for loco_key, loco_data in self.locos.items():
-                locos_map.update({loco_key: loco_data.encode()})
-            emap.update({Global.LOCOS: locos_map})
+            locos_list = []
+            for _loco_key, loco_data in self.locos.items():
+                locos_list.append(loco_data.encode())
+            emap.update({Global.LOCOS: locos_list})
         if self.consists is not None:
-            consists_map = {}
-            for consist_key, consist_data in self.consists.items():
-                consists_map.update({consist_key: consist_data.encode()})
+            consists_map = []
+            for _consist_key, consist_data in self.consists.items():
+                consists_map.append(consist_data.encode())
             emap.update({Global.CONSISTS: consists_map})
         return {Global.ROSTER: emap}

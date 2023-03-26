@@ -1,0 +1,46 @@
+{
+	"functions": {
+		"cols" : 4,
+		"rows" : 4,
+		"grid": [		
+			{
+				"row": 0,
+				"cols": [
+						{"col" : 0,"id": "f0","label":"Light","type":"toggle","state":"unknown"},
+						{"col" : 1,"id": "f1","label":"Bell","type":"momentary","state":"unknown"},
+						{"col" : 2,"id": "f2","label":"Horn","type":"momentary","state":"unknown"},
+						{"col" : 3,"id": "f3","label":"Motor","type":"momentary","state":"unknown"}
+					]
+			},		
+			{
+				"row": 1,
+				"cols": [
+						{"col" : 0,"id": "f4","label":"Doors","type":"momentary","state":"unknown"},
+						{"col" : 1,"id": "f5","label":"Clang","type":"momentary","state":"unknown"},
+						{"col" : 2,"id": "f6","label":"Squeal","type":"momentary","state":"unknown"},
+						{"col" : 3,"id": "f7","label":"F7","type":"momentary","state":"unknown"}
+					]
+			},		
+			{
+				"row": 2,
+				"cols": [
+						{"col" : 0,"id": "f8","label":"F8","type":"momentary","state":"unknown"},
+						{"col" : 1,"id": "f9","label":"F9","type":"momentary","state":"unknown"},
+						{"col" : 2,"id": "f10","label":"F10","type":"momentary","state":"unknown"},
+						{"col" : 3,"id": "f11","label":"F11","type":"momentary","state":"unknown"}
+					]
+			},		
+			{
+				"row": 3,
+				"cols": [
+						{"col" : 0,"id": "f12","label":"F12","type":"momentary","state":"unknown"},
+						{"col" : 1,"id": "f13","label":"F13","type":"momentary","state":"unknown"},
+						{"col" : 2,"id": "f14","label":"F14","type":"momentary","state":"unknown"},
+						{"col" : 3,"id": "f14","label":"F15","type":"momentary","state":"unknown"}
+					]
+			}
+		]		
+	}
+}
+
+

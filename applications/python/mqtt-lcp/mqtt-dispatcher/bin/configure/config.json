@@ -1,0 +1,55 @@
+{
+  "config": {
+    "node": {
+      "name": "mqtt-dispatcher"
+    },
+    "logger": {
+      "level": "info",
+      "file": "/var/log/mqtt-lcp/**node**.log"
+    },
+    "io": {
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "port": 1883,
+        "user": "trains",
+        "password": "choochoo",
+        "ping": 10,
+        "sub-topics": {
+          "self": "cmd/mqtt-lcp/node/**node**/#",
+          "broadcast": "cmd/mqtt-lcp/node/all/#",
+          "fastclock": "dt/mqtt-lcp/fastclock/#",
+          "sensor": "dt/mqtt-lcp/sensor/#",
+          "signal": "dt/mqtt-lcp/signal/#",
+          "switch": "dt/mqtt-lcp/switch/#",
+          "locator": "dt/mqtt-lcp/locator/#",
+          "cab": "dt/mqtt-lcp/cab/+/**node**",
+          "dashboard": "dt/mqtt-lcp/tower/+/dashboard/#",
+          "inventory": "dt/mqtt-lcp/tower/+/inventory/#"
+        },
+        "pub-topics": {
+          "broadcast": "cmd/mqtt-lcp/node/all",
+          "ping": "dt/mqtt-lcp/ping/**node**",
+          "sensor": "dt/mqtt-lcp/sensor/**node**",
+          "backup": "dt/mqtt-lcp/backup/**node**",
+          "tower": "cmd/mqtt-lcp/tower/mqtt-dev-tower/inventory",
+          "power": "cmd/mqtt-lcp/switch/mqtt-dcc-command",
+          "dcc_command": "cmd/mqtt-lcp/cab/mqtt-dcc-command"
+        }
+      }
+    },
+    "options": {
+      //"track-power": {
+      //  "node-id": "mqtt-dcc-command",
+      //  "port-id": "track",
+      //  "type": "power"
+      //},
+      "image-path": "img",
+      // signal type ether color = 3 color, or pos = positional
+      "signal-type": "color",
+      "ping": 10,
+      "screen-size": "large",
+      "loco-image-width": 142,
+      "loco-image-height": 30
+    }
+  }
+}

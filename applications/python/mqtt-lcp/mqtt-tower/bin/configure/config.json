@@ -1,0 +1,56 @@
+{
+    "config": {
+        "node": {
+            "name": "mqtt-dev-tower"
+        },
+        "logger": {
+            "level": "info",
+            "file": "/var/log/mqtt-lcp/**node**.log"
+        },
+        "io": {
+            "mqtt": {
+                "broker": "mqtt-broker.local",
+                "port": 1883,
+                "user": "trains",
+                "password": "choochoo",
+                "ping": 10,
+                "sub-topics": {
+                    "broadcast": "cmd/mqtt-lcp/node/all/#",
+                    "inventory": "cmd/mqtt-lcp/tower/**node**/inventory/#",
+                    "route": "cmd/mqtt-lcp/route/**node**/#",
+                    "ping": "dt/mqtt-lcp/ping/#",
+                    "backup": "dt/mqtt-lcp/backup/#",
+                    "sensor": "dt/mqtt-lcp/sensor/#",
+                    "block": "dt/mqtt-lcp/block/#",
+                    "locator": "dt/mqtt-lcp/locator/#",
+                    "switch": "dt/mqtt-lcp/switch/#",
+                    "signal": "dt/mqtt-lcp/signal/#",
+                    "self": "cmd/mqtt-lcp/node/**node**/#"
+                },
+                "pub-topics": {
+                    "ping": "dt/mqtt-lcp/ping/**node**",
+                    "fastclock": "dt/mqtt-lcp/tower/**node**/fastclock",
+                    "dashboard": "dt/mqtt-lcp/tower/**node**/dashboard",
+                    "switch": "dt/mqtt-lcp/switch/**node**",
+                    "tower": "cmd/mqtt-lcp/tower",
+                    "node": "cmd/mqtt-lcp/node",
+                    "inventory": "dt/mqtt-lcp/tower/**node**/inventory"
+                }
+            }
+        },
+        "options": {
+            "backup-path": "/home/pi/mqtt-lcp/backups",
+            "data-path": "/home/pi/mqtt-lcp/data",
+            "time": {
+                "dashboard": {
+                    "timeout": 45,
+                    "interval": 10
+                },
+                "fastclock": {
+                    "ratio": 4,
+                    "interval": 30
+                }
+            }
+        }
+    }
+}

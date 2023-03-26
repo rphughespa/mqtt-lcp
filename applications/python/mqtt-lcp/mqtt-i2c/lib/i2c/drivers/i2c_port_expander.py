@@ -7,7 +7,7 @@
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -54,7 +54,7 @@ class I2cPortExpander(I2cBaseDriver):
                          i2c_bus=i2c_bus,
                          log_queue=log_queue)
         # print(">>> Port Expander Device: "+ str(self.io_devices.io_device))
-        if self.io_devices.io_device == Global.PORT_EXPANDER_RELAY_16:
+        if self.io_devices.io_device == Global.PORT_EXPANDER_RELAY:
             self.device_driver = I2cPortExpanderRelay16Qwiic(
                 i2c_address=self.io_devices.io_address,
                 i2c_bus=i2c_bus,
@@ -65,6 +65,7 @@ class I2cPortExpander(I2cBaseDriver):
                 i2c_bus=i2c_bus,
                 log_queue=log_queue)
         else:
+            # print(">>> init port expander")
             self.device_driver = I2cPortExpanderMcp23017(
                 i2c_address=self.io_devices.io_address,
                 i2c_bus=i2c_bus,
@@ -87,7 +88,7 @@ class I2cPortExpander(I2cBaseDriver):
         changed_pins = self.device_driver.read_input()
         return_data = None
         if changed_pins is not None:
-            #print(">>> ;;; "+str(changed_pins))
+            # print(">>> ;;; "+str(changed_pins))
             self.log_debug("Pins Changed: " + str(changed_pins))
             return_data = []
             for (pin, on_off) in changed_pins:
@@ -173,7 +174,7 @@ class I2cPortExpander(I2cBaseDriver):
             active = io_device.io_metadata.get(Global.ACTIVE, Global.LOW)
             if active == Global.HIGH:
                 in_pin_active_low = False
-        self.log_debug("Init Sensor: " + str(in_pin))
+        self.log_info("Init Sensor: " + str(in_pin) +" ... "+str(in_pin_active_low))
         self.device_driver.init_input_pin(in_pin, active_low=in_pin_active_low)
         self.input_pin_map.update({in_pin: io_device.mqtt_port_id})
         self.input_pin_report_map.update({in_pin: in_pin_report})
@@ -212,6 +213,7 @@ class I2cPortExpander(I2cBaseDriver):
         sub_dev.send_sensor_message = io_device.mqtt_send_sensor_message
         sub_dev.pulse = pulse
         sub_dev.blink = blink
+        sub_dev.state = Global.OFF
         self.port_map.update({io_device.mqtt_port_id: sub_dev})
 
     def __initialize_a_signal(self, io_device):
@@ -250,6 +252,7 @@ class I2cPortExpander(I2cBaseDriver):
         sub_dev.send_sensor_message = io_device.mqtt_send_sensor_message
         sub_dev.pulse = pulse
         sub_dev.blink = blink
+        sub_dev.state = Global.OFF
         self.port_map.update({io_device.mqtt_port_id: sub_dev})
 
     def __send_request_to_signal(self, message):
@@ -341,22 +344,27 @@ class I2cPortExpander(I2cBaseDriver):
         return signal_pins
 
     def __send_request_to_switch(self, message):
+        #print(">>> switch request: " + str(message))
         data_reported = None
         return_reported = Global.ERROR
         return_message = "Unknown request: " + str(message.mqtt_desired)
         send_after_message = None
-        desired = message.mqtt_desired
-        if Synonyms.in_synonym_activate(message.mqtt_desired):
-            desired = Global.ON
-        elif Synonyms.in_synonym_deactivate(desired):
-            desired = Global.OFF
-        if desired in (Global.ON, Global.OFF):
-            sub_dev = self.port_map.get(message.mqtt_port_id, None)
-            #print(">>> sub dev: " + str(sub_dev))
-            if sub_dev is None:
-                return_message = "Unknown Port ID: " + \
-                    str(message.mqtt_port_id)
-            else:
+        sub_dev = self.port_map.get(message.mqtt_port_id, None)
+        if sub_dev is None:
+            return_message = "Unknown Port ID: " + \
+            str(message.mqtt_port_id)
+        else:
+            desired = message.mqtt_desired
+            if desired == Global.THROW:
+                if sub_dev.state == Global.OFF:
+                    desired = Global.ON
+                else:
+                    desired = Global.OFF
+            if Synonyms.is_synonym_activate(message.mqtt_desired):
+                desired = Global.ON
+            elif Synonyms.is_synonym_deactivate(desired):
+                desired = Global.OFF
+            if desired in (Global.ON, Global.OFF):
                 # pulse pins on rather than continous
                 pulse = sub_dev.pulse
                 selected_pins = []
@@ -381,7 +389,9 @@ class I2cPortExpander(I2cBaseDriver):
                         selected_pins.append((sub_dev.base_pin, False, 0))
                 self.__send_pin_changes(selected_pins)
                 return_reported = Synonyms.desired_to_reported(
-                    message.mqtt_desired)
+                        message.mqtt_desired)
+                sub_dev.state = return_reported
+                self.port_map.update({message.mqtt_port_id: sub_dev})
                 return_message = None
         #print(">>> 2: " + str(sub_dev.send_sensor_message))
         if return_reported != Global.ERROR and sub_dev.send_sensor_message:
@@ -393,7 +403,7 @@ class I2cPortExpander(I2cBaseDriver):
                 send_after_message)
 
     def __send_pin_changes(self, selected_pins):
-        """ send pin chnages to the device """
+        """ send pin changes to the device """
         # some pins groups may have mutually exclusive pins
         # set the "off" pins first
         #print(">>> set pins: "+str(selected_pins))

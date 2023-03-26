@@ -1,0 +1,122 @@
+{
+	"signals": {
+		"b1wb": {
+			"description":"harris block 1 wb",
+			"type": "prr",
+			"blocks": [
+				{
+					"name": "b1",
+					"type": "immediate"
+				},
+				{
+					"name" : "b2",
+					"type": "next"
+				}
+			],
+			"messages":{
+				"command": "cmd/mqtt-lcp/signal/harris01/block1-wb",
+				"state": "st/mqtt-lcp/signal/harris01/block1-wb"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		},
+		"b2wb": {
+			"description": "harris block 2 WB",
+			"type": "prr",
+			"blocks": [
+				{
+					"name": "b2",
+					"type": "immediate"
+				},
+				{
+					"name" : "b3",
+					"type": "next"
+				}
+			],
+			"messages":{
+				"command": "cmd/mqtt-lcp/signal/harris01/block2-wb",
+				"state": "dt/mqtt-lcp/signal/harris01/block2-wb"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		},
+		"b3wb": {
+			"description": "harris block 3 WB",
+			"type": "prr",
+			"blocks": [
+				{
+					"name": "b3",
+					"type": "immediate"
+				}
+			],
+			"messages":{
+				"command": "cmd/mqtt-lcp/signal/harris01/block3-wb",
+				"state": "dt/mqtt-lcp/signal/harris01/block3-wb"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		},
+		"b1eb": {
+			"description": "harris block 1 eb",
+			"type": "3way",
+			"blocks": [
+				{
+					"name": "b1",
+					"type": "immediate"
+				}
+			],
+			"messages": {
+				"command" : "cmd/mqtt-lcp/signal/harris01/block01-eb",
+				"state" : "dt/mqtt-lcp/signal/harris01/block01-eb"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		},
+		"b2eb": {
+			"description": "harris block 2 eb",
+			"type": "3way",
+			"blocks": [
+				{
+					"name": "b2",
+					"type": "immediate"
+				},
+				{
+					"name" : "b1",
+					"type": "next"
+				}
+			],
+			"messages": {
+				"command" : "cmd/mqtt-lcp/signal/harris01/block02-wb",
+				"state" : "dt/mqtt-lcp/signal/harris01/block02-wb"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		},
+		"b3eb": {
+			"description": "harris block 3 eb",
+			"type": "3way",
+			"blocks": [
+				{
+					"name": "b3",
+					"type": "immediate"
+				},
+				{
+					"name" : "b2",
+					"type": "next"
+				}
+			],
+			"messages": {
+				"command" : "cmd/mqtt-lcp/signal/harris01/block03-eb",
+				"state" : "dt/mqtt-lcp/signal/harris01/block03-eb"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		}
+	}
+}

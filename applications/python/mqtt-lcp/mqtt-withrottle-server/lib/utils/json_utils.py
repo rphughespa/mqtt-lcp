@@ -18,14 +18,19 @@
         includes:
 
             JSON files be included into other JSON files by specifiying:
+                : include one json file:
 
-                "..." : "include_file_name.json"
+                    "..." : "include_file_name.json"
+
+                : or include all json file in a folder as a list:
+
+                    " ..." : "include_folder_name"
 
             Includes can be nested; i.e. an included file may itself contain includes.
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -44,20 +49,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 
 """
+import json
+import locale
+import os
+import sys
+import pathlib
+
 INCLUDE_TOKEN = "\"...\""
 COMMENT_TOKEN = "//"
 
-import sys
-import os
 
 sys.path.append('../../lib')
-import locale
 
-import json
-
+from utils.global_constants import Global
 
 class JsonUtils(object):
     """ help class for json operations """
+
     def __init__(self):
         pass
 
@@ -69,36 +77,87 @@ class JsonUtils(object):
     def load_and_parse_file(self, file_name):
         """ loads and parses a json file, optionally including other files """
         json_parsed = None
-        json_lines = self.__load_file(file_name, "")
-        # print(">>> JSON: " + str(json_lines))
-        try:
-            json_parsed = json.loads(json_lines)
-        except json.decoder.JSONDecodeError as excp:
-            print("!!!! JSON Parse Error: File: " + str(file_name))
-            print(" ... " + str(excp))
-            print(" ... " + str(json_lines))
-
-        # print(">>> Json Parsed: "+str(json_parsed))
+        config_dir = False
+        print("Parse: "+str(file_name))
+        if file_name.endswith(".json"):
+            # name is a single file, not a folder, parse it
+            json_parsed = self.__parse_one_json_file(file_name)
+        else:
+            # file name is a folder
+            config_dir = os.listdir(file_name)
+            #print(">>> config dir: "+str(config_dir))
+            if "config.json" not in config_dir:
+                print("!!! Error: Config,json not found in "+str(file_name))
+            else:
+                config_file_name = file_name + "/" +"config.json"
+                # print(">>> Parsing: config file: "+ str(config_file_name))
+                json_parsed = self.__parse_one_json_file(config_file_name)
+                #print(">>> json parsed: "+str(json_parsed))
+                print("config dir: "+str(config_dir))
+                for jfile in config_dir:
+                    # load device configs
+                    if jfile != "config.json" and \
+                                jfile.endswith(".json") and \
+                                jfile.startswith(Global.DEVICE) :
+                        #print("parse sub file: "+str(jfile))
+                        io_parsed = self.__parse_one_json_file(file_name+"/"+jfile)
+                        if not isinstance(io_parsed,list):
+                            io_parsed = [io_parsed]
+                        for device_item in io_parsed:
+                            json_parsed[Global.CONFIG][Global.IO][Global.IO_DEVICES].append(device_item)
+        #print(">>> json_parsed: "+str(json_parsed))
         return json_parsed
 
     #
     # private functions
     #
 
+    def __parse_one_json_file(self, file_name):
+        """ read and parse a json file """
+        json_parsed = None
+        json_lines = self.__load_file(file_name, "")
+        # print(">>> JSON: " + str(json_lines))
+        try:
+            json_parsed = json.loads(json_lines)
+        except Exception as ex:
+            print("!!!! JSON Parse Error: File: " + str(file_name))
+            print(" ... " + str(ex))
+            print(" ... " + str(json_lines))
+        return json_parsed
+
     def __load_file(self, file_name, indent):
+        """ load a file for all file in a folder """
         json_lines = ""
-        #print(">>> Loading Json: "+ file_name)
+        # print("Loading JSON: " + file_name)
+        if os.path.isdir(file_name):
+            comma = ""
+            for sub_file_name in os.listdir(file_name):
+                extension = pathlib.Path(sub_file_name).suffix
+                if extension.lower() in [".json"]:
+                    incl_dir_file_name = file_name + os.path.sep + sub_file_name
+                    json_lines += comma
+                    comma = ","
+                    json_lines += indent + self.__load_file(
+                        incl_dir_file_name, indent)
+        else:
+            json_lines += self.__load_one_file(file_name, indent)
+        return json_lines
+
+    def __load_one_file(self, file_name, indent):
+        """ load just one file """
+        json_lines = ""
+        # print("Loading JSON: " + file_name)
         with open(file_name,
                   encoding=locale.getpreferredencoding(False)) as json_file:
             json_line_list = json_file.readlines()
             for json_line in json_line_list:
                 new_line = json_line.rstrip()
                 # print(">>> line: {"+str(sline)+"}")
-                include_loc = new_line.find(INCLUDE_TOKEN)
-                if include_loc != -1:
+                trim_new_line = new_line.strip()
+                # print(">>> time line: " + str(trim_new_line))
+                if trim_new_line.startswith(INCLUDE_TOKEN):
                     (include_file_name, new_indent) = \
                         self.__parse_include_file_name(new_line, indent)
-                    # print(">>> include: " + str(include_file_name))
                     if os.path.sep in include_file_name:
                         # file name include a dir path, leave it alone
                         pass
@@ -106,12 +165,13 @@ class JsonUtils(object):
                         (fpath, _fname) = os.path.split(file_name)
                         if fpath != "":
                             include_file_name = fpath + os.path.sep + include_file_name
+                    # print("Include JSON file: " + str(include_file_name))
                     json_lines += new_indent + self.__load_file(
                         include_file_name, new_indent)
                     if new_line.endswith(","):
                         json_lines += new_indent + ","
                 else:
-                    if new_line.find(COMMENT_TOKEN) == -1:
+                    if not trim_new_line.startswith(COMMENT_TOKEN):
                         # ignore comments
                         #print(">>> Json Line: "+ str(json_line))
                         json_lines += indent + new_line

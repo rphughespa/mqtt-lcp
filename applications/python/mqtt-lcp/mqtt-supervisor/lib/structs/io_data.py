@@ -6,7 +6,7 @@
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,17 +25,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 
+
 import sys
 from copy import deepcopy
 import json
 
 sys.path.append('../../lib')
 
-from utils.utility import Utility
 from utils.global_constants import Global
-
-
-
+from utils.utility import Utility
 #import time
 
 
@@ -79,7 +77,7 @@ class IoData(object):
         self.mqtt_version = None
         self.mqtt_command_topic = None
         self.mqtt_data_topic = None
-        self.mqtt_dispatcher_topic = None
+        self.mqtt_roster_topic = None
         self.mqtt_data_type = None
         self.mqtt_timestamp = None
         self.mqtt_metadata = None
@@ -101,40 +99,47 @@ class IoData(object):
             print("Exception during JSON parsing: " + str(exc) + "\n" +
                   str(body))
         if body_map is not None:
+            if not isinstance(body_map, dict):
+                # opps, mqtt bost is a value, not a map, build a amp for it
+                body_map = {Global.UNKNOWN: {Global.STATE: {Global.DESIRED: body_map}}}
             # get root key of dict
             mroot = list(body_map.keys())[0]
             mbody = body_map[mroot]
-            new_io_data.mqtt_message_root = reversed_globals.get(
-                mroot, mroot).lower()
+            if mbody is not None and isinstance(mbody, dict):
+                new_io_data.mqtt_message_root = reversed_globals.get(
+                    mroot, mroot).lower()
 
-            new_io_data.mqtt_topic = topic
-            new_io_data.mqtt_reported = mbody.get(Global.REPORTED, None)
-            new_io_data.mqtt_node_id = mbody.get(Global.NODE_ID, None)
-            new_io_data.mqtt_port_id = mbody.get(Global.PORT_ID, None)
-            new_io_data.mqtt_throttle_id = mbody.get(Global.THROTTLE_ID, None)
-            new_io_data.mqtt_cab_id = mbody.get(Global.CAB_ID, None)
-            new_io_data.mqtt_loco_id = mbody.get(Global.LOCO_ID, None)
-            new_io_data.mqtt_identity = mbody.get(Global.IDENTITY, None)
-            new_io_data.mqtt_session_id = mbody.get(Global.SESSION_ID, None)
-            new_io_data.mqtt_version = mbody.get(Global.VERSION, None)
-            new_io_data.mqtt_timestamp = mbody.get(Global.TIMESTAMP, None)
-            new_io_data.mqtt_respond_to = mbody.get(Global.RESPOND_TO, None)
-            new_io_data.mqtt_metadata = mbody.get(Global.METADATA, None)
-            if ((new_io_data.mqtt_metadata is not None)
-                    and (isinstance(new_io_data.mqtt_metadata, dict))):
-                new_io_data.mqtt_type = new_io_data.mqtt_metadata.get(
-                    Global.TYPE, None)
-            new_io_data.mqtt_state = mbody.get(Global.STATE, None)
-            if ((new_io_data.mqtt_state is not None)
-                    and (isinstance(new_io_data.mqtt_state, dict))):
-                new_io_data.mqtt_desired = new_io_data.mqtt_state.get(
-                    Global.DESIRED, None)
-                new_io_data.mqtt_reported = new_io_data.mqtt_state.get(
-                    Global.REPORTED, None)
+                new_io_data.mqtt_topic = topic
+                new_io_data.mqtt_reported = mbody.get(Global.REPORTED, None)
+                new_io_data.mqtt_node_id = mbody.get(Global.NODE_ID, None)
+                new_io_data.mqtt_port_id = mbody.get(Global.PORT_ID, None)
+                new_io_data.mqtt_throttle_id = mbody.get(
+                    Global.THROTTLE_ID, None)
+                new_io_data.mqtt_cab_id = mbody.get(Global.CAB_ID, None)
+                new_io_data.mqtt_loco_id = mbody.get(Global.LOCO_ID, None)
+                new_io_data.mqtt_identity = mbody.get(Global.IDENTITY, None)
+                new_io_data.mqtt_session_id = mbody.get(
+                    Global.SESSION_ID, None)
+                new_io_data.mqtt_version = mbody.get(Global.VERSION, None)
+                new_io_data.mqtt_timestamp = mbody.get(Global.TIMESTAMP, None)
+                new_io_data.mqtt_respond_to = mbody.get(
+                    Global.RESPOND_TO, None)
+                new_io_data.mqtt_metadata = mbody.get(Global.METADATA, None)
+                if ((new_io_data.mqtt_metadata is not None)
+                        and (isinstance(new_io_data.mqtt_metadata, dict))):
+                    new_io_data.mqtt_type = new_io_data.mqtt_metadata.get(
+                        Global.TYPE, None)
+                new_io_data.mqtt_state = mbody.get(Global.STATE, None)
+                if ((new_io_data.mqtt_state is not None)
+                        and (isinstance(new_io_data.mqtt_state, dict))):
+                    new_io_data.mqtt_desired = new_io_data.mqtt_state.get(
+                        Global.DESIRED, None)
+                    new_io_data.mqtt_reported = new_io_data.mqtt_state.get(
+                        Global.REPORTED, None)
 
-            (m, c) = new_io_data.categorize_message(topic)
-            new_io_data.mqtt_major_category = m
-            new_io_data.mqtt_message_category = c
+                (m, c) = new_io_data.categorize_message(topic)
+                new_io_data.mqtt_major_category = m
+                new_io_data.mqtt_message_category = c
         return new_io_data
 
     @classmethod
@@ -388,8 +393,8 @@ class IoData(object):
                 category = Global.MQTT_REQUEST_NODE
         elif self.mqtt_message_root == Global.TOWER:
             category = Global.MQTT_REQUEST_TOWER
-        elif self.mqtt_message_root == Global.DISPATCHER:
-            category = Global.MQTT_REQUEST_DISPATCHER
+        elif self.mqtt_message_root == Global.ROSTER:
+            category = Global.MQTT_REQUEST_ROSTER
         elif self.mqtt_message_root == Global.FASTCLOCK:
             category = Global.MQTT_REQUEST_FASTCLOCK
         elif self.mqtt_message_root == Global.SWITCH:
@@ -406,6 +411,7 @@ class IoData(object):
 
     def categorize_response_message(self):
         """ categorize a response message """
+        # print(">>> response root: " + str(self.mqtt_message_root))
         category = Global.MQTT_RESPONSE
         if self.mqtt_message_root == Global.NODE:
             category = Global.MQTT_RESPONSE_NODE
@@ -423,24 +429,29 @@ class IoData(object):
             #            else:
             #                category = Global.MQTT_RESPONSE_TOWER_REPORT
             report = self.mqtt_reported
+            port_id = self.mqtt_port_id
             if report is None:
                 category = Global.MQTT_RESPONSE_TOWER
-            elif report == Global.ROSTER:
-                category = Global.MQTT_RESPONSE_TOWER_REPORT
-            elif report == Global.INVENTORY:
+            elif port_id == Global.INVENTORY:
                 category = Global.MQTT_RESPONSE_INVENTORY_REPORT
-            elif report == Global.WARRANTS:
-                category = Global.MQTT_RESPONSE_WARRANTS_REPORT
-            elif report == Global.PANELS:
+            elif port_id == Global.PANELS:
                 category = Global.MQTT_RESPONSE_PANELS_REPORT
-            elif report == Global.STATES:
+            elif port_id == Global.STATES:
                 category = Global.MQTT_RESPONSE_STATES_REPORT
+            elif port_id == Global.SWITCHES:
+                category = Global.MQTT_RESPONSE_SWITCHES_REPORT
+            elif port_id == Global.SIGNALS:
+                category = Global.MQTT_RESPONSE_SIGNALS_REPORT
+            elif port_id == Global.ROUTES:
+                category = Global.MQTT_RESPONSE_ROUTES_REPORT
+            elif port_id == Global.FASTCLOCK:
+                category = Global.MQTT_RESPONSE_FASTCLOCK
             else:
                 category = Global.MQTT_RESPONSE_TOWER_REPORT
-        elif self.mqtt_message_root == Global.FASTCLOCK:
-            category = Global.MQTT_RESPONSE_FASTCLOCK
-        elif self.mqtt_message_root == Global.DISPATCHER:
-            category = Global.MQTT_RESPONSE_DISPATCHER
+        elif self.mqtt_message_root == Global.ROSTER:
+            category = Global.MQTT_RESPONSE_ROSTER_REPORT
+        elif self.mqtt_message_root == Global.DCC_COMMAND:
+            category = Global.MQTT_RESPONSE_DCC_COMMAND
         elif self.mqtt_message_root == Global.SWITCH:
             category = Global.MQTT_RESPONSE_SWITCH
         elif self.mqtt_message_root == Global.SENSOR:
@@ -472,6 +483,12 @@ class IoData(object):
             category = Global.MQTT_DATA_BACKUP
         elif self.mqtt_message_root == Global.CAB:
             category = Global.MQTT_DATA_CAB
+        elif self.mqtt_message_root == Global.ROSTER:
+            category = Global.MQTT_DATA_ROSTER
+        elif self.mqtt_message_root == Global.DASHBOARD:
+            category = Global.MQTT_DATA_DASHBOARD
+        elif self.mqtt_message_root == Global.TOWER:
+            category = Global.MQTT_DATA_TOWER
         else:
             category = Global.MQTT_DATA
         return category

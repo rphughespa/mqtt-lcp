@@ -8,7 +8,7 @@ global_synonyms.py - helper class to provide use of synonyms for certain terms.
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -39,7 +39,7 @@ class Synonyms(object):
         pass
 
     @classmethod
-    def in_synonym_active(cls, name=None):
+    def is_synonym_active(cls, name=None):
         """ checks for synonyms of 'thrown' """
         syn = False
         if name in [Global.THROWN, Global.OPENED, Global.ON, Global.ACTIVE,
@@ -48,16 +48,16 @@ class Synonyms(object):
         return syn
 
     @classmethod
-    def in_synonym_activate(cls, name=None):
+    def is_synonym_activate(cls, name=None):
         """ checks for synonyms of 'throw' """
         syn = False
-        if name in [Global.THROW, Global.OPEN, Global.ON, Global.ACTIVE,
+        if name in [Global.THROW, Global.OPEN, Global.ON, Global.ACTIVATE,
                     "1", 1]:
             syn = True
         return syn
 
     @classmethod
-    def in_synonym_inactive(cls, name=None):
+    def is_synonym_inactive(cls, name=None):
         """ check for synonyms of 'closed' """
         syn = False
         if name in [Global.CLOSED, Global.OFF, Global.INACTIVE, "0", 0]:
@@ -65,7 +65,7 @@ class Synonyms(object):
         return syn
 
     @classmethod
-    def in_synonym_deactivate(cls, name=None):
+    def is_synonym_deactivate(cls, name=None):
         """ check for synonyms of 'close' """
         syn = False
         if name in [Global.CLOSE, Global.OFF, Global.DEACTIVATE, "0", 0]:

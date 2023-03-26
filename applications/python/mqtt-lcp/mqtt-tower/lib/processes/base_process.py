@@ -7,7 +7,7 @@ base_process - parent class for processes
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -254,12 +254,15 @@ class BaseProcess(Process):
 
     def __load_config_file(self):
         """ load  configuration file """
-        if os.path.exists('config.yaml'):
-            self.__load_yaml_config_file(file="config.yaml")
-        elif os.path.exists('config.yml'):
-            self.__load_yaml_config_file(file="config.yml")
+        config_root = "."
+        if os.path.exists("configure"):
+            config_root = "configure"
+        if os.path.exists(os.path.join(config_root, 'config.yaml')):
+            self.__load_yaml_config_file(file=os.path.join(config_root, "config.yaml"))
+        elif os.path.exists(os.path.join(config_root,'config.yml')):
+            self.__load_yaml_config_file(file=os.path.join(config_root,"config.yml"))
         else:
-            self.__load_json_config_file()
+            self.__load_json_config_file(config_root)
         #  print(">>> config: "+str(self.config))
 
     def __load_yaml_config_file(self, file="config.yaml"):
@@ -278,15 +281,15 @@ class BaseProcess(Process):
             self.events[Global.SHUTDOWN].set()
         self.config = config
 
-    def __load_json_config_file(self):
+    def __load_json_config_file(self, file="config.json"):
         """ load config.json configuration file """
         config = None
         json_helper = JsonUtils()
         try:
-            config = json_helper.load_and_parse_file("config.json")
+            config = json_helper.load_and_parse_file(file)
         except Exception as exc:
             message = "Exception during JSON parsing, exiting: "\
-                + str(exc) + "\n" + str("config.json")
+                + str(exc) + "\n" + str(file)
             print(message)
             self.log_critical(message)
             # wait a few seconds to error to be logged

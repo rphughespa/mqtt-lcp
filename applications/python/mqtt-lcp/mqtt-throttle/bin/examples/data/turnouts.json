@@ -1,0 +1,64 @@
+{
+	"turnouts": {
+		"e-platform-1": {
+			"description": "East Platform 1",
+			"blocks": {
+				"entry": "b2",
+				"continue": "b3",
+				"diverge":"b2n"
+			},
+			"messages": {
+				"command" : "cmd/mqtt-lcp/turnout/harris01/e-platform1",
+				"state": "dt/mqtt-lcp//turnout/harris01/e-platform1"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		},
+		"e-platform-2": {
+			"description": "East Platform 2",
+			"blocks": {
+				"entry": "b3",
+				"continue": "b4",
+				"diverge":"b3n"
+			},
+			"messages": {
+				"command" : "cmd/mqtt-lcp/turnout/harris01/e-platform2",
+				"state": "dt/mqtt-lcp/turnout/harris01/e-platform2"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		},
+		"w-platform-1": {
+			"description": "Eest Platform 1",
+			"blocks": {
+				"entry": "b1",
+				"continue": "b2",
+				"diverge":"b1n"
+			},
+			"messages": {
+				"command" : "cmd/mqtt-lcp/turnout/state01/w-platform1",
+				"state": "dt/mqtt-lcp/turnout/state01/w-platform1"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		},
+		"w-platform-2": {
+			"description": "West Platform 2",
+			"blocks": {
+				"entry": "b4",
+				"continue": "b5",
+				"diverge":"b5n"
+			},
+			"messages":{
+				"command" : "cmd/mqtt-lcp/turnout/state01/w-platform2",
+				"state": "dt/mqtt-lcp/turnout/state01/w-platform2"
+			},
+			"state":{
+				"reported": "unknown"
+			}
+		}
+	}
+}

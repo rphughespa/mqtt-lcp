@@ -5,7 +5,7 @@ IocConfig- helper class that is used when passing io device config items from co
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -103,7 +103,8 @@ class IoConfig(object):
         io_mux_address = dev_config.get(Global.IO_MUX_ADDRESS, None)
         io_device = dev_config.get(Global.IO_DEVICE, None)
         io_device_type = dev_config.get(Global.IO_DEVICE_TYPE, None)
-        okk = self.__check_config(io_device, io_device_type, io_address,
+        io_port_id = dev_config.get(Global.PORT_ID, None)
+        okk = self.__check_config(io_device, io_device_type, io_address, io_port_id,
                                   io_sub_address, dev_config)
         if okk:
             io_dev_key = str(io_address)
@@ -150,11 +151,12 @@ class IoConfig(object):
         """ if the device type valid """
         return dev_type in (Global.BLOCK, Global.DCC_ACCESSORY, Global.ENCODER,
                             Global.LOCATOR, Global.MULTIPLE,
-                            Global.PORT_EXPANDER, Global.PORT_EXPANDER_RELAY_16,
+                            Global.PORT_EXPANDER, Global.PORT_EXPANDER_RELAY,
                             Global.PORT_EXPANDER_RELAY_QUAD,
                             Global.RAILCOM, Global.RFID, Global.SENSOR,
                             Global.SERVO, Global.SERVO_CONTROLLER,
-                            Global.SIGNAL, Global.SWITCH)
+                            Global.SIGNAL, Global.SWITCH, Global.DISPLAY,
+                            Global.TURNTABLE)
 
     def __build_port_map(self):
         """ build a map of device by port id """
@@ -169,14 +171,14 @@ class IoConfig(object):
     def __add_port_to_map(self, port_id, key):
         if port_id is not None:
             if port_id in self.io_port_map:
-                self.__log_warning("Configuration error: duplicate ite with same port: ["+\
+                self.__log_warning("Configuration error: duplicate item with same port: ["+\
                             str(port_id)+"]")
             else:
                 self.io_port_map[port_id] = key
                 self.__log_debug("I2C Device: " + str(key) +\
                             " : " + str(port_id))
 
-    def __check_config(self, io_device, io_device_type, io_address,
+    def __check_config(self, io_device, io_device_type, io_address, io_port_id,
                        io_sub_address, dev_config):
         okk = True
         if io_address is None and io_sub_address is None:
@@ -202,6 +204,12 @@ class IoConfig(object):
                 "Configuration error, io-device-type invalid: " +
                 str(dev_config))
             okk = False
+        if io_port_id is not None:
+            if " " in io_port_id:
+                self.__log_warning(
+                    "Configuration error, port_id contain spaces: " +
+                    str(dev_config))
+                okk = False
         return okk
 
     def __log_warning(self, message):

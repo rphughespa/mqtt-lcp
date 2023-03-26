@@ -1,0 +1,39 @@
+{
+    "config": {
+        "node": {
+            "name": "**host**-i2c"
+        },
+        "logger": {
+            "level": "info",
+            "file": "/var/log/mqtt-lcp/**node**.log"
+        },
+        "io": {
+            "mqtt": {
+                "broker": "mqtt-broker.local",
+                "port": 1883,
+                "user": "trains",
+                "password": "choochoo",
+                "ping": 10,
+                "sub-topics": {
+                    "self": "cmd/mqtt-lcp/node/**node**/#",
+                    "broadcast": "cmd/mqtt-lcp/node/all/#",
+                    "switch": "cmd/mqtt-lcp/switch/**node**/#",
+                    "signal": "cmd/mqtt-lcp/signal/**node**/#",
+                    "sensor": "cmd/mqtt-lcp/sensor/**node**/#"
+                },
+                "pub-topics": {
+                    "ping": "dt/mqtt-lcp/ping/**node**",
+                    "locator": "dt/mqtt-lcp/locator/**node**",
+                    "sensor": "dt/mqtt-lcp/sensor/**node**",
+                    "backup": "dt/mqtt-lcp/backup/**node**",
+                    "roster": "cmd/mqtt-lcp/roster/mqtt-dev-dcc-command",
+                    "registry": "cmd/mqtt-lcp/registry/mqtt-registry/reports"
+                }
+            },
+            "i2c": {
+                "i2c-bus-number": 1
+            },
+            "io-devices": []
+        }
+    }
+}

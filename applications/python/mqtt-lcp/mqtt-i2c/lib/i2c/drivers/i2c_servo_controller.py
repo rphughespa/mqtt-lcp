@@ -7,7 +7,7 @@
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -76,6 +76,7 @@ class I2cServoController(I2cBaseDriver):
 
     def request_device_action(self, message):
         """ send rquest to i2c device; message is an io_data instance"""
+        #print(">>> servo request")
         return_reported = Global.ERROR
         return_message = "Unknown request: " + str(message.mqtt_desired)
         send_after = None
@@ -128,6 +129,7 @@ class I2cServoController(I2cBaseDriver):
         sub_dev.send_sensor_message = io_device.mqtt_send_sensor_message
         sub_dev.open = open_deg
         sub_dev.close = close_deg
+        sub_dev.state = Global.OFF
         self.port_map.update({io_device.mqtt_port_id: sub_dev})
 
     def __send_request_to_switch(self, message):
@@ -136,17 +138,22 @@ class I2cServoController(I2cBaseDriver):
         return_reported = Global.ERROR
         return_message = "Unknown request: " + str(message.mqtt_desired)
         send_after_message = None
-        desired = message.mqtt_desired
-        if Synonyms.in_synonym_activate(message.mqtt_desired):
-            desired = Global.ON
-        elif Synonyms.in_synonym_deactivate(desired):
-            desired = Global.OFF
-        if desired in (Global.ON, Global.OFF):
-            sub_dev = self.port_map.get(message.mqtt_port_id, None)
-            if sub_dev is None:
-                return_message = "Unknown Port ID: " + \
-                    str(message.mqtt_port_id)
-            else:
+        sub_dev = self.port_map.get(message.mqtt_port_id, None)
+        if sub_dev is None:
+            return_message = "Unknown Port ID: " + \
+            str(message.mqtt_port_id)
+        else:
+            desired = message.mqtt_desired
+            if desired == Global.THROW:
+                if sub_dev.state == Global.OFF:
+                    desired = Global.ON
+                else:
+                    desired = Global.OFF
+            if Synonyms.is_synonym_activate(message.mqtt_desired):
+                desired = Global.ON
+            elif Synonyms.is_synonym_deactivate(desired):
+                desired = Global.OFF
+            if desired in (Global.ON, Global.OFF):
                 start_pos = sub_dev.close
                 end_pos = sub_dev.open
                 if desired == Global.OFF:
@@ -158,6 +165,8 @@ class I2cServoController(I2cBaseDriver):
                 send_after_message = self.__move_servo(message, sub_dev.base_pin, start_pos, end_pos)
                 return_reported = Synonyms.desired_to_reported(
                     message.mqtt_desired)
+                sub_dev.state = return_reported
+                self.port_map.update({message.mqtt_port_id: sub_dev})
                 return_message = None
         if return_reported != Global.ERROR and sub_dev.send_sensor_message:
             data_reported = return_reported

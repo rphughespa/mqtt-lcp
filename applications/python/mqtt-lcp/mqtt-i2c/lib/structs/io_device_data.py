@@ -6,7 +6,7 @@
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -26,7 +26,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 """
 import sys
 
-sys.path.append('../../lib')
 
 
 class IoDeviceData(object):
@@ -42,8 +41,3 @@ class IoDeviceData(object):
         self.blink = 0
         self.open = 0
         self.close = 0
-
-    def __repr__(self):
-        # return "%s(%r)" % (self.__class__, self.__dict__)
-        fdict = repr(self.__dict__)
-        return f"{self.__class__}({fdict})"

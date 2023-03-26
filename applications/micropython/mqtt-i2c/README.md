@@ -8,7 +8,7 @@ Some of application translat SWITCH and SIGNAL MQTT requests and manipulates the
 
 Other applications read from I2C devices and transmit SENSOR messages.
 
-These application are designed to run on microcontrollers.  They were primarily designed and tested on a Raspberry RP2040 Pico W board.  They were also tested on an ESP32 board, the Adafruit QT Py ESP32 Pico.
+These application are designed to run on microcontrollers.  They were primarily designed and tested on a Raspberry RP2040 Pico W board.  They were also tested on an ESP32 board, the Adafruit QT Py ESP32 Pico. Both used micropython ver 1.19.1.
 
 Each applicarion only supports a specific type of I2C device:
 
@@ -34,8 +34,6 @@ In reality there are two major factors that limit how many devices can be useful
 The first is electrical.  In many situations, the length of the physical I2C wiring should not exceed about 12 inches
 
 The second limit is on what computing device controls the I2C bus.  On a microcontroller, having one or two device on the bus is useful.  On a larger computer, like a Raspberry PI, many more devices can be controlled.
-
-
 
 
 [Please see the WIKI for more information](https://github.com/rphughespa/mqtt-lcp/wiki)

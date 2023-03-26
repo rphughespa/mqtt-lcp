@@ -1,0 +1,69 @@
+{
+  "config": {
+    "node": {
+      "name": "**host**-turntable"
+    },
+    "logger": {
+      "level": "info",
+      "file": "/var/log/mqtt-lcp/**node**.log"
+    },
+    "io": {
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "port": 1883,
+        "user": "trains",
+        "password": "choochoo",
+        "ping": 10,
+        "sub-topics": {
+          "self": "cmd/mqtt-lcp/node/**node**/#",
+          "broadcast": "cmd/mqtt-lcp/node/all/#",
+          "switch": "cmd/mqtt-lcp/switch/**node**/#"
+        },
+        "pub-topics": {
+          "ping": "dt/mqtt-lcp/ping/**node**",
+          "switch": "dt/mqtt-lcp/switch/**node**"
+        }
+      },
+      "serial": {
+        "baudrate": 9600,
+        "usb-vendor-id": 1027,
+        "usb-product-id": 24577,
+        "serial-mode": "text"
+      },
+      "io-devices": [
+        {
+          "io-device": "turntable",
+          "io-device-type": "switch",
+          "io-address": 0,
+          "port-id": "home",
+          "description": "move to home",
+          "send-sensor-message": "yes"
+        },
+        {
+          "io-device": "turntable",
+          "io-device-type": "switch",
+          "io-address": 1,
+          "port-id": "track-1",
+          "description": "move to track 1",
+          "send-sensor-message": "yes"
+        },
+        {
+          "io-device": "turntable",
+          "io-device-type": "switch",
+          "io-address": 2,
+          "port-id": "track-2",
+          "description": "move to track 2",
+          "send-sensor-message": "yes"
+        },
+        {
+          "io-device": "turntable",
+          "io-device-type": "switch",
+          "io-address": 3,
+          "port-id": "track-3",
+          "description": "move to track 3",
+          "send-sensor-message": "yes"
+        }
+      ]
+    }
+  }
+}

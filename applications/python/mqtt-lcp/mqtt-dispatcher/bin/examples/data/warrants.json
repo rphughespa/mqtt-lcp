@@ -1,0 +1,80 @@
+{
+	"warrants": {
+		"wb-b1-b3": {
+			"description": "WB Block 1 to block 3",
+			"paths": [
+				{
+					"block": {
+						"name" : "b1",
+						"state": "trains/state/block/harris01/block1"
+					},
+					"signal": {
+						"name": "b1wb",
+						"state": "trains/state/signal/harris01/block1-wb"
+					},
+					"state": "clear"
+				},
+				{
+					"block": {
+						"name" : "b2",
+						"state": "trains/state/block/harris01/block2"
+					},
+					"signal": {
+						"name": "b2wb",
+						"state": "trains/state/signal/harris01/block2-wb"
+					},
+					"state": "clear"
+				},
+				{
+					"block": {
+						"name" : "b3",
+						"state": "trains/state/block/harris01/block3"
+					},
+					"signal": {
+						"name": "b3wb",
+						"state": "trains/state/signal/harris01/block3-wb"
+					},
+					"state": "clear"
+				}
+			]
+		},
+		"eb-b3-b1": {
+			"description": "EB Block 3 to block 1",
+			"paths": [
+				{
+					"block": {
+						"name" : "b3",
+						"state": "trains/state/block/harris01/block3"
+					},
+					"signal": {
+						"name": "b3eb",
+						"state": "trains/state/signal/harris01/block1-eb"
+					},
+					"state": "clear"
+				},
+				{
+					"block": {
+						"name" : "b2",
+						"state": "trains/state/block/harris01/block2"
+					},
+					"signal": {
+						"name": "b2eb",
+						"state": "trains/state/signal/harris01/block2-eb"
+					},
+					"state": "clear"
+				},
+				{
+					"block": {
+						"name" : "b1",
+						"state": "trains/state/block/harris01/block1"
+					},
+					"signal": {
+						"name": "b3eb",
+						"state": "trains/state/signal/harris01/block3-eb"
+					},
+					"state": "clear"
+				}
+			]
+		}
+	}
+}

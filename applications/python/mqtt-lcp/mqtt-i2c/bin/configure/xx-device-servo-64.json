@@ -1,0 +1,51 @@
+{
+    "io-device": "servo-controller",
+    "io-device-type": "multiple",
+    "io-address": 64,
+    "io-sub-devices": [
+        {
+            "io-sub-address": 0,
+            "io-device-type": "switch",
+            "port-id": "maryville",
+            "description": "Maryville Siding",
+            "send-sensor-message": "yes",
+            "io-metadata": {
+                "open": 75,
+                "close": 25
+            }
+        },
+        {
+            "io-device-type": "switch",
+            "io-sub-address": 1,
+            "port-id": "oak",
+            "description": "Oak Siding",
+            "send-sensor-message": "yes",
+            "io-metadata": {
+                "open": 55,
+                "close": 35
+            }
+        },
+        {
+            "io-device-type": "switch",
+            "io-sub-address": 2,
+            "port-id": "garland",
+            "description": "Garland Station",
+            "send-sensor-message": "yes",
+            "io-metadata": {
+                "open": 55,
+                "close": 35
+            }
+        },
+        {
+            "io-device-type": "switch",
+            "io-sub-address": 3,
+            "port-id": "summersville",
+            "description": "Summersville Station",
+            "end-sensor-message": "yes",
+            "io-metadata": {
+                "open": 55,
+                "close": 35
+            }
+        }
+    ]
+}

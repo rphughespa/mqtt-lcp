@@ -1,0 +1,10 @@
+{
+    "io-device": "rfid",
+    "io-device-type": "sensor",
+    "io-address": 119,
+    "port-id": "station-east-entrance",
+    "description": "Entrance to station, East side",
+    "io-metadata": {
+        "type": "rfid"
+    }
+}

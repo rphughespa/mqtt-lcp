@@ -1,0 +1,95 @@
+{
+	"roster": {
+		"pcc-trolley-3247" : { 
+			"description": "PTC PCC trolley # 3247",
+			"ids": {
+				"dcc": "3247",
+				"rfid": "74992736454"
+			},
+			"max_speedstep" : "10",
+			"functions": {
+				"f0": {
+					"label": "light",
+					"type": "toggle",
+					"state": "unknown"
+				},
+				"f1": {
+					"label": "motor",
+					"type": "toggle",
+					"state": "unknown"
+				},
+				"f2": {
+					"label": "bell",
+					"type": "monentary",
+					"state": "unknown"
+				},
+				"f3": {
+					"label": "horn",
+					"type": "momemtary",
+					"state": "unknown"
+				}
+			}
+		},
+		"green-gg1-6354": {
+			"description": "PRR GG1 in Green # 6354",
+			"ids": {
+				"dcc": "3247",
+				"rfid": "27465786"
+			},
+			"max_speedstep" : "10",
+			"functions": {
+				"f0": {
+					"label": "light",
+					"type": "toggle",
+					"state": "unknown"
+				},
+				"f1": {
+					"label": "motor",
+					"type": "toggle",
+					"state": "unknown"
+				},
+				"f2": {
+					"label": "bell",
+					"type": "monentary",
+					"state": "unknown"
+					
+				},
+				"f3": {
+					"label": "horn",
+					"type": "momemtary",
+					"state": "unknown"
+				}
+			}
+		},
+		"e8-4352": {
+			"description": "PRR E8 in Tuscan # 4352",
+			"ids": {
+				"dcc": "4352",
+				"rfid": "837463524"
+			},
+			"max_speedstep" : "10",
+			"functions": {
+				"f0": {
+					"label": "light",
+					"type": "toggle",
+					"state": "unknown"
+				},
+				"f1": {
+					"label": "motor",
+					"type": "toggle",
+					"state": "unknown"
+				},
+				"f2": {
+					"label": "bell",
+					"type": "monentary",
+					"state": "unknown"
+				},
+				"f3": {
+					"label": "horn",
+					"type": "momemtary",
+					"state": "unknown"
+				}
+			}
+		}
+	}
+}

@@ -8,7 +8,7 @@ I2cPortExpanderMcp23017 - low level hardware driver fot a port expander connecte
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -125,6 +125,142 @@ class I2cPortExpanderMcp23017(I2cBaseDevice):
         #    print(">>> ... "+str(read_pins))
         return read_pins
 
+    def init_output_pin(self, selected_pin, active_low=True):
+        """ set a pin into output_mode """
+        # pins must be 0-15
+        iodir_reg = None
+        gpio_reg = None
+
+        reg_bit = None
+        if 0 <= selected_pin <= 7:
+            iodir_reg = REG_IODIR_A
+            gpio_reg = REG_GPIO_A
+            reg_bit = selected_pin
+        elif 8 <= selected_pin <= 15:
+            iodir_reg = REG_IODIR_B
+            gpio_reg = REG_GPIO_B
+            reg_bit = selected_pin - 8
+        else:
+            self.log_error("Port expander pins must be 0-15: {" +
+                           str(selected_pin) + "}")
+        self.pin_active_low[selected_pin] = active_low
+        if iodir_reg is not None:
+            # 1 = input, 0 = output
+            self.__clear_a_register_bit(iodir_reg, reg_bit)
+            if active_low:
+                # turn on pin as init value
+                self.__set_a_register_bit(gpio_reg, reg_bit)
+            else:
+                # turn off pin as init_value
+                self.__clear_a_register_bit(gpio_reg, reg_bit)
+            self.log_debug("Init Output Pin: " + " ... " + str() +
+                           str(selected_pin))
+
+    def init_input_pin(self, selected_pin, active_low=True):
+        """ set a pin into output_mode """
+        # pins must be 0-15
+        iodir_reg = None
+        gpio_reg = None
+        gpinten_reg = None
+        gppu_reg = None
+        intcon_reg = None
+        reg_bit = None
+        if 0 <= selected_pin <= 7:
+            iodir_reg = REG_IODIR_A
+            gpio_reg = REG_GPIO_A
+            gpinten_reg = REG_GPINTEN_A
+            intcon_reg = REG_INTCON_A
+            gppu_reg = REG_GPPU_A
+            reg_bit = selected_pin
+        elif 8 <= selected_pin <= 15:
+            iodir_reg = REG_IODIR_B
+            gpio_reg = REG_GPIO_B
+            gpinten_reg = REG_GPINTEN_B
+            intcon_reg = REG_INTCON_B
+            gppu_reg = REG_GPPU_B
+            reg_bit = selected_pin - 8
+        else:
+            self.log_error("Port expander pins must be 0-15: {" +
+                           str(selected_pin) + "}")
+        self.has_inputs = True
+        self.pin_active_low[selected_pin] = active_low
+        if iodir_reg is not None:
+            # 1 = input, 0 = output
+            # by default all pins already initialized as input
+            # self.__clear_a_register_bit(iodir_reg, reg_bit)
+            # set pullup on all input pins
+            self.__set_a_register_bit(gppu_reg, reg_bit)
+            if self.pin_active_low[selected_pin]:
+                # turn on pin as init value
+                self.__set_a_register_bit(gpio_reg, reg_bit)
+            else:
+                # turn off pin as init_value
+                self.__clear_a_register_bit(gpio_reg, reg_bit)
+            # set pin to trigger interrupt on change
+            self.__set_a_register_bit(gpinten_reg, reg_bit)
+            # set pin to interrupt when value changes
+            self.__clear_a_register_bit(intcon_reg, reg_bit)
+            self.log_debug("Init Interrupt Input Pin: " + " ... " + str() +
+                           str(selected_pin))
+
+    def set_output_pin(self, selected_pin, pin_on=False, pulse=0):
+        """ set a output pin on or off """
+        # pins must be 0-15
+        gpio_reg = None
+        reg_bit = None
+        if 0 <= selected_pin <= 7:
+            gpio_reg = REG_GPIO_A
+            reg_bit = selected_pin
+        elif 8 <= selected_pin <= 15:
+            gpio_reg = REG_GPIO_B
+            reg_bit = selected_pin - 8
+        else:
+            self.log_error("Port expander pins must be 0-15: {" +
+                           str(selected_pin) + "}")
+        # self.pin_active_low[selected_pin] = active_low
+        pin_mode = pin_on
+        if self.pin_active_low[selected_pin]:
+            pin_mode = not pin_mode
+        if gpio_reg is not None:
+            if pin_mode:
+                # turn on pin
+                self.__set_a_register_bit(gpio_reg, reg_bit)
+                if pulse != 0:
+                    time.sleep(pulse / 1000)
+                    self.__clear_a_register_bit(gpio_reg, reg_bit)
+            else:
+                # turn off pin
+                self.__clear_a_register_bit(gpio_reg, reg_bit)
+                if pulse != 0:
+                    time.sleep(pulse / 1000)
+                    self.__set_a_register_bit(gpio_reg, reg_bit)
+
+    def read_input_pin(self, selected_pin):
+        """ read a input pin on or off """
+        # pins must be 0-15
+        gpio_reg = None
+        reg_bit = None
+        if 0 <= selected_pin <= 7:
+            gpio_reg = REG_GPIO_A
+            reg_bit = selected_pin
+        elif 8 <= selected_pin <= 15:
+            gpio_reg = REG_GPIO_B
+            reg_bit = selected_pin - 8
+        else:
+            self.log_error("Port expander pins must be 0-15: {" +
+                           str(selected_pin) + "}")
+
+        pin_setting = None
+        if gpio_reg is not None:
+            pin_setting = self.__isset_a_register_bit(gpio_reg, reg_bit)
+            if self.pin_active_low[selected_pin]:
+                pin_setting = not pin_setting
+        return pin_setting
+
+#
+# private functions
+#
+
     def __read_input_pins(self):
         """ read input pin values """
         fixed_pins = []
@@ -205,132 +341,6 @@ class I2cPortExpanderMcp23017(I2cBaseDevice):
         all_regs = self.i2c_bus.read_i2c_block_data(self.i2c_address, 0x00, 22)
         self.log_debug("All Regs: " + str(self.i2c_address) + " ... " +
                        str(all_regs))
-
-    def init_output_pin(self, selected_pin, active_low=True):
-        """ set a pin into output_mode """
-        # pins must be 0-15
-        iodir_reg = None
-        gpio_reg = None
-        reg_bit = None
-        if 0 <= selected_pin <= 7:
-            iodir_reg = REG_IODIR_A
-            gpio_reg = REG_GPIO_A
-            reg_bit = selected_pin
-        elif 8 <= selected_pin <= 15:
-            iodir_reg = REG_IODIR_B
-            gpio_reg = REG_GPIO_B
-            reg_bit = selected_pin - 8
-        else:
-            self.log_error("Port expander pins must be 0-15: {" +
-                           str(selected_pin) + "}")
-        self.pin_active_low[selected_pin] = active_low
-        if iodir_reg is not None:
-            # 1 = input, 0 = output
-            self.__clear_a_register_bit(iodir_reg, reg_bit)
-            if active_low:
-                # turn on pin as init value
-                self.__set_a_register_bit(gpio_reg, reg_bit)
-            else:
-                # turn off pin as init_value
-                self.__clear_a_register_bit(gpio_reg, reg_bit)
-            self.log_debug("Init Output Pin: " + " ... " + str() +
-                           str(selected_pin))
-
-    def init_input_pin(self, selected_pin, active_low=True):
-        """ set a pin into output_mode """
-        # pins must be 0-15
-        iodir_reg = None
-        gpio_reg = None
-        gpinten_reg = None
-        intcon_reg = None
-        reg_bit = None
-        if 0 <= selected_pin <= 7:
-            iodir_reg = REG_IODIR_A
-            gpio_reg = REG_GPIO_A
-            gpinten_reg = REG_GPINTEN_A
-            intcon_reg = REG_INTCON_A
-            reg_bit = selected_pin
-        elif 8 <= selected_pin <= 15:
-            iodir_reg = REG_IODIR_B
-            gpio_reg = REG_GPIO_B
-            gpinten_reg = REG_GPINTEN_B
-            intcon_reg = REG_INTCON_B
-            reg_bit = selected_pin - 8
-        else:
-            self.log_error("Port expander pins must be 0-15: {" +
-                           str(selected_pin) + "}")
-        self.has_inputs = True
-        self.pin_active_low[selected_pin] = active_low
-        if iodir_reg is not None:
-            # 1 = input, 0 = output
-            # by default all pins already initialized as input
-            # self.__clear_a_register_bit(iodir_reg, reg_bit)
-            if self.pin_active_low[selected_pin]:
-                # turn on pin as init value
-                self.__set_a_register_bit(gpio_reg, reg_bit)
-            else:
-                # turn off pin as init_value
-                self.__clear_a_register_bit(gpio_reg, reg_bit)
-            # set pin to trigger interrupt on change
-            self.__set_a_register_bit(gpinten_reg, reg_bit)
-            # set pin to interrupt when value chnages
-            self.__clear_a_register_bit(intcon_reg, reg_bit)
-            self.log_debug("Init Interrupt Input Pin: " + " ... " + str() +
-                           str(selected_pin))
-
-    def set_output_pin(self, selected_pin, pin_on=False, pulse=0):
-        """ set a output pin on or off """
-        # pins must be 0-15
-        gpio_reg = None
-        reg_bit = None
-        if 0 <= selected_pin <= 7:
-            gpio_reg = REG_GPIO_A
-            reg_bit = selected_pin
-        elif 8 <= selected_pin <= 15:
-            gpio_reg = REG_GPIO_B
-            reg_bit = selected_pin - 8
-        else:
-            self.log_error("Port expander pins must be 0-15: {" +
-                           str(selected_pin) + "}")
-        # self.pin_active_low[selected_pin] = active_low
-        pin_mode = pin_on
-        if self.pin_active_low[selected_pin]:
-            pin_mode = not pin_mode
-        if gpio_reg is not None:
-            if pin_mode:
-                # turn on pin
-                self.__set_a_register_bit(gpio_reg, reg_bit)
-                if pulse != 0:
-                    time.sleep(pulse / 1000)
-                    self.__clear_a_register_bit(gpio_reg, reg_bit)
-            else:
-                # turn off pin
-                self.__clear_a_register_bit(gpio_reg, reg_bit)
-                if pulse != 0:
-                    time.sleep(pulse / 1000)
-                    self.__set_a_register_bit(gpio_reg, reg_bit)
-
-    def read_input_pin(self, selected_pin):
-        """ read a input pin on or off """
-        # pins must be 0-15
-        gpio_reg = None
-        reg_bit = None
-        if 0 <= selected_pin <= 7:
-            gpio_reg = REG_GPIO_A
-            reg_bit = selected_pin
-        elif 8 <= selected_pin <= 15:
-            gpio_reg = REG_GPIO_B
-            reg_bit = selected_pin - 8
-        else:
-            self.log_error("Port expander pins must be 0-15: {" +
-                           str(selected_pin) + "}")
-
-        pin_setting = None
-        if gpio_reg is not None:
-            pin_setting = self.__isset_a_register_bit(gpio_reg, reg_bit)
-            if self.pin_active_low[selected_pin]:
-                pin_setting = not pin_setting
-        return pin_setting
 
     def __set_a_register_bit(self, selected_register, selected_bit):
         """ set a bit in a register """

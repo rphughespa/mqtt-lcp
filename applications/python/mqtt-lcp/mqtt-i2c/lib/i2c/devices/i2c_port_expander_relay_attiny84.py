@@ -9,7 +9,7 @@ I2cPortExpanderRelayAttiny84 - low level hardware driver for a port expander con
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,

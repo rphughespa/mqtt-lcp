@@ -1,7 +1,0 @@
-{
-    "io-device": "encoder",
-    "io-device-type": "sensor",
-    "io-address": 63,
-    "port-id": "throttle",
-    "description": "Throttle"
-}

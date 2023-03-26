@@ -7,7 +7,7 @@
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -31,6 +31,8 @@ sys.path.append('../../lib')
 
 import time
 from random import randrange
+
+import json
 
 import paho.mqtt.client as mqtt
 
@@ -98,7 +100,8 @@ class MqttProcess(BaseProcess):
         if message_type == Global.MQTT_PUBLISH_JSON:
             # message body is already in JSON format
             (topic, message_body) = message
-            self.__send_to_mqtt(topic, message_body)
+            payload = json.dumps(message_body)
+            self.__send_to_mqtt(topic, payload)
         elif message_type == Global.MQTT_PUBLISH_IODATA:
             # message body id iodata instance
             (topic, message_body) = message
@@ -115,6 +118,12 @@ class MqttProcess(BaseProcess):
     def process_other(self):
         """ proceesses not related to messages to in_queue """
         pass
+
+
+
+    #
+    # privarte functions
+    #
 
     def __start_mqtt_process(self):
         """ Start MQTT IO """
@@ -175,13 +184,22 @@ class MqttProcess(BaseProcess):
             # Signal connection
             self.connected = True
         else:
-            self.log_info("Connection failed: " + str(rcode))
-            raise OSError("MQTT Connettion Failed")
+            self.log_critical("Connection failed: " + str(rcode))
+            # raise OSError("MQTT Connettion Failed")
+            self.log_critical("Reconnecting ...")
+            time.sleep(3)
+            self.close()
 
     def disconnect_cb(self, client, userdata, rcode=0):
         """ callback from paho modile during disconnection """
-        self.log_critical("DisConnected result code " + str(rcode))
-        self.mqtt_client.loop_stop()
+        if not self.events[Global.SHUTDOWN].is_set():
+            # raise OSError("MQTT Connettion Failed")
+            self.log_critical("DisConnected result code " + str(rcode))
+            self.log_critical("Reconnecting ...")
+            time.sleep(3)
+            self.close()
+        else:
+            self.mqtt_client.loop_stop()
 
     def subscribe_cb(self, client, userdata, mid, granted_qos):
         """ callback from paho module during subscription """

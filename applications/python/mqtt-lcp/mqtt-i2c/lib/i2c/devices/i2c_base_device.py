@@ -7,7 +7,7 @@ I2cBaseDevice - contain soem common helper functions for I2C device devices
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -60,6 +60,10 @@ class I2cBaseDevice(object):
         """ read input """
         # nothing read
         return []
+
+    def init_input_pin(self, selected_pin, active_low=True):
+        """ initialize input pin """
+        # nothing to do
 
     def request_device_action(self, _message):
         """ send output to the i2c device """

@@ -26,16 +26,16 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 import sys
+import copy
+
 
 sys.path.append('../../lib')
 
-import copy
-
 from utils.global_constants import Global
-
 
 class InventoryData(object):
     """ status of a node """
+
     def __init__(self, init_map=None):
         self.key = None
         self.node_id = None
@@ -48,20 +48,23 @@ class InventoryData(object):
             self.parse(init_map)
 
     def __repr__(self):
-        #return "%s(%r)" % (self.__class__, self.__dict__)
+        # return "%s(%r)" % (self.__class__, self.__dict__)
         fdict = repr(self.__dict__)
         return f"{self.__class__}({fdict})"
 
     def parse(self, map_body=None):
         """ parse a map return new class instance """
         # print(">>> item body: " + str(map_body))
-        self.node_id = map_body.get(Global.NODE_ID, None)
-        self.port_id = map_body.get(Global.PORT_ID, None)
-        self.description = map_body.get(Global.DESCRIPTION, None)
-        self.command_topic = map_body.get(Global.COMMAND_TOPIC, None)
-        self.data_topic = map_body.get(Global.DATA_TOPIC, None)
-        self.metadata = map_body.get(Global.METADATA, None)
-        self.key = str(self.node_id) + ":" + str(self.port_id)
+        if not isinstance(map_body, dict):
+            print("!!! error, bad inventory item: " + str(map_body))
+        else:
+            self.node_id = map_body.get(Global.NODE_ID, None)
+            self.port_id = map_body.get(Global.PORT_ID, None)
+            self.description = map_body.get(Global.DESCRIPTION, None)
+            self.command_topic = map_body.get(Global.COMMAND_TOPIC, None)
+            self.data_topic = map_body.get(Global.DATA_TOPIC, None)
+            self.metadata = map_body.get(Global.METADATA, None)
+            self.key = str(self.node_id) + ":" + str(self.port_id)
 
     def encode(self):
         """ encode a map """
@@ -83,6 +86,7 @@ class InventoryData(object):
 
 class InventoryGroupData(object):
     """ a group of inventory data items"""
+
     def __init__(self, init_list=None):
         self.inventory_items = []
         if init_list is not None:
@@ -136,6 +140,7 @@ class InventoryGroupData(object):
 
 class Inventory(object):
     """ a groups of inventory data items"""
+
     def __init__(self, init_map=None):
         self.description = None
         self.inventory_groups = self.__init_group_map()
@@ -151,8 +156,8 @@ class Inventory(object):
         """ parse a map return new class instance """
         #print(">>> inc: " + str(map_map))
         map_body = map_map.get(Global.INVENTORY, map_map)
-        group_body = map_body.get(Global.GROUPS, map_body)
-        #print(">>> inc2: " + str(group_body))
+        group_body = map_body.get(Global.INVENTORY, map_body)
+        # print(">>> inc2: " + str(group_body))
         self.inventory_groups = self.__init_group_map()
         for inventory_group_key, inventory_group_data in \
                 group_body.items():
@@ -163,28 +168,34 @@ class Inventory(object):
             })
         # print(">>> inventory groups parsed : " + str(self.inventory_groups))
 
-    def encode(self):
+    def encode(self, requested_group=None):
         """ encode a map """
+        print(">>> inv encode: "+str(requested_group))
         emap = {}
         if self.inventory_groups is not None:
-            new_inventory_groups = self.__init_group_map()
+            new_inventory_groups = {}
+            if requested_group is not None:
+                new_inventory_groups = {requested_group: InventoryGroupData()}
+            else:
+                new_inventory_groups = self.__init_group_map()
             for inventory_group_key, inventory_group in \
                     self.inventory_groups.items():
-                new_inventory_group = inventory_group.encode()
-                new_inventory_groups.update(
-                    {inventory_group_key: new_inventory_group})
+                if (requested_group is None) or (requested_group == inventory_group_key):
+                    new_inventory_group = inventory_group.encode()
+                    new_inventory_groups.update(
+                            {inventory_group_key: new_inventory_group})
             emap = new_inventory_groups
         #  print(">>> inventory groups encoded: " + str(emap))
         return {
             Global.INVENTORY: {
                 Global.DESCRIPTION: "Inventory",
-                Global.GROUPS: emap
+                Global.INVENTORY: emap
             }
         }
 
     def add_node_inventory(self, node_id, node_inventory):
         """ update current inventory with inventory from a node """
-        #print(">>> node inventory: " + str(node_id) + "...\n" +
+        # print(">>> node inventory: " + str(node_id) + "...\n" +
         #      str(node_inventory))
         # clear out previous inventroy item from this node
         self.remove_node_inventory(node_id)
@@ -201,14 +212,14 @@ class Inventory(object):
     def remove_node_inventory(self, node_id):
         """ remove all inventory items belonging to a node """
         for _inventory_group_key, inventory_group in \
-                    self.inventory_groups.items():
+                self.inventory_groups.items():
             inventory_group.remove_node_inventory(node_id)
 
     def build_node_item_list(self, node_id):
         """ build a list of all inventory items for a node """
         node_item_list = []
         for inventory_group_key, inventory_group in \
-                    self.inventory_groups.items():
+                self.inventory_groups.items():
             for item in inventory_group.inventory_items:
                 if item.node_id == node_id:
                     node_item_list.append(inventory_group_key + ":" + item.key)

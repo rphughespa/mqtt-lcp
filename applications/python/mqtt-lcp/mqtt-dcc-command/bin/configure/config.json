@@ -1,0 +1,114 @@
+{
+    "config": {
+        "node": {
+            "name": "mqtt-dev-dcc-command"
+        },
+        "logger": {
+            "level": "info",
+            "file": "/var/log/mqtt-lcp/**node**.log"
+        },
+        "io": {
+            "mqtt": {
+                "broker": "mqtt-broker.local",
+                "port": 1883,
+                "user": "trains",
+                "password": "choochoo",
+                "ping": 10,
+                "sub-topics": {
+                    "self": "cmd/mqtt-lcp/+/**node**/#",
+                    "broadcast": "cmd/mqtt-lcp/node/all/#",
+                    "roster": "cmd/mqtt-lcp/roster/**node**/#",
+                    "cab": "cmd/mqtt-lcp/cab/**node**/#",
+                    "switch": "cmd/mqtt-lcp/switch/**node**/#"
+                },
+                "pub-topics": {
+                    "ping": "dt/mqtt-lcp/ping/**node**",
+                    "switch": "dt/mqtt-lcp/switch/**node**",
+                    "cab": "dt/mqtt-lcp/cab/**node**",
+                    "backup": "dt/mqtt-lcp/backup/**node**",
+                    "roster": "dt/mqtt-lcp/roster/**node**/roster",
+                    "block": "dt/mqtt-lcp/block/**node**",
+                    "locator": "dt/mqtt-lcp/locator/**node**"
+                },
+                "other-topics": {
+                    "throttle-ping": "dt/mqtt-lcp/ping/**throttle**"
+                }
+            },
+            "roster-server": {
+                "host": "mqtt-broker.local",
+                "port": 12080,
+                "path": "/json/roster"
+            },
+            "serial": {
+                // "serial settings for dcc++ driver"
+                "baudrate": "115200",
+                "usb-vendor-id": 9025,
+                "usb-product-id": 66,
+                "serial-mode": "text"
+            },
+            "network": {
+                "server": {
+                    // " a withrottle server driver"
+                    //  "lnw1 ",
+                    "host": "192.168.7.1",
+                    "port": 12090,
+                    // "jmri"
+                    //host": "mqtt-broker.local",
+                    //"port": 12090,
+                    "mode": "text"
+                }
+            },
+            "io-devices": [
+                // for dcc connected accessory decoders
+                {
+                    "io-device": "dcc-accessory",
+                    "io-device-type": "switch",
+                    "io-address": 11,
+                    "io-sub-address": 0,
+                    "port-id": "jonesville",
+                    "description": "jonesville siding",
+                    "send-sensor-message": "yes"
+                },
+                {
+                    "io-device": "dcc-accessory",
+                    "io-device-type": "switch",
+                    "io-address": 12,
+                    "io-sub-address": 0,
+                    "port-id": "maple",
+                    "description": "maple siding",
+                    "send-sensor-message": "yes"
+                },
+                {
+                    "io-device": "dcc-accessory",
+                    "io-device-type": "switch",
+                    "io-address": 13,
+                    "io-sub-address": 0,
+                    "port-id": "clarksboro",
+                    "description": "clarksboro siding",
+                    "send-sensor-message": "yes"
+                },
+                {
+                    "io-device": "dcc-accessory",
+                    "io-device-type": "switch",
+                    "io-address": 14,
+                    "io-sub-address": 0,
+                    "port-id": "harris ferry",
+                    "description": "harris ferry siding",
+                    "send-sensor-message": "yes"
+                }
+            ]
+        },
+        "options": {
+            "roster-data-path": "/home/pi/mqtt-lcp/data/roster",
+            "consists-data-path": "/home/pi/mqtt-lcp/data/consists",
+            "max-locos": 32,
+            // "mode: specify type of device; either dcc++ or withrottle"
+            // "mode": "dcc++",
+            "mode": "withrottle",
+            "time": {
+                "throttle-timeout": 15,
+                "roster-server-refresh": 300
+            }
+        }
+    }
+}

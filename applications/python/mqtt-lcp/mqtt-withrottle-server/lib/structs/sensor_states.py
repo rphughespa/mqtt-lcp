@@ -63,7 +63,7 @@ class SensorStateData(object):
         self.reported = map_body.get(Global.REPORTED, None)
         self.timestamp = map_body.get(Global.TIMESTAMP, 0)
         self.metadata = map_body.get(Global.METADATA, None)
-        self.key = str(self.node_id) + ":" + str(self.port_id)
+        self.key = SensorStates.build_sensor_key(self.node_id, self.port_id)
 
     def encode(self):
         """ encode a map """
@@ -124,7 +124,7 @@ class SensorStatesGroupData(object):
                 item = self.sensor_state_items.get(key, None)
                 if item is not None and \
                     item.node_id == node_id:
-                    match_key = group_id + ":" + item.key
+                    match_key = SensorStates.build_sensor_key(group_id, item.key)
                     # print(">>> match key: " + str(match_key))
                     if not match_key in node_item_list:
                         self.sensor_state_items.pop(key)
@@ -141,6 +141,12 @@ class SensorStates(object):
         # return "%s(%r)" % (self.__class__, self.__dict__)
         fdict = repr(self.__dict__)
         return f"{self.__class__}({fdict})"
+
+    @classmethod
+    def build_sensor_key(cls, node_id, port_id):
+        """ build key for a sensor """
+        return str(node_id) + ":" + str(port_id)
+
 
     def parse(self, map_map=None):
         """ parse a map return new class instance """
@@ -194,12 +200,24 @@ class SensorStates(object):
         # Global.OCCUPIED
         # Global.CLEAR
         # Global.APPROACH
-        if not self.__sensor_data_momentary(sensor_group_id, new_sensor_state):
-            if sensor_group_id == Global.LOCATOR:
-                # railcom type locator device, needs special handling
-                self.__update_locator_state(sensor_group_id, new_sensor_state)
-            else:
-                self.__update_simple_state(sensor_group_id, new_sensor_state)
+        if sensor_group_id == Global.LOCATOR:
+            # railcom type locator device, needs special handling
+            self.__update_locator_state(sensor_group_id, new_sensor_state)
+        else:
+            self.__update_simple_state(sensor_group_id, new_sensor_state)
+
+    def sensor_data_momentary(self, sensor_group_id, new_sensor_state):
+        """ sensor data for monentary switch """
+        momentary = False
+        if sensor_group_id == Global.LOCATOR:
+            if new_sensor_state.reported == Global.DETECTED:
+                # RFID tag read, don't record state
+                momentary = True
+        elif sensor_group_id == Global.SENSOR:
+            if new_sensor_state.reported == Global.CLICKED:
+                # push button read, don't record state
+                momentary = True
+        return momentary
 
     #
     # private functions
@@ -225,7 +243,7 @@ class SensorStates(object):
                         #print(">>> loco id: " + str(loco))
                         #print(">>> loco2: " + str(exisiting_sensor_state.loco_id))
                         if new_sensor_state.reported == Global.ENTERED:
-                            # new loc reported, add to loco listif
+                            # new loc reported, add to loco list
                             if exisiting_sensor_state.loco_id.count(loco) == 0:
                                 exisiting_sensor_state.loco_id.append(loco)
                         elif new_sensor_state.reported == Global.EXITED:
@@ -249,17 +267,7 @@ class SensorStates(object):
                     exisiting_sensor_state.timestamp = new_sensor_state.timestamp
                     exisiting_sensor_state.reported = new_sensor_state.reported
 
-    def __sensor_data_momentary(self, sensor_group_id, new_sensor_state):
-        momentary = False
-        if sensor_group_id == Global.LOCATOR:
-            if new_sensor_state.reported == Global.DETECTED:
-                # RFID tag read, don't record state
-                momentary = True
-        elif sensor_group_id == Global.SENSOR:
-            if new_sensor_state.reported == Global.CLICKED:
-                # push button read, don't record state
-                momentary = True
-        return momentary
+
 
     def __init_group_map(self):
         """ init groups """

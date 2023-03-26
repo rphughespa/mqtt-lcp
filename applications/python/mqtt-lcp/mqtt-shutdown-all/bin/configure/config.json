@@ -1,0 +1,27 @@
+{
+  "config": {
+    "node": {
+      "name": "**host**-shutdown-all"
+    },
+    "logger": {
+      "level": "info",
+      "file": "/var/log/mqtt-lcp/**node**.log"
+    },
+    "io": {
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "port": 1883,
+        "user": "trains",
+        "password": "choochoo",
+        "ping": 10,
+        "sub-topics": {
+          "self": "cmd/mqtt-lcp/nodes/**node**/#"
+        },
+        "pub-topics": {
+          "ping": "dt/mqtt-lcp/broadcast/ping/**node**",
+          "broadcast": "cmd/mqtt-lcp/node/all/req"
+        }
+      }
+    }
+  }
+}

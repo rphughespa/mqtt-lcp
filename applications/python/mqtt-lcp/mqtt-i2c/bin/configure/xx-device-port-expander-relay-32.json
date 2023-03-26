@@ -1,0 +1,95 @@
+{
+	"io-device": "port-expander-relay",
+	"io-device-type": "multiple",
+	"io-address": 32,
+	"io-sub-devices": [
+		{
+			"io-sub-address": 0,
+			"io-device-type": "sensor",
+			"port-id": "mill-siding-sensor-32",
+			"description": "Steel Mill Siding",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"report": {
+					"on": "clicked"
+				}
+			}
+		},
+		{
+			"io-sub-address": 1,
+			"io-device-type": "sensor",
+			"port-id": "lumber-siding-sensor-32",
+			"description": "Lumber Siding",
+			"send-sensor-message": "yes"
+		},
+		{
+			"io-sub-address": 2,
+			"io-device-type": "signal",
+			"port-id": "130w-32",
+			"description": "130w",
+			"send-sensor-message": "no",
+			"io-metadata": {
+				"signal-type": "single",
+				"x-blink": 500
+			}
+		},
+		{
+			"io-sub-address": 3,
+			"io-device-type": "signal",
+			"port-id": "131w-32",
+			"description": "131w",
+			"send-sensor-message": "no",
+			"io-metadata": {
+				"signal-type": "single",
+				"blink": 500
+			}
+		},
+		{
+			"io-sub-address": 4,
+			"io-device-type": "switch",
+			"port-id": "oak-32",
+			"description": "Oak Duplex Siding",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"x-switch-type": "toggle",
+				"switch-type": "duplex"
+			}
+		},
+		{
+			"io-sub-address": 6,
+			"io-device-type": "switch",
+			"port-id": "maryville-32",
+			"description": "Maryville Duplex Siding",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"x-switch-type": "toggle",
+				"switch-type": "duplex",
+				"pulse": 100
+			}
+		},
+		{
+			"io-sub-address": 8,
+			"io-device-type": "signal",
+			"port-id": "112e-32",
+			"description": "112e",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"xx-signal-type": "single",
+				"signal-type": "color",
+				"x2-signal-type": "position"
+			}
+		},
+		{
+			"io-sub-address": 12,
+			"io-device-type": "signal",
+			"port-id": "121e-32",
+			"description": "121e",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"xx-signal-type": "single",
+				"x2-signal-type": "color",
+				"signal-type": "position"
+			}
+		}
+	]
+}

@@ -7,7 +7,7 @@ I2cBus - thin wrapper around smbus2 adding retries on block read and write
 
 The MIT License (MIT)
 
-Copyright 2021 richard p hughes
+Copyright 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -65,7 +65,6 @@ class I2cBus(SMBus):
             self.log_queue.put(
                 (Global.LOG_LEVEL_ERROR, "Exception during i2c_write: " + str(exc) +
                     " ... " + str(i2c_addr)))
-
 
     def write_i2c_block_data(self, i2c_addr, register, data, force=None):
         """ wrute a block of data """
@@ -126,6 +125,21 @@ class I2cBus(SMBus):
                     " ... " + str(i2c_addr)))
             # raise exc
         return rett
+
+    #def scan(self):
+    #    """ scna the i2c bus, report device found """
+    #    found = []
+    #    for device in range(128):
+    #        try:
+    #            super().read_byte_data(device, 0, 1)
+    #            found.append(device)
+    #        except: # exception if read_byte fails
+    #            pass
+    #    return found
+
+#
+#   private functions
+#
 
     def __write_byte_catch_exception(self, i2c_addr, register, data):
         io_ok = True
