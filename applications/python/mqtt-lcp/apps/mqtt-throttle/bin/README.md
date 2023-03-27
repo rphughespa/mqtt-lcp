@@ -1,6 +1,6 @@
 #### MQTT-LCP Application
 
-# MQTT-PI-THROTTLE
+# MQTT-THROTTLE
 
 This application presents an GUI interface to control locos.
 
