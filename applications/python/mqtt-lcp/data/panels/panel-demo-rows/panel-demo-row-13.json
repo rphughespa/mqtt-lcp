@@ -1,0 +1,12 @@
+{
+    "row": 13,
+    "cols": [
+       {
+            "col": 7,
+            "node-id": "mqtt-dev-proto",
+            "port-id": "120e",
+            "image": "signal-left",
+            "type": "signal"
+        }
+    ]
+}

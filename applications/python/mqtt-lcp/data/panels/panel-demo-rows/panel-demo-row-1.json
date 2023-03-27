@@ -1,0 +1,18 @@
+{
+    "row": 1,
+    "cols": [
+        {
+            "col": 6,
+            "node-id": "mqtt-dev-proto",
+            "port-id": "130w",
+            "image": "signal-right",
+            "type": "signal"
+        },
+        {
+            "col": 7,
+            "node-id": "mqtt-dev-proto",
+            "port-id": "25",
+            "type": "locator"
+        }
+    ]
+}

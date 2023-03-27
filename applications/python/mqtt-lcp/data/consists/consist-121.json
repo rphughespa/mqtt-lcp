@@ -1,0 +1,15 @@
+{
+    "name": "consist 121",
+    "description": "consist of two locos",
+    "dcc-id": 121,
+    "locos": [
+        {
+            "dcc-id": 6352,
+            "direction": "forward"
+        },
+        {
+            "dcc-id": 7352,
+            "direction": "forward"
+        }
+    ]
+}

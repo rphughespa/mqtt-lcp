@@ -1,0 +1,9 @@
+{
+    "io-device": "dcc-accessory",
+    "io-device-type": "switch",
+    "io-address": 14,
+    "io-sub-address": 0,
+    "port-id": "harris-ferry",
+    "description": "harris ferry siding",
+    "send-sensor-message": "yes"
+}

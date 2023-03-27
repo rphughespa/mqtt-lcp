@@ -1,0 +1,9 @@
+{
+    "io-device": "dcc-accessory",
+    "io-device-type": "switch",
+    "io-address": 13,
+    "io-sub-address": 0,
+    "port-id": "clarksboro",
+    "description": "clarksboro siding",
+    "send-sensor-message": "yes"
+}

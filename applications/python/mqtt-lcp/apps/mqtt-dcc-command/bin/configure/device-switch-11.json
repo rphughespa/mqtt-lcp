@@ -1,0 +1,9 @@
+{
+    "io-device": "dcc-accessory",
+    "io-device-type": "switch",
+    "io-address": 11,
+    "io-sub-address": 0,
+    "port-id": "jonesville",
+    "description": "jonesville siding",
+    "send-sensor-message": "yes"
+}

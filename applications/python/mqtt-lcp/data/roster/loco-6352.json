@@ -1,0 +1,34 @@
+{
+    "name": "rdc-6352",
+    "description": "PRR RDC # 6352",
+    "dcc-id": 6352,
+    "rfid-id": "836663511",
+    "max_speedstep": 64,
+    "image": "rdc-prr-silver.png",
+    "functions": {
+        "f0": {
+            "name": "f0",
+            "label": "light",
+            "type": "toggle",
+            "state": "unknown"
+        },
+        "f1": {
+            "name": "f1",
+            "label": "bell",
+            "type": "toggle",
+            "state": "unknown"
+        },
+        "f2": {
+            "name": "f2",
+            "label": "bell",
+            "type": "monentary",
+            "state": "unknown"
+        },
+        "f3": {
+            "name": "f3",
+            "label": "motor",
+            "type": "toggle",
+            "state": "unknown"
+        }
+    }
+}

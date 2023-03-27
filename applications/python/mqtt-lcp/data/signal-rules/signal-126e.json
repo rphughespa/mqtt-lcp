@@ -1,0 +1,39 @@
+{
+    "node-id": "mqtt-i2c",
+    "port-id": "126e",
+    "clear": [
+        [
+            {
+                "node-id": "mqtt-i2c",
+                "port-id": "garland",
+                "state": "closed"
+            },
+            {
+                "node-id": "mqtt-railcom",
+                "port-id": "24",
+                "state": "clear"
+            },
+            {
+                "node-id": "mqtt-i2c",
+                "port-id": "130e",
+                "state": "clear"
+            }
+        ]
+    ],
+    "stop": [
+        [
+            {
+                "node-id": "mqtt-i2c",
+                "port-id": "garland",
+                "state": "thrown"
+            }
+        ],
+        [
+            {
+                "node-id": "mqtt-railcom",
+                "port-id": "24",
+                "state": "occupied"
+            }
+        ]
+    ]
+}

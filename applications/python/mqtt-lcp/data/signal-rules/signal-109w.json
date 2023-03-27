@@ -1,0 +1,25 @@
+{
+    "node-id": "mqtt-i2c",
+    "port-id": "109w",
+    "stop": [
+        [
+            {
+                "node_id": "mqtt-i2c",
+                "port-id": "summersville",
+                "state": "closed"
+            }
+        ],
+        [
+            {
+                "node_id": "mqtt-i2c",
+                "port-id": "summersville",
+                "state": "thrown"
+            },
+            {
+                "node_id": "mqtt-i2c",
+                "port-id": "26",
+                "state": "occupied"
+            }
+        ]
+    ]
+}

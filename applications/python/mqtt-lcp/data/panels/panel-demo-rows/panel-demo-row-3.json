@@ -1,0 +1,40 @@
+{
+    "row": 3,
+    "cols": [
+        {
+            "col": 4,
+            "node-id": "mqtt-dev-proto",
+            "port-id": "25",
+            "image": "low-slash",
+            "type": "block"
+        },
+        {
+            "col": 5,
+            "node-id": "mqtt-dev-proto",
+            "port-id": "25",
+            "image": "up-slash",
+            "type": "block"
+        },
+        {
+            "col": 7,
+            "node-id": "mqtt-dev-proto",
+            "port-id": "140e",
+            "image": "signal-left",
+            "type": "signal"
+        },
+        {
+            "col": 8,
+            "node-id": "mqtt-dev-proto",
+            "port-id": "25",
+            "image": "up-back-slash",
+            "type": "block"
+        },
+        {
+            "col": 9,
+            "node-id": "mqtt-dev-proto",
+            "port-id": "25",
+            "image": "low-back-slash",
+            "type": "block"
+        }
+    ]
+}

@@ -1,0 +1,25 @@
+{
+    "node-id": "mqtt-i2c",
+    "port-id": "138e",
+    "stop": [
+        [
+            {
+                "node-id": "mqtt-i2c",
+                "port-id": "oak",
+                "state": "closed"
+            }
+        ],
+        [
+            {
+                "node-id": "mqtt-i2c",
+                "port-id": "oak",
+                "state": "thrown"
+            },
+            {
+                "node-id": "mqtt-railcom",
+                "port-id": "26",
+                "state": "occupied"
+            }
+        ]
+    ]
+}

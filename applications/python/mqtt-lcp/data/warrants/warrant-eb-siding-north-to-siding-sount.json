@@ -1,0 +1,33 @@
+{
+    "name": "eb-siding-north-to-siding-south",
+    "description": "EB: Siding North to Siding South",
+    "reported": "unknown",
+    "command-topic": "cmd/trains/warrant/harris01/block1-wb/req",
+    "data-topic": "dt/trains/warrant/harris01/block1-wb",
+    "blocks": [
+        {
+            "switch": "siding-north-east",
+            "state": "thrown"
+        },
+        {
+            "block": "north-east",
+            "signal": "north-east-eb"
+        },
+        {
+            "block": "east",
+            "signal": "east-eb"
+        },
+        {
+            "block": "south-east",
+            "signal": "south-east-eb"
+        },
+        {
+            "switch": "siding-southh-east",
+            "state": "thrown"
+        },
+        {
+            "block": "siding-south",
+            "signal": "siding-south-eb"
+        }
+    ]
+}

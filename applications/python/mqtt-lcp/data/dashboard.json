@@ -1,0 +1,36 @@
+{
+	"dashboard": {
+		"name" : "dashboard",
+		"description" : "dashboard of running applications",
+		"nodes" : {
+			"mqtt-broker-supervisor": {
+				"timestamp" : 0,
+				"state" : "error"
+			},
+			"mqtt-registry": {
+				"timestamp" : 0,
+				"state" : "error"
+			},
+			"mqtt-zero1-supervisor": {
+				"timestamp" : 0,
+				"state" : "error"
+			},
+			"mqtt-zero2-supervisor": {
+				"timestamp" : 0,
+				"state" : "error"
+			},
+			"mqtt-zero3-supervisor": {
+				"timestamp" : 0,
+				"state" : "error"
+			},
+			"mqtt-rfid1": {
+				"timestamp" : 0,
+				"state" : "error"
+			},
+			"mqtt-rfid2": {
+				"timestamp" : 0,
+				"state" : "error"
+			}
+		}
+	}
+}

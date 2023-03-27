@@ -1,0 +1,12 @@
+{
+    "roster": {
+        "name": "roster",
+        "description": "list of locos",
+        "locos": [
+            "...": "roster"
+        ],
+        "consists": [
+            "...": "consists"
+        ]
+    }
+}

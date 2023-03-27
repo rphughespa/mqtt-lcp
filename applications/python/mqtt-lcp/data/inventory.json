@@ -1,0 +1,9 @@
+{
+    "inventory": {
+        "name": "inventory",
+        "description": "list of trackside devices",
+        "inventory": {
+            "...": "inventory"
+        }
+    }
+}

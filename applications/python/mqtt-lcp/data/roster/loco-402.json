@@ -1,0 +1,34 @@
+{
+    "name": "gp9-402",
+    "description": "DT&I GP9 # 402",
+    "dcc-id": 402,
+    "rfid-id": "516892220496",
+    "max_speedstep": 24,
+    "image": "gp9-dti-orange.png",
+    "functions": {
+        "f0": {
+            "name": "f0",
+            "label": "light",
+            "type": "toggle",
+            "state": "unknown"
+        },
+        "f1": {
+            "name": "f1",
+            "label": "motor",
+            "type": "toggle",
+            "state": "unknown"
+        },
+        "f2": {
+            "name": "f2",
+            "label": "bell",
+            "type": "monentary",
+            "state": "unknown"
+        },
+        "f3": {
+            "name": "f3",
+            "label": "horn",
+            "type": "momemtary",
+            "state": "unknown"
+        }
+    }
+}

@@ -1,0 +1,21 @@
+{
+    "name": "eb-b3-b1",
+    "description": "EB Block 3 to block 1",
+    "reported": "unknown",
+    "command-topic": "cmd/trains/warrant/harris01/block1-wb/req",
+    "data-topic": "dt/trains/warrant/harris01/block1-wb",
+    "blocks": [
+        {
+            "block": "b3",
+            "signal": "b3eb"
+        },
+        {
+            "block": "b2",
+            "signal": "b2eb"
+        },
+        {
+            "block": "b1",
+            "signal": "b3e"
+        }
+    ]
+}

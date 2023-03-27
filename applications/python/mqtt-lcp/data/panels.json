@@ -1,0 +1,9 @@
+{
+    "panels": {
+        "name": "panels",
+        "description": "track layout panels",
+        "panels": [
+            "...": "panels"
+        ]
+    }
+}

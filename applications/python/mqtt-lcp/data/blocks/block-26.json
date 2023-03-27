@@ -1,0 +1,46 @@
+{
+    "node-id": "mqtt-railcom",
+    "port-id": "26",
+    "connections": [
+        {
+            "block": {
+                "node-id": "mqtt-ralcom",
+                "port-id": "25"
+            },
+            "signal": {
+                "node-id": "mqtt-i2c",
+                "port-id": "120w"
+            }
+        },
+        {
+            "block": {
+                "node-id": "mqtt-ralcom",
+                "port-id": "27"
+            },
+            "signal": {
+                "node-id": "mqtt-i2c",
+                "port-id": "120w"
+            }
+        },
+        {
+            "block": {
+                "node-id": "mqtt-ralcom",
+                "port-id": "22"
+            },
+            "signal": {
+                "node-id": "mqtt-i2c",
+                "port-id": "141w"
+            }
+        },
+        {
+            "block": {
+                "node-id": "mqtt-ralcom",
+                "port-id": "23"
+            },
+            "signal": {
+                "node-id": "mqtt-i2c",
+                "port-id": "141w"
+            }
+        }
+    ]
+}

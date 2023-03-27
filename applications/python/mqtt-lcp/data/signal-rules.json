@@ -1,0 +1,9 @@
+{
+    "signal-rules": {
+        "name": "signal-rules",
+        "description": "list of signal rules",
+        "signals": [
+            "...": "signal-rules"
+        ]
+    }
+}

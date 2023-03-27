@@ -1,0 +1,9 @@
+{
+    "io-device": "dcc-accessory",
+    "io-device-type": "switch",
+    "io-address": 12,
+    "io-sub-address": 0,
+    "port-id": "maple",
+    "description": "maple siding",
+    "send-sensor-message": "yes"
+}

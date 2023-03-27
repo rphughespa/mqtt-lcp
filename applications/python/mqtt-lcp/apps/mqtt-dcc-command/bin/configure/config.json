@@ -60,42 +60,6 @@
             },
             "io-devices": [
                 // for dcc connected accessory decoders
-                {
-                    "io-device": "dcc-accessory",
-                    "io-device-type": "switch",
-                    "io-address": 11,
-                    "io-sub-address": 0,
-                    "port-id": "jonesville",
-                    "description": "jonesville siding",
-                    "send-sensor-message": "yes"
-                },
-                {
-                    "io-device": "dcc-accessory",
-                    "io-device-type": "switch",
-                    "io-address": 12,
-                    "io-sub-address": 0,
-                    "port-id": "maple",
-                    "description": "maple siding",
-                    "send-sensor-message": "yes"
-                },
-                {
-                    "io-device": "dcc-accessory",
-                    "io-device-type": "switch",
-                    "io-address": 13,
-                    "io-sub-address": 0,
-                    "port-id": "clarksboro",
-                    "description": "clarksboro siding",
-                    "send-sensor-message": "yes"
-                },
-                {
-                    "io-device": "dcc-accessory",
-                    "io-device-type": "switch",
-                    "io-address": 14,
-                    "io-sub-address": 0,
-                    "port-id": "harris ferry",
-                    "description": "harris ferry siding",
-                    "send-sensor-message": "yes"
-                }
             ]
         },
         "options": {
@@ -103,8 +67,8 @@
             "consists-data-path": "/home/pi/mqtt-lcp/data/consists",
             "max-locos": 32,
             // "mode: specify type of device; either dcc++ or withrottle"
-            // "mode": "dcc++",
-            "mode": "withrottle",
+            "mode": "dcc++",
+            //"mode": "withrottle",
             "time": {
                 "throttle-timeout": 15,
                 "roster-server-refresh": 300

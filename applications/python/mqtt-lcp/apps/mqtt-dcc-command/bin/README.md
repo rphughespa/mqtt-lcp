@@ -10,9 +10,11 @@ This application is coded to communicate with two differnt hardware "back-ends" 
 * **DCC++** - MQTT-DCC-COMMAND can connect directly to an Arduiono running the DCC++ (or DCC++Ex) via
         a serial USB connection.
 
+        Note: Tested with DCC-EX V-4.1.2. The preamble size was changed from 16 to 64 to better accomodate Railcom.
+
 * **WITHROTTLE** - MQTT-DCC-COMMAND can connect to a Withrottle server to drive locos via that server.
 
-    Tested with Digitrax LNW1 and JMRI Withrottle servers.
+        Note: Tested with Digitrax LNW1 and JMRI Withrottle servers.
 
 MQTT-DCC-COMMAND also distributes the ROSTER to the throttles. Optionally, this aplication will peridoically
 connect to a JMRI REST server and download the ROSTER maintained in DecoderPro and merge it into the MQTT-LCP ROSTER.
