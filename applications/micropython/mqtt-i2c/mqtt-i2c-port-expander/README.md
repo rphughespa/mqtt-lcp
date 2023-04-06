@@ -22,13 +22,30 @@ The MCP23017 is an IO device where the 12v Relay board is output only.
 The output operation supported on both boards are:
 
 * **Signals**
-    * **single lamps**: on/off or blink
-    * **3 lamps**: 'color' signal heads
-    * **4 lamps**: 'positional'signal heads
+
+    * **single**: one pin on/off or blink
+
+    * **color**: 'three pins for a color' signal heads
+
+    * **position**: four pins for a 'positional'signal heads
+
+    * **rgb**: three pins to drive an rpg led used as a searchlight signal/
+
+    * **toggle**: two pins, "on" turn on one pin, turn off the other. "off" reverses the lights.
+
+    * **flasher**: Two pins are alternate on/off at a set blink rate.
+
+    * **pulse**: The "single" or "toggle" types can be engerized for a short period then quickly deengerized. This is intended to simulate a push button press/release
+
+
+
 * **Switches**:
-    * **Single**: Simple on/off (throw/close)
-    * **Toggle**: Two pins. When one pin is engerized on on, the other pin engerized on off
-    * **Pulse**: Either of the above switch types default to steady state, simulating a togole switch.  Each of the above can also be configured to PULSE, quick ON then OFF. This simulates a puch button.
+
+    * **single**: Simple on/off (throw/close)
+
+    * **toggle**: Two pins. When one pin is engerized on on, the other pin engerized on off
+
+    * **pulse**: Either of the above switch types default to steady state, simulating a togole switch.  Each of the above can also be configured to PULSE, quick ON then OFF. This simulates a puch button.
 
 
 [Please see the WIKI for more information](https://github.com/rphughespa/mqtt-lcp/wiki)

@@ -1,0 +1,33 @@
+{
+  "config": {
+    "node": {
+      "name": "mqtt-gpio-port-expander"
+    },
+    "io": {
+      "network": {
+        "wifi": {
+          "ssid": "xx-ssid-xx",
+          "password": "xx-passwd-xx",
+          "hostname": "mqtt-i2c-rfid"
+        }
+      },
+      "mqtt": {
+        "broker": "mqtt-broker.local",
+        "port": 1883,
+        "user": "trains",
+        "password": "choochoo",
+        "ping": 10,
+        "sub-topics": {
+          "self": "cmd/mqtt-lcp/node/**node**/#",
+          "broadcast": "cmd/mqtt-lcp/node/all/#",
+          "signal": "cmd/mqtt-lcp/signal/**node**/#"
+        },
+        "pub-topics": {
+          "ping": "dt/mqtt-lcp/ping/**node**",
+          "sensor": "dt/mqtt-lcp/sensor/**node**"
+        }
+      },
+      "io-devices": []
+    }
+  }
+}

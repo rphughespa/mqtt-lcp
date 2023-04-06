@@ -54,6 +54,9 @@ class I2cServoController():
         self.input_pin_map = {}
         self.input_pin_report_map = {}
         self.send_after_port_queue = {}  # ports that have active send after operations
+        
+    def initialize(self):
+        """ init the controller """
         self.__initialize_device()
 
     def perform_periodic_operation(self):
@@ -106,7 +109,7 @@ class I2cServoController():
         """ initialize the device """
         if self.io_device.io_sub_devices is not None:
             for (_key, sub_device) in self.io_device.io_sub_devices.items():
-                self.logger.log_line("sub dev: " + str(sub_device.io_sub_address))
+                # self.logger.log_line("sub dev: " + str(sub_device.io_sub_address))
                 self.__initialize_a_port(sub_device)
 
     def __initialize_a_port(self, sub_device):

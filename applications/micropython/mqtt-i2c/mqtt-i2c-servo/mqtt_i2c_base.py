@@ -179,7 +179,8 @@ class MqttI2cBase:
         """ setup a logger, console only or console and i2c display """
         for _key, item in self.io_config.io_device_map.items():
             # print(">>> i2c: "+str(item.io_device))
-            if item.io_device == Global.DISPLAY:
+            if item.io_device == Global.DISPLAY and \
+                    item.io_address in self.i2c_bus.scan():
                 meta = item.io_metadata
                 # found an i2c display
                 self.logger = LoggerDisplay(self.i2c_bus, item.io_address, meta.get(Global.TYPE, None))
@@ -208,16 +209,21 @@ class MqttI2cBase:
         msg_body.mqtt_node_id = self.node_name
         msg_body.mqtt_version = "1.0"
         msg_body.mqtt_timestamp = now
-        self.publish_message(topic, msg_body)
+        pub_topic = topic
+        port_id = msg_body.mqtt_port_id
+        if port_id is not None and not port_id in pub_topic:
+            pub_topic = pub_topic + "/" + port_id
+        self.publish_message(pub_topic, msg_body)
 
     def publish_sensor_data_message(self, msg_body):
         """ publish a sensor type data mqtt message """
-        topic = self.pub_topics.get(msg_body.mqtt_message_root, None)
-        if topic is None:
-            topic = self.pub_topics.get(Global.SENSOR, None)
-        if topic is not None:
-            topic += "/" + msg_body.mqtt_port_id
-            self.publish_data_message(topic, msg_body)
+        pub_topic = self.pub_topics.get(msg_body.mqtt_message_root, None)
+        if pub_topic is None:
+            pub_topic = self.pub_topics.get(Global.SENSOR, None)
+        if pub_topic is not None:
+            if msg_body.mqtt_port_id is not None:
+                pub_topic += "/" + msg_body.mqtt_port_id
+            self.publish_data_message(pub_topic, msg_body)
 
     def publish_roster_report_request(self, report_desired):
         """ request roster from dcc_command """
@@ -336,7 +342,7 @@ class MqttI2cBase:
                     else:
                         # message not processed, wrong port ID
                         err_msg = "Unknown Port Id: " + str(new_message.mqtt_port_id)
-                        self.logger.log_line(err_msg) 
+                        self.logger.log_line(err_msg)
                         self.publish_response_message(Global.ERROR, {Global.MESSAGE: err_msg}, \
                                                                      None, new_message)
 
@@ -348,7 +354,7 @@ class MqttI2cBase:
                 messages = i2c_device.perform_periodic_operation()
             if messages is not None:
                 for (topic, body) in messages:
-                    self.publish_message(topic, body)
+                    self.publish_data_message(topic, body)
 
     def reverse_globals(self):
         """ generate a reversed list of globals """
@@ -386,6 +392,9 @@ class MqttI2cBase:
                 gc.collect()
                 gc_count = 0
 
+    def is_device_correct_type(main_process, item):
+        """ is config device correct type """
+        return False
 
 #
 # private functions
@@ -409,7 +418,7 @@ class MqttI2cBase:
 
     def __parse_io_config(self):
         """ parse out info from io device in map """
-        i2c_device_found = self.i2c_bus.scan()
+        i2c_devices_found = self.i2c_bus.scan()
         for key, item in self.io_config.io_device_map.items():
             print("io dev config: " + str(key) + \
                   " , type: " + str(item.io_device_type) + \
@@ -418,11 +427,15 @@ class MqttI2cBase:
                   " , sub: " + str(item.io_sub_address) + \
                   " , port: " + str(item.mqtt_port_id))
             if self.is_device_correct_type(item):
-                if item.io_address not in i2c_device_found:
+                if item.io_address != 0 and item.io_address not in i2c_devices_found:
                     print("I2C Device not active: "+str(item.io_address))
                 else:
                     new_device = self.create_new_device(item)
                     self.i2c_devices.append(new_device)
             elif not self.__is_device_display(item):
                 print("Error: device configured is not correct type: " + str(item.io_device_type))
-# 
+
+    def is_device_correct_type(item):
+        """ is device type ok"""
+        # override in derived class
+        return False

@@ -77,7 +77,7 @@ class IoData(object):
         self.mqtt_data_type = None
         self.mqtt_timestamp = None
         self.mqtt_metadata = None
-
+    
     def timestamp(self):
         """ get a millisecond epoch timestamp """
         epoch_seconds = time.time()

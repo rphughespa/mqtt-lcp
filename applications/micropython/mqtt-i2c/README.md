@@ -16,10 +16,13 @@ Each applicarion only supports a specific type of I2C device:
 
 * **MQTT-I2c-SERVO** Supports a servo control board.
 
-* **MQTT-I2C-PORT-EXPANDER** : Supports two different I2C connected port expoanders for controlling signals, switches, sensors.
+* **MQTT-I2C-PORT-EXPANDER** : Supports two different I2C connected port expanders for controlling signals, switches, sensors.
 
     * **MCP23017 Port Expander Board**
     * **12v Relay Board** controlled vai a I2C connected PCA9685 (Iowa Scaled Enginering interface board)
+
+* **MQTT-GPIO-PORT-EXPANDER** : Supports using 16 GPIO pines on a RP2040 PICO W board to control low voltage signals and input devices.
+
 
 ## I2C Bus Devices
 

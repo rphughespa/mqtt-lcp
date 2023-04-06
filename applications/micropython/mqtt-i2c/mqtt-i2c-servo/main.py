@@ -47,6 +47,8 @@ class MqttI2cServo(MqttI2cBase):
         rett = False
         if item.io_device == Global.SERVO_CONTROLLER:
             rett = True
+            print(">>> dev: "+str(item.io_device)+" : "+str(item.io_device_type)+ \
+                  " : "+str(rett))
         return rett
 
     def create_new_device(main_process, device_item):
@@ -54,6 +56,7 @@ class MqttI2cServo(MqttI2cBase):
         device = I2cServoController(i2c_bus=main_process.i2c_bus, \
                     io_device=device_item, node_name=main_process.node_name, pub_topics=main_process.pub_topics,\
                         logger=main_process.logger)
+        device.initialize()
         return device
 
     def start_i2c(main_process):
@@ -69,6 +72,7 @@ class MqttI2cServo(MqttI2cBase):
         """ process a request message """
         rett = i2c_device.process_request_message(message)
         return rett
+
 time.sleep(2)
 
 print("In Main...")

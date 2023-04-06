@@ -43,18 +43,18 @@ from io_device_data import IoDeviceData
 
 import mcp23017
 
-from i2c_port_expander_base import I2cPortExpanderBase
+from port_expander_base import PortExpanderBase
 
 #mcp.pin(3, mode=0) # set pin as output
 #mcp.pin(1, mode=1, polarity=1) # swet pin as input
 # mcp = mcp23017.MCP23017(i2c_bus, 39)
 
-class I2cPortExpander(I2cPortExpanderBase):
+class I2cPortExpander(PortExpanderBase):
     """ Class for an I2C connected port expander device"""
 
     def __init__(self, i2c_bus=None, io_device=None, node_name=None, pub_topics=None, logger=None):
         """ Initialize """
-        super().__init__(io_device=io_device, node_name=node_name, pub_topics=pub_topics,logger=logger) 
+        super().__init__(io_device=io_device, node_name=node_name, pub_topics=pub_topics,logger=logger)
         self.name="port expander_relay"
         self.logger = logger
         self.i2c_address = self.io_device.io_address
@@ -134,14 +134,14 @@ class I2cPortExpander(I2cPortExpanderBase):
         # some pins groups may have mutually exclusive pins
         # set the "off" pins first
         for (set_pin, set_mode, set_pulse) in selected_pins:
-            if not set_mode:
+            if set_mode in [0, False, Global.OFF]:
                 #print(">>> "+str(set_pin)+" ... "+str(set_mode))
-                self.set_output_pin(set_pin, set_mode, set_pulse)
+                self.set_output_pin(set_pin, False, set_pulse)
         # set the "on" pins next
         for (set_pin, set_mode, set_pulse) in selected_pins:
-            if set_mode:
+            if set_mode in [1, True, Global.ON]:
                 #print(">>> "+str(set_pin)+" ... "+str(set_mode))
-                self.set_output_pin(set_pin, set_mode, set_pulse)
+                self.set_output_pin(set_pin, True, set_pulse)
 
     def initialize_device(self):
         """ initialize the device """

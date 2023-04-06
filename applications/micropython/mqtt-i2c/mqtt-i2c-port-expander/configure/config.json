@@ -6,9 +6,9 @@
     "io": {
       "network": {
         "wifi": {
-          "ssid": "zz-ssid",
-          "password": "zz-passwd",
-          "hostname": "mqtt-i2c-port-expander"
+          "ssid": "xx-ssid-xx",
+          "password": "xx-passwd-xx",
+          "hostname": "mqtt-i2c-rfid"
         }
       },
       "mqtt": {

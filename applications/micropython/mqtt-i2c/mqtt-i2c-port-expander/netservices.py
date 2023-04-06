@@ -25,7 +25,8 @@ class NetServices:
         import network
         print("Net Config: "+str(self.config[Global.CONFIG][Global.IO][Global.NETWORK]))
         wlan = network.WLAN(network.STA_IF)
-        wlan.active(True)
+        print("WLAN Active:",wlan.active(True)) 
+        # wlan.active(True)
         wifi_ssid = self.config[Global.CONFIG][Global.IO][Global.NETWORK][Global.WIFI][Global.SSID]
         wifi_password = self.config[Global.CONFIG][Global.IO][Global.NETWORK][Global.WIFI][Global.PASSWORD]
         if not wlan.isconnected():

@@ -52,6 +52,8 @@ class MqttI2cRfid(MqttI2cBase):
             meta_rfid = item.io_metadata.get(Global.TYPE, None)
         if item.io_device_type == Global.SENSOR and meta_rfid == Global.RFID:
             rett = True
+            print(">>> dev: "+str(item.io_device)+" : "+str(item.io_device_type)+ \
+                  " : "+str(rett))
         return rett
 
     def create_new_device(main_process, device_item):
@@ -71,7 +73,7 @@ class MqttI2cRfid(MqttI2cBase):
         """ perform initial one-time operation at startup """
         super().perform_initial_operations()
         self.publish_roster_report_request(Global.ROSTER)
-        
+
     def process_data_message(self, i2c_device, message):
         """ process a received data message """
         if message.mqtt_message_root == Global.ROSTER and \
@@ -81,12 +83,12 @@ class MqttI2cRfid(MqttI2cBase):
             self.logger.log_line("data message recvd: "+ message.mqtt_message_root)
         else:
             self.logger.log_line("Error: Unexpected data message: " + str(message.mqtt_desired))
-            
+
     def process_response_message(self, i2c_device, message):
         """ a response message was received """
         self.logger.log_line("response message recvd: "+ message.mqtt_message_root)
         i2c_device.process_response_message(message)
-        
+
     def process_request_message(self, i2c_device, message):
         """ a request message was received """
         self.logger.log_line("Error: Unexpected request message: " + str(message.mqtt_desired))

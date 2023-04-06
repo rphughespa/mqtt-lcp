@@ -39,14 +39,14 @@ gc.collect()
 from i2c_port_expander import I2cPortExpander
 gc.collect()
 
-class MqttI2cPortExpander(MqttI2cBase):
+class MqttPortExpander(MqttI2cBase):
     """ An i2c connected device """
 
     def __init__(main_process):
         super().__init__()
 
 
-    def is_device_correct_type(main_process, item):
+    def is_device_correct_type(self, item):
         """ is config device correct type """
         rett = False
         if item.io_device == Global.PORT_EXPANDER_RELAY or \
@@ -80,7 +80,7 @@ class MqttI2cPortExpander(MqttI2cBase):
     def perform_initial_operations(main_process):
         """ perform initial one-time operation at startup """
         super().perform_initial_operations()
-        
+
     def process_request_message(self, i2c_device, message):
         """ process a request message """
         rett = i2c_device.process_request_message(message)
@@ -90,7 +90,7 @@ time.sleep(2)
 
 print("In Main...")
 
-main_process = MqttI2cPortExpander()
+main_process = MqttPortExpander()
 
 start_ok = False
 main_process.led_blink_fast(3)

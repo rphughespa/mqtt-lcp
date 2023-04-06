@@ -71,8 +71,6 @@ class IoConfig:
             metadata.update({Global.SIGNAL: signals})
         return metadata
 
-
-
     #
     # private functions
     #
@@ -122,8 +120,9 @@ class IoConfig:
         io_mux_address = dev_config.get(Global.IO_MUX_ADDRESS, None)
         io_device = dev_config.get(Global.IO_DEVICE, None)
         io_device_type = dev_config.get(Global.IO_DEVICE_TYPE, None)
+        io_port_id = dev_config.get(Global.PORT_ID, None)
         okk = self.__check_config(io_device, io_device_type, io_address,
-                                  io_sub_address, dev_config)
+                                  io_sub_address, io_port_id, dev_config)
         if okk:
             io_dev_key = str(io_address)
             if io_mux_address is not None:
@@ -168,7 +167,7 @@ class IoConfig:
     def __is_valid_io_device_type(self, dev_type):
         """ if the device type valid """
         return dev_type in (Global.BLOCK, Global.DCC_ACCESSORY, Global.ENCODER,
-                            Global.LOCATOR, Global.MULTIPLE,
+                            Global.LOCATOR, Global.MULTIPLE, Global.GPIO,
                             Global.PORT_EXPANDER, Global.PORT_EXPANDER_RELAY,
                             Global.RAILCOM, Global.RFID, Global.SENSOR,
                             Global.SERVO, Global.SERVO_CONTROLLER,
@@ -197,21 +196,17 @@ class IoConfig:
                             " : " + str(port_id))
 
     def __check_config(self, io_device, io_device_type, io_address,
-                       io_sub_address, dev_config):
+                       io_sub_address, port_id, dev_config):
         okk = True
         if io_address is None and io_sub_address is None:
             print(
                 "Configuration error, io_address, io-sub-address missing: " +
                 str(dev_config))
             okk = False
-        if io_device is None:
-            print("Configuration error, io-device missing: " +
-                               str(dev_config))
-            okk = False
-        elif not self.__is_valid_io_device_type(io_device):
-            print("Configuration error, io-device invalid: " +
-                               str(dev_config))
-            okk = False
+        if port_id is not None and \
+                " " in port_id:
+            print("Configuration error, port-id contains spaces: " + \
+                    str(dev_config))
         if io_device_type is None:
             print(
                 "Configuration error, io-device-type missing: " +

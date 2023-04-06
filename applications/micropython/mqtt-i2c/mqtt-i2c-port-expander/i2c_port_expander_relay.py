@@ -37,10 +37,10 @@ from bit_utils import BitUtils
 
 from io_device_data import IoDeviceData
 
-from i2c_port_expander_base import I2cPortExpanderBase
+from port_expander_base import PortExpanderBase
 # from ise_relay_16 import relay16
 
-class I2cPortExpanderRelay(I2cPortExpanderBase):
+class I2cPortExpanderRelay(PortExpanderBase):
     """ Class for an I2C connected port expander device"""
 
     def __init__(self, i2c_bus=None, io_device=None, node_name=None, pub_topics=None,logger=None):
@@ -60,21 +60,21 @@ class I2cPortExpanderRelay(I2cPortExpanderBase):
         self.initialize_device()
         super().initialize()
 
-   
+
     def send_pin_changes(self, selected_pins):
         """ send pin changes to the device """
         # some pins groups may have mutually exclusive pins
         # set the "off" pins first
         # print(">>> set pins: "+str(selected_pins))
         for (set_pin, set_mode, set_pulse) in selected_pins:
-            if not set_mode:
+            if set_mode in [0, False, Global.OFF]:
                 #print(">>> "+str(set_pin)+" ... "+str(set_mode))
-                self.set_output_pin(set_pin, set_mode, set_pulse)
+                self.set_output_pin(set_pin, False, set_pulse)
         # set the "on" pins next
         for (set_pin, set_mode, set_pulse) in selected_pins:
-            if set_mode:
+            if set_mode in [1, True, Global.ON]:
                 #print(">>> "+str(set_pin)+" ... "+str(set_mode))
-                self.set_output_pin(set_pin, set_mode, set_pulse)
+                self.set_output_pin(set_pin, True, set_pulse)
 
     def read_input(self):
         """ Read input from relay_controller device"""

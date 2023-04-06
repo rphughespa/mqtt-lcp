@@ -29,7 +29,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 import sys
 
-
 import binascii
 
 
@@ -37,11 +36,6 @@ class BitUtils(object):
     """ help class for bit operations """
     def __init__(self):
         pass
-
-    def __repr__(self):
-        # return "%s(%r)" % (self.__class__, self.__dict__)
-        fdict = repr(self.__dict__)
-        return f"{self.__class__}({fdict})"
 
     @classmethod
     def set_a_bit(cls, int_num, offset):

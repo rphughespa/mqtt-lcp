@@ -41,3 +41,4 @@ class IoDeviceData(object):
         self.blink = 0
         self.open = 0
         self.close = 0
+        

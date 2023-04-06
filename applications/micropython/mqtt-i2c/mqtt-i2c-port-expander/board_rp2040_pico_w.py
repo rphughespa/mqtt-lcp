@@ -27,13 +27,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 """
 from machine import I2C, Pin
 
-# from i2c_bus import I2cBus
+
+
 
 class BoardRp2040PicoW():
     """ a class for the Raspberry RP2040 Pico W micro controller board"""
 
     def __init__(self):
-        self.i2c_bus = I2C(0, sda=Pin(8), scl=Pin(9), freq=100000)
+        self.i2c_bus = I2C(0, sda=Pin(16), scl=Pin(17), freq=100000)
         print("I2c Devices: "+str(self.i2c_bus.scan()))
         self.led = Pin("LED", Pin.OUT)
 

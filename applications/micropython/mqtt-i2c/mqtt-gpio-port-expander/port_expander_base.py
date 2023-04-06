@@ -2,7 +2,7 @@
 # # ic2_port_expander_base.py
 """
 
-I2cPortExpanderBase - low level hardware driver fot a port expander connected to i2c
+PortExpanderBase - low level hardware driver fot a port expander connected to i2c
                          Pin number range from 1 - 16
 
 
@@ -39,7 +39,17 @@ from io_data import IoData
 from utility import Utility
 from io_device_data import IoDeviceData
 
-class I2cPortExpanderBase():
+class BlinkPin():
+    """ Class for a blinking/flashing pin(s) """
+
+    def __init__(self, pin_number, pin_type=Global.BLINK, blink_rate=500):
+        self.pin_number = pin_number
+        self.pin_type = pin_type
+        self.blink_rate = blink_rate
+        self.state = True
+        self.last_current_ms = time.ticks_ms()
+
+class PortExpanderBase():
     """ Class for an I2C connected relay controller device"""
 
     def __init__(self, io_device=None, node_name=None, pub_topics=None, logger=None):
@@ -65,19 +75,33 @@ class I2cPortExpanderBase():
     def perform_periodic_operation(self):
         """ perform operations that are not related to received messages """
         rett_messages = None
+        selected_pins = []
         current_ms = time.ticks_ms()
         for p in range(16):
             if self.blink_pins[p] is not None:
-                (new_state, blink_rate, last_current_ms) = self.blink_pins[p]
-                ops_time = last_current_ms + blink_rate
-                if current_ms < last_current_ms:
+                blink_pin = self.blink_pins[p]
+                ops_time = blink_pin.last_current_ms + blink_pin.blink_rate
+                if current_ms < blink_pin.last_current_ms:
                     # tick flipped over, adjust
                     ops_time = current_ms - 1
                 if ops_time < current_ms:
-                    # self.logger.log_line(">>> blink: "+str(ops_time)+" ... "+str(current_ms)+ " ... "+str(blink_rate))
-                    self.send_pin_changes([(p, new_state, 0)])
-                    next_state =  not new_state
-                    self.blink_pins[p] = (next_state, blink_rate, current_ms)
+                    #self.logger.log_line(">>> blink: "+str(p)+" : "+str(ops_time)+" ... "+ \
+                     #                    str(current_ms)+ " ... "+str(blink_pin.state))
+                    if blink_pin.pin_type == Global.FLASHER:
+                        if blink_pin.state:
+                            selected_pins.append((blink_pin.pin_number, Global.OFF, 0))
+                            selected_pins.append((blink_pin.pin_number+1, Global.ON, 0))
+                        else:
+                            selected_pins.append((blink_pin.pin_number, Global.ON, 0))
+                            selected_pins.append((blink_pin.pin_number+1, Global.OFF, 0))
+                    else:
+                        selected_pins.append((p, blink_pin.state, 0))
+                    next_state =  not blink_pin.state
+                    blink_pin.state = next_state
+                    blink_pin.last_current_ms = current_ms
+        if len(selected_pins) > 0:
+            #print(">>> pin changes: "+str(selected_pins))
+            self.send_pin_changes(selected_pins)
         return self.read_input_messages()
 
     def process_response_message(self, new_message):
@@ -125,7 +149,7 @@ class I2cPortExpanderBase():
                         body.mqtt_version = "1.0"
                         body.mqtt_timestamp = Utility.now_milliseconds()
                         rett_messages.append((self.sensor_topic, body))
-                        self.logger.log_line("Data: "+str(body.mqtt_reported)+" : "+str(body.mqtt_node_id))
+                        self.logger.log_line("Data: "+str(body.mqtt_reported)+" : "+str(body.mqtt_port_id))
         return rett_messages
 
     def request_device_action(self, message):
@@ -147,12 +171,12 @@ class I2cPortExpanderBase():
 
     def initialize_configured_devices(self):
         """ initialize the device """
-        #print(">>> init a device")
+        #print(">>> init a devices: "+str(self.io_device))
         if self.io_device.io_sub_devices is not None:
             for (_key, sub_device) in self.io_device.io_sub_devices.items():
-                self.logger.log_line("sub dev: " + str(sub_device))
+                # self.logger.log_line("sub dev: " + str(sub_device))
                 self.initialize_a_port(sub_device)
-        self.logger.log_line("ports: "+str(self.port_map))
+        #self.logger.log_line("ports: "+str(self.port_map))
 
     def initialize_a_port(self, sub_device):
         #print(">>> init a port")
@@ -249,6 +273,10 @@ class I2cPortExpanderBase():
         elif signal_type == Global.POSITION:
             # use 4 consecutive pins for the signal: clear, approach, stop, center light
             number_of_pins = 4
+        elif signal_type == Global.FLASHER:
+            number_of_pins = 2
+        elif signal_type == Global.RGB:
+            number_of_pins = 3
         for out_pin in range(0, number_of_pins):
             selected_pin = base_pin + out_pin
             #self.logger.log_line(">>> pins: "+str(base_pin) +" ... "+str(out_pin))
@@ -270,7 +298,6 @@ class I2cPortExpanderBase():
         return_reported = Global.ERROR
         return_message = "Unknown request: " + str(message.mqtt_desired)
         send_after_message = None
-        process_this_message = True
         data_reported = None
         return_message = "Unknown request: " + str(message.mqtt_desired)
         desired = message.mqtt_desired
@@ -286,25 +313,19 @@ class I2cPortExpanderBase():
                 signal_type = sub_dev.dev_sub_type
                 # self.logger.log_line(">>> "+str(signal_type))
                 selected_pins = []
+                #print(">>> signal type: "+str(signal_type))
                 if signal_type == Global.SINGLE:
-                    pin = sub_dev.base_pin
-                    if desired == Global.OFF:
-                        # turn off any blinking in place for this pin
-                        self.blink_pins[pin] = None
-                    elif blink_rate != 0:
-                        # set up blinking for this pin
-                        current_ms = time.ticks_ms()
-                        self.blink_pins[pin] = (False, blink_rate, current_ms)
-                    if process_this_message:
-                        selected_pins = self.set_single_signal_pins(sub_dev, desired)
+                    selected_pins = self.set_single_signal_pins(sub_dev, desired)
+                elif signal_type == Global.FLASHER:
+                    selected_pins = self.set_flasher_signal_pins(sub_dev, desired)
+                elif signal_type in (Global.RGB):
+                   selected_pins = self.set_rgb_signal_pins(
+                        sub_dev, desired)
                 elif signal_type in (Global.COLOR, Global.POSITION):
                     selected_pins = self.set_multi_signal_pins(
                         sub_dev, desired)
                 self.send_pin_changes(selected_pins)
-                if process_this_message:
-                    return_reported = desired
-                else:
-                    return_reported = None
+                return_reported = desired
                 return_message = None
         #self.logger.log_line(">>> 2: " + str(sub_dev.send_sensor_message))
         if return_reported is not None and \
@@ -313,11 +334,34 @@ class I2cPortExpanderBase():
             data_reported = return_reported
         return (return_reported, return_message, data_reported)
 
+    def set_flasher_signal_pins(self, sub_dev, desired):
+        """ set pins for a two lamp alkternating flasher signal """
+        pin = sub_dev.base_pin
+        blink_rate = sub_dev.blink
+        signal_pins = []
+        if desired == Global.OFF:
+            # turn off any blinking in place for this pin
+            self.blink_pins[pin] = None
+            signal_pins.append((sub_dev.base_pin, False, 0))
+            signal_pins.append((sub_dev.base_pin+1, False, 0))
+        elif blink_rate != 0:
+            # set up blinking for this pin
+            self.blink_pins[pin] = BlinkPin(pin, pin_type=Global.FLASHER, blink_rate=blink_rate)
+            signal_pins.append((sub_dev.base_pin, True, 0))
+            signal_pins.append((sub_dev.base_pin+1, False, 0))
+        return signal_pins
 
     def set_single_signal_pins(self, sub_dev, desired):
         """ set pins for a single lamp signal """
-        # self.logger.log_line(">>> single_signal: "+str(sub_dev.base_pin)+" ... "+str(desired))
-        pulse = sub_dev.pulse  # pulse pins on rather than continous
+        pin = sub_dev.base_pin
+        blink_rate = sub_dev.blink
+        pulse = sub_dev.pulse
+        if desired == Global.OFF:
+            # turn off any blinking in place for this pin
+            self.blink_pins[pin] = None
+        elif blink_rate != 0:
+            # set up blinking for this pin
+            self.blink_pins[pin] = BlinkPin(pin, pin_type=Global.BLINK, blink_rate=blink_rate)
         signal_pins = []
         if desired == Global.ON:
             signal_pins.append((sub_dev.base_pin, True, pulse))
@@ -354,6 +398,33 @@ class I2cPortExpanderBase():
             if number_of_pins == 4:
                 # position light center lamp
                 signal_pins.append((base_pin + 3, True, 0))
+        #print(">>> signal pins: "+str(signal_pins))
+        return signal_pins
+
+    def set_rgb_signal_pins(self, sub_dev, desired):
+        """ set pins for rgb multi lamp signal """
+        # three pins ordered as: red, green, and blue
+        # yellow approach light red and blue lit together
+        #print(">>> rgb!!!")
+        signal_pins = []
+        base_pin = sub_dev.base_pin
+        number_of_pins = sub_dev.number_of_pins
+        if desired == Global.OFF:
+            for p in range(base_pin, base_pin + number_of_pins):
+                signal_pins.append((p, False, 0))
+        elif desired == Global.CLEAR:
+            signal_pins.append((base_pin, False, 0))
+            signal_pins.append((base_pin + 1, True, 0))
+            signal_pins.append((base_pin + 2, False, 0))
+        elif desired == Global.APPROACH:
+            signal_pins.append((base_pin, True, 0))
+            signal_pins.append((base_pin + 1, True, 0))
+            signal_pins.append((base_pin + 2, False, 0))
+        elif desired == Global.STOP:
+            signal_pins.append((base_pin, True, 0))
+            signal_pins.append((base_pin + 1, False, 0))
+            signal_pins.append((base_pin + 2, False, 0))
+        #print(">>> set pins: "+str(signal_pins))
         return signal_pins
 
     def send_request_to_switch(self, message):
