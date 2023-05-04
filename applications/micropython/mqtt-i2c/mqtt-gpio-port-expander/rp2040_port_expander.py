@@ -1,5 +1,5 @@
-#!/usr/bin/python3
-# # rp2040_port_expander.py
+
+# rp2040_port_expander.py
 """
 
 
@@ -33,8 +33,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 
-import micropython, sys, time, gc
-from machine import Pin, PWM
+
+import sys
+import time
+import gc
+from machine import Pin
+from machine import PWM
+import micropython
+
+sys.path.append('./lib')
 
 from global_constants import Global
 from global_synonyms import Synonyms
@@ -104,7 +111,7 @@ class GpIoPin():
 class Rp2040PortExpander(PortExpanderBase):
     """ Class for an I2C connected port expander device"""
 
-    def __init__(self, i2c_bus=None, io_device=None, node_name=None, pub_topics=None, logger=None):
+    def __init__(self, _i2c_bus=None, io_device=None, node_name=None, pub_topics=None, logger=None):
         """ Initialize """
         super().__init__(io_device=io_device, node_name=node_name, pub_topics=pub_topics,logger=logger)
         self.name="port expander_relay"
@@ -117,7 +124,7 @@ class Rp2040PortExpander(PortExpanderBase):
 
         changed_pins = self.__read_input_pins()
         if len(changed_pins) < 1:
-           changed_pins = None
+            changed_pins = None
         return changed_pins
 
     def send_pin_changes(self, selected_pins):
@@ -144,7 +151,7 @@ class Rp2040PortExpander(PortExpanderBase):
 
     def initialize_device(self):
         """ initialize the device """
-        for p in range(16):
+        for _p in range(16):
             self.pins.append(None)
         self.clear_all_pins()
         #print(">>> pins: "+str(self.pins))
@@ -153,7 +160,7 @@ class Rp2040PortExpander(PortExpanderBase):
         """ set a pin into input_mode """
         # pins must be 0-15
         if selected_pin not in range(16):
-            self.log_error("RP2040: Port GPIO pins must be 0-15: {" +
+            self.logger.log_error("RP2040: Port GPIO pins must be 0-15: {" +
                            str(selected_pin) + "}")
         else:
             self.has_inputs = True
@@ -165,7 +172,7 @@ class Rp2040PortExpander(PortExpanderBase):
         """ set a pin into output_mode """
         #print(">>> pins len: "+str(len(self.pins)))
         if selected_pin not in range(16):
-            self.log_error("RP2040: Port GPIO pins must be 0-15: {" +
+            self.logger.log_error("RP2040: Port GPIO pins must be 0-15: {" +
                            str(selected_pin) + "}")
         else:
             pin = GpIoPin(selected_pin, PIN_TYPE_OUTPUT)
@@ -175,7 +182,7 @@ class Rp2040PortExpander(PortExpanderBase):
     def set_output_pin(self, selected_pin, pin_value=False, pulse=0):
         """ set a output pin on or off """
         if selected_pin not in range(16):
-            self.log_error("RP2040: Port GPIO pins must be 0-15: {" +
+            self.logger.log_error("RP2040: Port GPIO pins must be 0-15: {" +
                            str(selected_pin) + "}")
         else:
             if self.pins[selected_pin] is not None:
@@ -190,7 +197,7 @@ class Rp2040PortExpander(PortExpanderBase):
         for pin in self.pins:
             if pin is not None:
                 if pin.pin_type != PIN_TYPE_INPUT:
-                    self.pins[pin.set_pin_value(Global.OFF)]
+                    pin.set_pin_value(Global.OFF)
 
 #
 #   private functions

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 # # ic2_encoder.py
 """
 
@@ -82,6 +82,7 @@ class I2cEncoder():
 
 
     def perform_periodic_operation(self):
+        """ perform periodic operations """
         messages = None
         (return_counter, clicked) = self.__read_input()
         if return_counter is not None:
@@ -174,5 +175,3 @@ class I2cEncoder():
                     self.device_driver.set_encoder_green_thru_red_color(
                         self.counter_value)
         return (return_counter, clicked)
-
-

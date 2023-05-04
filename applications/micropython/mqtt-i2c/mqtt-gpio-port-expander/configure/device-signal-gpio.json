@@ -8,6 +8,8 @@
             "io-device-type": "signal",
             "port-id": "130w",
             "description": "130w",
+            "block-id": 25,
+            "direction": "north",
             "send-sensor-message": "yes",
             "io-metadata": {
                 "signal-type": "rgb"

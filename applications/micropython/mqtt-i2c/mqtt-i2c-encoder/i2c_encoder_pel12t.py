@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 # # ic2_encoder_pel12t.py
 """
 
@@ -56,7 +56,6 @@ class I2cEncoderPel12t():
     """ Class for an I2C connected encoder device"""
     def __init__(self, name="i2c_encoder_pel12t", i2c_address=None, i2c_bus=None, logger=None):
         """ Initialize """
-        self.name = "i2c_encoder"
         self.logger = logger
         self.i2c_address = i2c_address
         self.i2c_bus = i2c_bus
@@ -141,7 +140,7 @@ class I2cEncoderPel12t():
         button_int = button_value
         if isinstance(button_value, list):
             button_int = button_value[0]
-        button_int = int.from_bytes(bytearray(button_int), "big") # convert byte to int 
+        button_int = int.from_bytes(bytearray(button_int), "big") # convert byte to int
         #else:
         #print(">>> button value type: " + str(type(button_value)))
         #print(">>> button value: " + str(button_value))

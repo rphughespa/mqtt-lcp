@@ -6,8 +6,8 @@
     "io": {
       "network": {
         "wifi": {
-          "ssid": "xx-ssid-xx",
-          "password": "xx-passwd-xx",
+          "ssid": "xx-ssid",
+          "password": "xx-passwd",
           "hostname": "mqtt-i2c-servo"
         }
       },
@@ -27,7 +27,9 @@
           "sensor": "dt/mqtt-lcp/sensor/**node**"
         }
       },
-      "io-devices": []
+      "io-devices": [
+
+      ]
     }
   }
 }

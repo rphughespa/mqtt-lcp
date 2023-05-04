@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 # # ic2_port_expander.py
 """
 
@@ -32,7 +32,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 
-import micropython, sys, time, gc
+
+import sys
+import time
+import gc
+import micropython
+
+sys.path.append('./lib')
 
 from global_constants import Global
 from global_synonyms import Synonyms
@@ -40,10 +46,11 @@ from global_synonyms import Synonyms
 from io_data import IoData
 
 from io_device_data import IoDeviceData
+from port_expander_base import PortExpanderBase
 
 import mcp23017
 
-from port_expander_base import PortExpanderBase
+
 
 #mcp.pin(3, mode=0) # set pin as output
 #mcp.pin(1, mode=1, polarity=1) # swet pin as input
@@ -70,7 +77,7 @@ class I2cPortExpander(PortExpanderBase):
 
         changed_pins = self.__read_input_pins()
         if len(changed_pins) < 1:
-           changed_pins = None
+            changed_pins = None
         return changed_pins
 
     def initialize(self):
@@ -80,20 +87,12 @@ class I2cPortExpander(PortExpanderBase):
         self.initialize_device()
         super().initialize()
 
-
-    def initialize_device(self):
-        """ initialize the device """
-        # initally mark all pins as active low
-        #print(">>> init port expander")
-        for p in range(0, 16):
-            self.pin_active_low[p] = True
-
     def init_input_pin(self, selected_pin, active_low=True):
         """ set a pin into input_mode """
         # pins must be 0-15
 
         if selected_pin < 0 or selected_pin > 15:
-            self.log_error("Port expander pins must be 0-15: {" +
+            self.logger.log_error("Port expander pins must be 0-15: {" +
                            str(selected_pin) + "}")
         self.has_inputs = True
         self.pin_active_low[selected_pin] = active_low
@@ -120,7 +119,7 @@ class I2cPortExpander(PortExpanderBase):
         """ set a pin into output_mode """
         #print(">>> init output: "+str(selected_pin))
         if selected_pin < 0 or selected_pin > 15:
-            self.log_error("Port expander pins must be 0-15: {" +
+            self.logger.log_error("Port expander pins must be 0-15: {" +
                            str(selected_pin) + "}")
         self.pin_active_low[selected_pin] = active_low
         pin_mode = False
@@ -146,12 +145,12 @@ class I2cPortExpander(PortExpanderBase):
     def initialize_device(self):
         """ initialize the device """
         self.clear_all_pins()
-        ## special test code ##
-        # self.test_relay_board()
+
 
     def clear_all_pins(self):
         """ turn off all relays """
-        pass
+        for p in range(0, 16):
+            self.pin_active_low[p] = True
 
 
 #

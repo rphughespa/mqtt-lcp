@@ -24,9 +24,13 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
-import machine,sys
-import time,json
+
+import sys
+import time
 import gc
+import machine
+
+sys.path.append('./lib')
 
 from global_constants import Global
 from global_synonyms import Synonyms
@@ -40,9 +44,8 @@ gc.collect()
 class MqttSignals(MqttI2cBase):
     """ An i2c connected device """
 
-    def __init__(main_process):
+    def __init__(self):
         super().__init__()
-
 
     def is_device_correct_type(self, item):
         """ is config device correct type """
@@ -54,21 +57,20 @@ class MqttSignals(MqttI2cBase):
                   " : "+str(rett))
         return rett
 
-    def create_new_device(main_process, device_item):
+    def create_new_device(self, device_item):
         """ instantiate a instance of device class """
         device = None
-        device = Rp2040PortExpander(io_device=device_item, node_name=main_process.node_name,\
-                        pub_topics=main_process.pub_topics,\
-                        logger=main_process.logger)
+        device = Rp2040PortExpander(io_device=device_item, node_name=self.node_name,\
+                        pub_topics=self.pub_topics,\
+                        logger=self.logger)
         device.initialize()
         return device
 
-    def start_i2c(main_process):
+    def start_i2c(self):
         """ start i2c bus and device """
         super().start_i2c()
 
-
-    def perform_initial_operations(main_process):
+    def perform_initial_operations(self):
         """ perform initial one-time operation at startup """
         super().perform_initial_operations()
 
@@ -81,36 +83,34 @@ time.sleep(2)
 
 print("In Main...")
 
-main_process = MqttSignals()
+main = MqttSignals()
 
 start_ok = False
-main_process.led_blink_fast(3)
-main_process.parse_config()
-main_process.led_blink(1)
-if main_process.config is not None:
-    main_process.start_network()
-main_process.led_blink(2)
-if main_process.net_services is not None:
-    main_process.start_mqtt()
-main_process.led_blink(3)
-if main_process.mqtt_client is not None:
-    main_process.start_i2c()
-main_process.led_blink(4)
-if len(main_process.i2c_devices) > 0:
+main.led_blink_fast(3)
+main.parse_config()
+main.led_blink(1)
+if main.config is not None:
+    main.start_network()
+main.led_blink(2)
+if main.net_services is not None:
+    main.start_mqtt()
+main.led_blink(3)
+if main.mqtt_client is not None:
+    main.start_i2c()
+main.led_blink(4)
+if len(main.i2c_devices) > 0:
     start_ok = True
-main_process.led_blink(5)
+main.led_blink(5)
 
-if start_ok == False:
+if not start_ok:
     print("Error: Initialization failed")
     print("Rebooting ...")
-    main_process.led_blink(6)
+    main.led_blink(6)
     time.sleep(1)
-    main_process.led_blink_fast(20)
+    main.led_blink_fast(20)
     machine.reset()
     # sys.exit()
 else:
-    main_process.main_loop()
+    main.main_loop()
 
 print("Exiting")
-
-

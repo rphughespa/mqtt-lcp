@@ -1,11 +1,13 @@
-#!/usr/bin/python3
+
 # ic2_rfid_attiny64.py
 """
 
-I2cRfidAttiny64 - low level hardware driver fot a rdif reader connected to i2c using the attiny64 circuit device
+I2cRfidAttiny64 - low level hardware driver fot a rdif reader connected to
+    i2c using the attiny64 circuit device
 
 
-    supports sparkfun qwiic rfid reader; either one more device on same bus or multiple readers connected to a single i2c mux device
+    supports sparkfun qwiic rfid reader; either one more device on same bus or
+        multiple readers connected to a single i2c mux device
 
 The MIT License (MIT)
 
@@ -27,8 +29,11 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
-
+import sys
 import time
+
+sys.path.append('./lib')
+
 from global_constants import Global
 from utility import Utility
 from io_data import IoData
@@ -51,6 +56,7 @@ class I2cRfidAttiny64:
         self.__initialize_device()
 
     def perform_periodic_operation(self):
+        """ perform periodic operations """
         messages = None
         tags_read = self.__read_input()
         if tags_read is not None:
@@ -80,7 +86,7 @@ class I2cRfidAttiny64:
             self.__process_response_roster_message(msg_body)
         else:
             self.logger.log_line("Error: Unxepected response message: "+str(msg_body))
-            
+
 
 #
 # private functions
@@ -107,7 +113,7 @@ class I2cRfidAttiny64:
         rett = None
         # print("read tag from: "+str(io_device.io_config_item.mqtt_port_id))
         tag = self.rfid_device.get_tag()
-        time.sleep_ms(100) 
+        time.sleep_ms(100)
         if tag is not None:
             rett = [tag]
         return rett

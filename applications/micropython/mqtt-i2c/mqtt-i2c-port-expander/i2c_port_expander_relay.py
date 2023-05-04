@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 # # ic2_port_expander_relay.py
 """
 
@@ -28,7 +28,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 
-import sys, time, gc
+import sys
+import time
+import gc
+
+sys.path.append('./lib')
 
 from global_constants import Global
 from global_synonyms import Synonyms
@@ -37,8 +41,9 @@ from bit_utils import BitUtils
 
 from io_device_data import IoDeviceData
 
+
 from port_expander_base import PortExpanderBase
-# from ise_relay_16 import relay16
+
 
 class I2cPortExpanderRelay(PortExpanderBase):
     """ Class for an I2C connected port expander device"""
@@ -124,7 +129,7 @@ class I2cPortExpanderRelay(PortExpanderBase):
         # pin on relay are 1-16, not 0-15
         # print(">>> ... pin set: "+str(selected_pin))
         if not 0 <= selected_pin <= 15:
-            self.log_error("Invalid Relay Number, must be 1 -16: " +
+            self.logger.log_error("Invalid Relay Number, must be 1 -16: " +
                            str(selected_pin))
         else:
             if 0 <= selected_pin <= 7:
@@ -136,7 +141,7 @@ class I2cPortExpanderRelay(PortExpanderBase):
         """ turn on a relay """
         # print(">>>  ... pin clear: "+str(selected_pin))
         if not 0 <= selected_pin <= 15:
-            self.log_error("Invalid Relay Number, must be 1 -16: " +
+            self.logger.log_error("Invalid Relay Number, must be 1 -16: " +
                            str(selected_pin))
         else:
             if 0 <= selected_pin <= 7:

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+
 # # ic2_servo_controller.py
 """
 
@@ -30,6 +30,8 @@ import sys
 
 import time
 
+sys.path.append('./lib')
+
 from global_constants import Global
 from global_synonyms import Synonyms
 
@@ -54,7 +56,7 @@ class I2cServoController():
         self.input_pin_map = {}
         self.input_pin_report_map = {}
         self.send_after_port_queue = {}  # ports that have active send after operations
-        
+
     def initialize(self):
         """ init the controller """
         self.__initialize_device()
@@ -81,6 +83,7 @@ class I2cServoController():
         return response
 
     def process_data_message(self, new_message):
+        """ process data message """
         pass
 
     def read_input(self):
@@ -91,9 +94,9 @@ class I2cServoController():
     def request_device_action(self, message):
         """ send rquest to i2c device; message is an io_data instance"""
         return_reported = Global.ERROR
-        return_message = "Unknown request: " + str(message.mqtt_desired)
+        _return_message = "Unknown request: " + str(message.mqtt_desired)
         if message.mqtt_message_root == Global.SWITCH:
-            (return_reported, return_message, data_reported) = \
+            (return_reported, _return_message, data_reported) = \
                 self.__send_request_to_switch(message)
         return (return_reported, None, data_reported)
 
@@ -149,7 +152,7 @@ class I2cServoController():
         data_reported = None
         return_reported = Global.ERROR
         return_message = "Unknown request: " + str(message.mqtt_desired)
-        send_after_message = None
+        #send_after_message = None
         sub_dev = self.port_map.get(message.mqtt_port_id, None)
         if sub_dev is None:
             return_message = "Unknown Port ID: " + \
@@ -178,7 +181,8 @@ class I2cServoController():
                 return_reported = Synonyms.desired_to_reported(
                     message.mqtt_desired)
                 sub_dev.state = return_reported
-                # self.logger.log_line(">>> " + str(message.mqtt_port_id) + " ... " + str(sub_dev.state) + " ... " + str(len(self.port_map)))
+                # self.logger.log_line(">>> " + str(message.mqtt_port_id) + \
+                # " ... " + str(sub_dev.state) + " ... " + str(len(self.port_map)))
                 self.port_map[message.mqtt_port_id] = sub_dev
                 return_message = None
         if return_reported != Global.ERROR and sub_dev.send_sensor_message:
@@ -188,7 +192,7 @@ class I2cServoController():
             data_reported = None
         return (return_reported, return_message, data_reported)
 
-    def __position(self,message, base_pin, start_pos, end_pos):
+    def __position(self, _message, base_pin, start_pos, end_pos):
         """ move a server to a desired position """
         # only move one increment at a time,
         # then do a  sendafter message
@@ -196,7 +200,7 @@ class I2cServoController():
         # repeat cycle until servo move is done
         # this prevents one servo move from
         # blocking the i2c bus for long periods
-        send_after_message = None
+        _send_after_message = None
         incr = 2
         if end_pos < start_pos:
             incr = -1
