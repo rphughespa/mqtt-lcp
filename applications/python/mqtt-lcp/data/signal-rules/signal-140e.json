@@ -1,39 +1,63 @@
 {
-    "node-id": "mqtt-i2c",
+    "group": "signal",
     "port-id": "140e",
-    "clear": [
-        [
-            {
-                "node-id": "mqtt-i2c",
-                "port-id": "oak",
-                "state": "closed"
-            },
-            {
-                "node-id": "mqtt-railcom",
-                "port-id": "26",
-                "state": "clear"
-            },
-            {
-                "node-id": "mqtt-i2c",
-                "port-id": "120e",
-                "state": "clear"
-            }
-        ]
-    ],
-    "stop": [
-        [
-            {
-                "node-id": "mqtt-i2c",
-                "port-id": "oak",
-                "state": "thrown"
-            }
-        ],
-        [
-            {
-                "node-id": "mqtt-railcom",
-                "port-id": "26",
-                "state": "occupied"
-            }
-        ]
-    ]
+    "block-id": "25",
+    "direction": "east",
+    "rules": {
+        "clear": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "oak",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-26",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "122e",
+                    "state": "clear"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "oak",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-26",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "122e",
+                    "state": "approach"
+                }
+            ]
+        },
+        "approach": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "oak",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-26",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "122e",
+                    "state": "stop"
+                }
+            ]
+        }
+    }
 }

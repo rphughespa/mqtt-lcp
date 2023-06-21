@@ -1,0 +1,21 @@
+[
+    {
+        "node-id": "mqtt-tower",
+        "port-id": "siding-23",
+        "description": "Siding 23",
+        "switch": [
+            {
+                "node-id": "mqtt-dev-proto",
+                "port-id": "garland",
+                "command-topic": "cmd/mqtt-lcp/switch/mqtt-dev-proto/garland/req",
+                "desired": "throw"
+            },
+            {
+                "node-id": "mqtt-dev-proto",
+                "port-id": "summersville",
+                "command-topic": "cmd/mqtt-lcp/switch/mqtt-dev-proto/summersville/req",
+                "desired": "throw"
+            }
+        ]
+    }
+]

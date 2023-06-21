@@ -1,0 +1,75 @@
+{
+    "group": "signal",
+    "port-id": "122e",
+    "block-id": "26",
+    "direction": "east",
+    "rules": {
+        "clear": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "summersville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-22",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "111e",
+                    "state": "clear"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "summersville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-22",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "111e",
+                    "state": "approach"
+                }
+            ]
+        },
+        "approach": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "summersville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-22",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "111e",
+                    "state": "stop"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "summersville",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-23",
+                    "state": "clear"
+                }
+            ]
+        }
+    }
+}

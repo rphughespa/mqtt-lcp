@@ -1,0 +1,114 @@
+[
+    {
+        "io-address": 221,
+        "io-sub-address": 2,
+        "io-device": "railcom",
+        "io-device-type": "sensor",
+        "port-id": "railcom-21",
+        "block-id": "21",
+        "description": "locator detector block 21",
+        "io-metadata": {
+            "type": "railcom",
+            "facing": {
+                "normal": "east",
+                "reverse": "west"
+            }
+        }
+    },
+    {
+        "io-address": 222,
+        "io-sub-address": 2,
+        "io-device": "railcom",
+        "io-device-type": "sensor",
+        "port-id": "railcom-22",
+        "block-id": "22",
+        "description": "locator detector block 22",
+        "io-metadata": {
+            "type": "railcom",
+            "facing": {
+                "normal": "east",
+                "reverse": "west"
+            }
+        }
+    },
+    {
+        "io-address": 223,
+        "io-sub-address": 2,
+        "io-device": "railcom",
+        "io-device-type": "sensor",
+        "port-id": "railcom-23",
+        "block-id": "23",
+        "description": "locator detector block 23",
+        "io-metadata": {
+            "type": "railcom",
+            "facing": {
+                "normal": "east",
+                "reverse": "west"
+            }
+        }
+    },
+    {
+        "io-address": 224,
+        "io-sub-address": 2,
+        "io-device": "railcom",
+        "io-device-type": "sensor",
+        "port-id": "railcom-24",
+        "block-id": "24",
+        "description": "locator detector block 24",
+        "io-metadata": {
+            "type": "railcom",
+            "facing": {
+                "normal": "east",
+                "reverse": "west"
+            }
+        }
+    },
+    {
+        "io-address": 225,
+        "io-sub-address": 2,
+        "io-device": "railcom",
+        "io-device-type": "sensor",
+        "port-id": "railcom-25",
+        "block-id": "25",
+        "description": "locator detector block 25",
+        "io-metadata": {
+            "type": "railcom",
+            "facing": {
+                "normal": "east",
+                "reverse": "west"
+            }
+        }
+    },
+    {
+        "io-address": 226,
+        "io-sub-address": 2,
+        "io-device": "railcom",
+        "io-device-type": "sensor",
+        "port-id": "railcom-26",
+        "block-id": "26",
+        "description": "locator detector block 26",
+        "io-metadata": {
+            "type": "railcom",
+            "facing": {
+                "normal": "east",
+                "reverse": "west"
+            }
+        }
+    },
+    {
+        "io-address": 227,
+        "io-sub-address": 2,
+        "io-device": "railcom",
+        "io-device-type": "sensor",
+        "port-id": "railcom-27",
+        "block-id": "27",
+        "description": "locator detector block 27",
+        "io-metadata": {
+            "type": "railcom",
+            "facing": {
+                "normal": "east",
+                "reverse": "west"
+            }
+        }
+    }
+]

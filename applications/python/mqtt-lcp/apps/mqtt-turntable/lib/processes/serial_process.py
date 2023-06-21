@@ -6,11 +6,13 @@
 
     This process reveives data to send to the serial through it's "in_queue" message queue. These
     messesages are tagged as "SERIAL_DEVICE_SEND".  The process will also periodically poll the
-    serial device for input. Data received is send to the "app queue" and tagged as "SERIAL_DEVICE_DATA"
+    serial device for input. Data received is send to the "app queue" and
+    tagged as "SERIAL_DEVICE_DATA"
 
     The process can also do synchronius type functions of sending data to the serial device and
     then waiting for a response.  This "send and respond" process if invoked via message
-    type "SERIAL_DEVICE_SEND_AND_RESPOND" . THe response is returned tagged as "SERIAL_DEVICE_RESPONSE".
+    type "SERIAL_DEVICE_SEND_AND_RESPOND" . Tee response is returned
+    tagged as "SERIAL_DEVICE_RESPONSE".
 
 The MIT License (MIT)
 
@@ -331,7 +333,8 @@ class SerialProcess(BaseProcess):
         usb_port = None
         devs = serial.tools.list_ports.comports()
         for dev in devs:
-            self.log_info("Device: " + dev.device + ",  Name: " + dev.name + ",  Description: " + dev.description)
+            self.log_info("Device: " + dev.device + ",  Name: " + \
+                          dev.name + ",  Description: " + dev.description)
             if dev.vid is not None:
                 self.log_info(" Vendor ID: " + str(dev.vid) + ", " +
                             hex(dev.vid) +

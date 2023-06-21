@@ -1,0 +1,63 @@
+{
+  "group": "signal",
+  "port-id": "110e",
+  "block-id": "23",
+  "direction": "east",
+  "rules": {
+    "clear": {
+      "1": [
+        {
+          "group": "switch",
+          "port-id": "garland",
+          "state": "thrown"
+        },
+        {
+          "group": "block",
+          "port-id": "block-24",
+          "state": "clear"
+        },
+        {
+          "group": "signal",
+          "port-id": "132e",
+          "state": "clear"
+        }
+      ],
+      "2": [
+        {
+          "group": "switch",
+          "port-id": "garland",
+          "state": "thrown"
+        },
+        {
+          "group": "block",
+          "port-id": "block-24",
+          "state": "clear"
+        },
+        {
+          "group": "signal",
+          "port-id": "132e",
+          "state": "approach"
+        }
+      ]
+    },
+    "approach": {
+      "1": [
+        {
+          "group": "switch",
+          "port-id": "garland",
+          "state": "thrown"
+        },
+        {
+          "group": "block",
+          "port-id": "block-24",
+          "state": "clear"
+        },
+        {
+          "group": "signal",
+          "port-id": "132e",
+          "state": "stop"
+        }
+      ]
+    }
+  }
+}

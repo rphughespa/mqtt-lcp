@@ -7,7 +7,7 @@ SwitchesPage - Display / change the state of switches
 
 the MIT License (MIT)
 
-Copyright © 2020 richard p hughes
+Copyright © 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -36,15 +36,22 @@ from ttkbootstrap.constants import *
 
 sys.path.append('../../lib')
 
-from structs.gui_message import GuiMessage
 from utils.global_constants import Global
 from utils.global_synonyms import Synonyms
+
+from structs.gui_message import GuiMessage
+from structs.gui_message import GuiMessageEnvelope
 
 from components.image_clickable import ImageClickable
 from components.image_button import ImageButton
 from components.switches_info_list import SwitchesInfoList
-from components.tk_message import TkMessage
 
+
+
+# from components.local_constants import Local
+
+# from select_list_data import SelectListData
+# from key_pad import KeyPadFrame
 
 
 class SwitchesPage(ttk.Frame):
@@ -140,7 +147,7 @@ class SwitchesPage(ttk.Frame):
             switch_message.text = self.switch.text  # command topic
             switch_message.mode = new_mode
             self.parent_node.queue_tk_input(
-                TkMessage(msg_type=Global.PUBLISH, msg_data=switch_message))
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=switch_message))
 
     def refresh_page(self):
         """ refresh the display page """
@@ -154,26 +161,11 @@ class SwitchesPage(ttk.Frame):
     def process_output_message(self, message):
         """ process output message """
         if message.msg_type == Global.SWITCH:
-            if message.msg_data is None:
-                # clear out switch table
-                self.tower_data.switches = {}
+            if message.msg_data.name == Global.INFO_COMMAND:
+                if message.msg_data.mode == Global.REFRESH:
+                    self.refresh_page()
+            elif message.msg_data is None:
                 self.switch = None
-            else:
-                # an update of a single switch state
-                skey = message.msg_data.node_id + ":" + message.msg_data.port_id
-                switch = self.tower_data.switches.get(skey, None)
-                if switch is None:
-                    switch = copy.deepcopy(message.msg_data)
-                    switch.image = self.info_unknown_image
-                    self.tower_data.switches[skey] = switch
-                if switch is not None:
-                    switch.mode = message.msg_data.mode
-                    switch.image = self.info_unknown_image
-                    if Synonyms.is_synonym_active(name=switch.mode):
-                        switch.image = self.info_thrown_image
-                    if Synonyms.is_synonym_inactive(name=switch.mode):
-                        switch.image = self.info_closed_image
-            self.refresh_page()
 
 
     #
@@ -190,9 +182,9 @@ class SwitchesPage(ttk.Frame):
         self.title_label.config(text=self.switch.port_id)
         self.name_label.config(text=self.switch.name)
         #print(">>> switch mode: " + str(self.switch.mode))
-        if Synonyms.is_synonym_active(name=self.switch.mode):
+        if Synonyms.is_on(name=self.switch.mode):
             self.switch_button.replace_image(image=self.switch_thrown_image)
-        elif Synonyms.is_synonym_inactive(name=self.switch.mode):
+        elif Synonyms.is_off(name=self.switch.mode):
             self.switch_button.replace_image(image=self.switch_closed_image)
         else:
             self.switch_button.replace_image(image=self.switch_unknown_image)
@@ -218,7 +210,7 @@ class SwitchesPage(ttk.Frame):
         if image_path is not None:
             # load "info" signals
             info_image_path = image_path + "/" + Global.INFO
-
+            #print(">>> info image path: "+str(info_image_path))
             self.info_unknown_image = ImageClickable.load_image(
                 info_image_path + "/info-unknown.png")
             self.info_closed_image = ImageClickable.load_image(

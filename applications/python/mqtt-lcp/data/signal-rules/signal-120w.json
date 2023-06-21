@@ -1,0 +1,63 @@
+{
+    "group": "signal",
+    "port-id": "120w",
+    "block-id": "23",
+    "direction": "west",
+    "rules": {
+        "clear": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "summersville",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-26",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "142w",
+                    "state": "clear"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "summersville",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-26",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "142w",
+                    "state": "approach"
+                }
+            ]
+        },
+        "approach": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "summersville",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-26",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "142w",
+                    "state": "stop"
+                }
+            ]
+        }
+    }
+}

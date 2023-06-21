@@ -35,7 +35,7 @@ sys.path.append('../../lib')
 from utils.global_constants import Global
 from components.local_constants import Local
 from components.image_clickable import ImageClickable
-# from tk_message import TkMessage
+# from gui_message_envelope import GuiMessageEnvelope
 #from components.info_box import InfoBox
 
 
@@ -115,8 +115,8 @@ class StatusFrame(ttk.Frame):
         lead_loco = self.parent.parent_cab.lead_loco
         # print(">>> lead loco:" + str(lead_loco))
         if lead_loco is None:
-            self.location_railcom = ""
-            self.location_rfid = ""
+            self.location_railcom.configure(text="")
+            self.location_rfid.configure(text="")
         else:
             if lead_loco == message_data.dcc_id:
                 if message_data.sub_command == Global.RFID:

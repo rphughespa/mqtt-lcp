@@ -5,7 +5,11 @@
 
 fastclock_process - maintains and published a fast clock
 
-
+    The "fastclock" is maintained as an offset of seconds from the current time. Periodically,
+    the increment is increased by a certain amount defined in the "ratio" parameter.  The
+    "ratio" is the number of seconds to increase the fastclock increment per second of
+    the real clock second.  For example, if the ratio is 3, the fast clock is incremented by 3
+    seconds per real time second.
 
 
 The MIT License (MIT)
@@ -33,7 +37,7 @@ import sys
 
 sys.path.append('../lib')
 
-import datetime
+from datetime import datetime
 
 from structs.io_data import IoData
 from structs.mqtt_config import MqttConfig
@@ -86,32 +90,71 @@ class FastclockProcess(BaseProcess):
                 self.__publish_fastclock()
                 msg_consummed = True
             elif msg_type == Global.REQUEST:
-                self.log_info("Fastclock: " + str(msg_body.mqtt_desired))
-                (reported, metadata) = self.__process_request(msg_body)
-                self.app_queue.put(
-                    (Global.PUBLISH, {Global.TYPE: Global.RESPONSE, Global.REPORTED: reported, \
-                        Global.METADATA: metadata, Global.BODY: msg_body}))
-                msg_consummed = True
+                if msg_body.mqtt_port_id == Global.FASTCLOCK:
+                    meta_info = ""
+                    if msg_body.mqtt_metadata is not None:
+                        meta_info = " : "+ str(msg_body.mqtt_metadata.get(Global.FASTCLOCK, ""))
+                    self.log_info("Fastclock: " + str(msg_body.mqtt_desired)+meta_info)
+                    (reported, metadata) = self.__process_request(msg_body)
+                    self.app_queue.put(
+                        (Global.PUBLISH, {Global.TYPE: Global.RESPONSE, Global.REPORTED: reported, \
+                            Global.METADATA: metadata, Global.BODY: msg_body}))
+                    msg_consummed = True
         return msg_consummed
 
     #
     # private functions
     #
 
+    def __reset_fastclock(self, msg_body):
+        """ reset fastclock to current time or a specific time"""
+        now_seconds = Utility.now_seconds()
+        new_fastclock_incr = 0  # reste fastclock to current time
+        if msg_body.mqtt_metadata is not None:
+            # a specific fastclock time has been requested
+            fastclock_req = msg_body.mqtt_metadata.get(Global.FASTCLOCK, None)
+            if fastclock_req is not None:
+                new_fast_hhmm = fastclock_req.get(Global.TIME, None)
+                if new_fast_hhmm is not None:
+                    # a specific time requested, calulate its offset increment (in seconds)
+                    # request time s/b formated HH:MM string
+                    if len(new_fast_hhmm) < 5:
+                        new_fast_hhmm = "0"+new_fast_hhmm
+                    new_fast_seconds = self.__convert_hhmm_to_seconds(new_fast_hhmm)
+                    local_time_epoch = now_seconds
+                    local_time = datetime.fromtimestamp(
+                            local_time_epoch).isoformat()
+                    date_time_object = datetime.fromisoformat(local_time)
+                    current_seconds = date_time_object.hour * 3600 + date_time_object.minute * 60
+                    new_fastclock_incr = new_fast_seconds - current_seconds
+                    # pos num > future time, neg = past time
+        self.fastclock_incr = new_fastclock_incr
+        self.fastclock_paused = False
+
+    def __convert_hhmm_to_seconds(self, hhmm):
+        """ convert a string HH:MM into seconds past midnight"""
+        rett = 0
+        if ":" in hhmm:
+            new_hhmm = hhmm
+            if len(new_hhmm) < 5:
+                # pad with leading zero
+                new_hhmm = "0"+new_hhmm
+            hour = new_hhmm[0:2]
+            mins = new_hhmm[3:5]
+            rett = int(hour)*3600 + int(mins)*60
+        return rett
+
     def __process_request(self, msg_body):
         """ process request to modify fastclock """
-        change_desired = msg_body.get_desired_value_by_key(Global.FASTCLOCK)
-        reported = {
-            Global.FASTCLOCK: Synonyms.desired_to_reported(change_desired)
-        }
+        change_desired = msg_body.mqtt_desired
+        reported = Synonyms.desired_to_reported(change_desired)
         metadata = None
         if change_desired == Global.RUN:
             self.fastclock_paused = False
         elif change_desired == Global.PAUSE:
             self.fastclock_paused = True
         elif change_desired == Global.RESET:
-            self.fastclock_incr = 0
-            self.fastclock_paused = False
+            self.__reset_fastclock(msg_body)
         else:
             reported = {Global.FASTCLOCK: Global.ERROR}
             metadata = {
@@ -138,11 +181,11 @@ class FastclockProcess(BaseProcess):
             self.fastclock_seconds = now_seconds + self.fastclock_incr
 
         local_time_epoch = now_seconds
-        local_time = datetime.datetime.fromtimestamp(
+        local_time = datetime.fromtimestamp(
             local_time_epoch).isoformat()
 
         fast_time_epoch = self.fastclock_seconds
-        fast_time = datetime.datetime.fromtimestamp(
+        fast_time = datetime.fromtimestamp(
             fast_time_epoch).isoformat()
 
         fast_state = Global.RUN
@@ -164,11 +207,10 @@ class FastclockProcess(BaseProcess):
             Global.RATIO: fast_ratio
         }
         new_message = IoData()
-        new_message.mqtt_message_root = Global.FASTCLOCK
+        new_message.mqtt_message_root = Global.TOWER
         new_message.mqtt_metadata = metadata
         new_message.mqtt_port_id = Global.FASTCLOCK
         new_message.mqtt_reported = fast_state
-        # print(">>> ... :" + str(new_message)+"\n")
         self.app_queue.put(
             (Global.PUBLISH, {Global.TYPE:Global.DATA, \
                     Global.TOPIC: self.fastclock_topic, Global.BODY: new_message}))
@@ -189,7 +231,6 @@ class FastclockProcess(BaseProcess):
         milliseconds_to_next_fastclock = seconds_to_next_fastclock * 1000
         fastclock_send_after_message = SendAfterMessage(Global.FASTCLOCK, None, \
                         milliseconds_to_next_fastclock)
-        # print(">>> starting fastclock " + str(self.fastclock_interval))
         self.send_after(fastclock_send_after_message)
 
     def __parse_time_options_config(self, config):

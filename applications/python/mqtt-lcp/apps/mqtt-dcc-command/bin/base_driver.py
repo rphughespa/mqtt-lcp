@@ -379,7 +379,8 @@ class BaseDriver(BaseProcess):
                 if slot_loco is not None:
                     updated_message = self.__update_gui_message(gui_message, slot_loco)
                     adjusted_message = self.adjust_device_message_after_read(updated_message)
-                    updated_messages += [adjusted_message]
+                    if adjusted_message.command != Global.UNKNOWN:
+                        updated_messages += [adjusted_message]
                     # print(">>> function message: " + str(gui_message))
 
         return updated_messages
@@ -414,7 +415,8 @@ class BaseDriver(BaseProcess):
             if msg is not None and msg != "":
                 decoded_message = self.decode_message(msg, Global.SERVER)
                 adjusted_message = self.adjust_device_message_after_read(decoded_message)
-                rett += [adjusted_message]
+                if adjusted_message.command != Global.UNKNOWN:
+                    rett += [adjusted_message]
 
         return rett
 

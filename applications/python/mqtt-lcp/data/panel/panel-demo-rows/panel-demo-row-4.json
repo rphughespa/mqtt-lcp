@@ -1,0 +1,52 @@
+{
+    "row": 4,
+    "cols": [
+        {
+            "col": 3,
+            "block-id": "25",
+            "image": "low-slash",
+            "type": "block"
+        },
+        {
+            "col": 4,
+            "block-id": "25",
+            "image": "up-slash",
+            "type": "block"
+        },
+        {
+            "col": 5,
+            "port-id": "131w",
+            "image": "signal-right",
+            "type": "signal"
+        },
+        {
+            "col": 6,
+            "block-id": "27",
+            "type": "locator"
+        },
+        {
+            "col": 7,
+            "port-id": "siding-25",
+            "image": "route",
+            "type": "route"
+        },
+        {
+            "col": 9,
+            "block-id": "25",
+            "image": "up-back-slash",
+            "type": "block"
+        },
+        {
+            "col": 10,
+            "block-id": "25",
+            "image": "low-back-slash",
+            "type": "block"
+        },
+        {
+            "col": 11,
+            "port-id": "142w",
+            "image": "signal-right",
+            "type": "signal"
+        }
+    ]
+}

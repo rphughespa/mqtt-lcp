@@ -27,6 +27,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 """
 import sys
 import copy
+
 # from ast import Pass
 
 from tkinter import *
@@ -38,32 +39,35 @@ from ttkbootstrap.constants import *
 
 sys.path.append('../../lib')
 
-from utils.global_constants import Global
 from utils.global_synonyms import Synonyms
+from utils.global_constants import Global
+
 from structs.gui_message import GuiMessage
-# from ossaudiodev import control_names
-# from components.local_constants import Local
-# from components.tk_message import TkMessage
-from components.tk_message import TkMessage
+from structs.gui_message import GuiMessageEnvelope
+
 from components.image_clickable import ImageClickable
 
 
 
-
-
+# from ossaudiodev import control_names
+# from components.local_constants import Local
+# from structs.gui_message import GuiMessageEnvelope
 
 # from image_button import ImageButton
 
-IMAGE_WIDTH = 48 # 64
-IMAGE_HEIGHT = 24 # 32
+IMAGE_WIDTH = 48  # 64
+IMAGE_HEIGHT = 24  # 32
+
 
 class PanelItem(object):
     """ panel item """
+
     def __init__(self, key=None, button=None, state=None, ptype=Global.BLANK):
         self.key = key
         self.button = button
         self.state = state
         self.type = ptype
+
 
 class PanelPage(ttk.Frame):
     """ control panel page """
@@ -80,16 +84,18 @@ class PanelPage(ttk.Frame):
         self.signals = []
         self.blocks = []
         self.locators = []
+        self.routes = []
         self.callback = callback
         self.style = ttk.Style()
-        self.style.configure("Panel.TLabel", foreground="black", background="white")
+        self.style.configure(
+            "Panel.TLabel", foreground="black", background="white")
         (self.row_map, self.panel_rows, self.panel_cols) = self.__map_rows(rows)
         (self.panel_width, self.panel_height) = self.__calc_panel_size(
             self.panel_rows, self.panel_cols)
         # print(">>> panel size: "+str(self.panel_width) +
         #       " : " + str(self.panel_height))
         self.canvas = ttk.Canvas(
-            self, width=self.panel_width, height=self.panel_height) #  bg='black')
+            self, width=self.panel_width, height=self.panel_height)  # bg='black')
         self.frame = ttk.Frame(self.canvas)
         self.vsb = ttk.Scrollbar(
             self, orient="vertical", command=self.canvas.yview)
@@ -107,6 +113,24 @@ class PanelPage(ttk.Frame):
         if self.row_map is not None and \
                 len(self.row_map) > 0:
             self.populate(self.row_map, self.panel_rows, self.panel_cols)
+            # initialize the panel with data already reveived
+            for _key, switch in self.tower_data.switches.items():
+                message = GuiMessageEnvelope(msg_type=Global.SWITCH,
+                                    cab=Global.CAB_ALL,
+                                    msg_data=switch)
+                self.__process_a_switch_change(message)
+
+            for _key, signal in self.tower_data.signals.items():
+                message = GuiMessageEnvelope(msg_type=Global.SIGNAL,
+                                    cab=Global.CAB_ALL,
+                                    msg_data=signal)
+                self.__process_a_signal_change(message)
+
+            for _key, route in self.tower_data.routes.items():
+                message = GuiMessageEnvelope(msg_type=Global.ROUTE,
+                                    cab=Global.CAB_ALL,
+                                    msg_data=route)
+                self.__process_a_route_change(message)
 
     def populate(self, row_map, panel_rows, panel_cols):
         """ populate page """
@@ -134,35 +158,41 @@ class PanelPage(ttk.Frame):
                     if mapped_col is None:
                         # insert blanks images
                         self.__insert_image(
-                            row, col, Global.BLOCK, Global.UNKNOWN, Global.BLANK, "")
+                                row, col, Global.BLOCK, \
+                                Global.UNKNOWN, Global.BLANK, "")
                     else:
+                        # print(">>> mapped col: "+str(mapped_col))
                         ident = ""
                         button = None
-                        if mapped_col.type in [Global.BLOCK, Global.SWITCH, Global.SIGNAL, Global.LOCATOR]:
-                            if mapped_col.node_id is not None:
-                                ident += mapped_col.node_id
+                        if mapped_col.type in [Global.BLOCK, Global.SWITCH, \
+                                               Global.ROUTE, Global.SIGNAL, Global.LOCATOR]:
                             if mapped_col.port_id is not None:
-                                ident += ":" + mapped_col.port_id
+                                ident = mapped_col.port_id
+                            elif mapped_col.block_id is not None:
+                                ident = mapped_col.block_id
                         if mapped_col.type == Global.LOCATOR:
                             button = self.__insert_text(row, col, mapped_col.type,
-                                                    Global.UNKNOWN, mapped_col.image, ident)
+                                                        Global.UNKNOWN, mapped_col.image, ident)
                         else:
                             button = self.__insert_image(row, col, mapped_col.type,
-                                                    Global.UNKNOWN, mapped_col.image,ident)
+                                                         Global.UNKNOWN, mapped_col.image, ident)
                         if mapped_col.type == Global.SWITCH:
-                            self.switches.append(PanelItem(key=ident, \
-                                button=button, state=Global.UNKNOWN, ptype=mapped_col.image))
+                            self.switches.append(PanelItem(key=ident,
+                                                           button=button, state=Global.UNKNOWN, ptype=mapped_col.image))
                         elif mapped_col.type == Global.SIGNAL:
-                            self.signals.append(PanelItem(key=ident, \
-                                button=button, state=Global.UNKNOWN, ptype=mapped_col.image))
+                            self.signals.append(PanelItem(key=ident,
+                                                          button=button, state=Global.UNKNOWN, ptype=mapped_col.image))
+                        elif mapped_col.type == Global.ROUTE:
+                            self.routes.append(PanelItem(key=ident,
+                                                          button=button, state=Global.UNKNOWN, ptype=mapped_col.image))
                         elif mapped_col.type == Global.BLOCK:
                             # print(">>> new block: " + str(row) + " ... " +  \
                             # str(col) + " ... "+ str(ident) + " ... " + str(mapped_col))
-                            self.blocks.append(PanelItem(key=ident, button=button, \
-                                state=Global.UNKNOWN, ptype=mapped_col.image))
+                            self.blocks.append(PanelItem(key=ident, button=button,
+                                                         state=Global.UNKNOWN, ptype=mapped_col.image))
                         elif mapped_col.type == Global.LOCATOR:
-                            self.locators.append(PanelItem(key=ident, button=button, \
-                                state=""))
+                            self.locators.append(PanelItem(key=ident, button=button,
+                                                           state=""))
                         mapped_col.display = button
 
     def onFrameConfigure(self, _event):
@@ -176,6 +206,8 @@ class PanelPage(ttk.Frame):
             self.__process_a_switch_change(message)
         elif message.msg_type == Global.SIGNAL:
             self.__process_a_signal_change(message)
+        elif message.msg_type == Global.ROUTE:
+            self.__process_a_route_change(message)
         elif message.msg_type == Global.BLOCK:
             self.__process_a_block_change(message)
         elif message.msg_type == Global.LOCATOR:
@@ -184,17 +216,19 @@ class PanelPage(ttk.Frame):
     def on_item_clicked(self, state):
         """ panel item clicked """
         (group, ident) = state
-        #rint(">>> Item Clicked: " + str(group) + " : "+str(ident))
+        # print(">>> Item Clicked: " + str(group) + " : "+str(ident))
         if group == Global.SIGNAL:
-            self._signal_clicked(ident)
+            self.__signal_clicked(ident)
         elif group == Global.SWITCH:
-            self._switch_clicked(ident)
+            self.__switch_clicked(ident)
+        elif group == Global.ROUTE:
+            self.__route_clicked(ident)
 
     #
     # private functions
     #
 
-    def _signal_clicked(self, ident):
+    def __signal_clicked(self, ident):
         """ signal clicked """
         # print(">>> Signal Clicked: " + str(ident))
         signal = self.tower_data.signals.get(ident, None)
@@ -211,14 +245,31 @@ class PanelPage(ttk.Frame):
             signal_message.text = signal.text  # command topic
             signal_message.mode = new_mode
             self.parent_node.queue_tk_input(
-                TkMessage(msg_type=Global.PUBLISH, msg_data=signal_message))
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=signal_message))
 
-    def _switch_clicked(self, ident):
+    def __route_clicked(self, ident):
+        """ route clicked """
+        # print(">>> Route Clicked: " + str(ident))
+        route = self.tower_data.routes.get(ident, None)
+        if route is not None:
+            new_mode = Global.ON
+            if route.mode == Global.ON:
+                new_mode = Global.OFF
+            route_message = GuiMessage()
+            route_message.command = Global.ROUTE
+            route_message.port_id = route.port_id
+            route_message.node_id = route.node_id
+            route_message.text = route.text  # command topic
+            route_message.mode = new_mode
+            self.parent_node.queue_tk_input(
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=route_message))
+
+    def __switch_clicked(self, ident):
         """ switch clicked """
-        #print(">>> Switch Clicked: " + str(ident))
+        # print(">>> Switch Clicked: " + str(ident))
         switch = self.tower_data.switches.get(ident, None)
         if switch is not None:
-            new_mode = Global.THROWN
+            new_mode = Global.THROW
             if switch.mode == Global.THROWN:
                 new_mode = Global.CLOSE
             switch_message = GuiMessage()
@@ -228,7 +279,7 @@ class PanelPage(ttk.Frame):
             switch_message.text = switch.text  # command topic
             switch_message.mode = new_mode
             self.parent_node.queue_tk_input(
-                TkMessage(msg_type=Global.PUBLISH, msg_data=switch_message))
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=switch_message))
 
     def __insert_image(self, r, c, group, state, image_name, ident):
         # create a new image on the panel
@@ -256,7 +307,7 @@ class PanelPage(ttk.Frame):
                 layout_button = ImageClickable(self.frame, height=IMAGE_HEIGHT, width=IMAGE_WIDTH,
                                                image=layout_image,
                                                bg="black", command=self.on_item_clicked,
-                                               command_value=(group,ident))
+                                               command_value=(group, ident))
                 layout_button.grid(row=r, column=c, padx=0,
                                    pady=0, ipadx=0, ipady=0)
                 rett_button = layout_button
@@ -267,16 +318,18 @@ class PanelPage(ttk.Frame):
                                   pady=0, ipadx=0, ipady=0)
                 rett_button = layout_image
             if rett_button is None:
-                print("!!! Error image not found: "+str(group)+":"+str(state)+":"+str(image_name))
+                print("!!! Error image not found: "+str(group) +
+                      ":"+str(state)+":"+str(image_name))
         return rett_button
 
     def __insert_text(self, r, c, _group, _state, _image_name, _ident):
         # create a new text box on the panel
-        locator_box = ttk.Label(self.frame, text="     ", width=5, style="Panel.TLabel")
-            # bootstyle="dark")
-            # bg="black", fg="white", width=5)
+        locator_box = ttk.Label(self.frame, text="     ",
+                                width=5, style="Panel.TLabel")
+        # bootstyle="dark")
+        # bg="black", fg="white", width=5)
         locator_box.grid(row=r, column=c, padx=0,
-                                  pady=0, ipadx=0, ipady=0)
+                         pady=0, ipadx=0, ipady=0)
         return locator_box
 
     def __map_rows(self, rows):
@@ -304,9 +357,10 @@ class PanelPage(ttk.Frame):
         panel_height = max_rows * (blank_image.height() + 4)
         return (panel_width, panel_height)
 
+
     def __process_a_switch_change(self, message):
         """ a single switch has changed state """
-        skey = message.msg_data.node_id + ":" + message.msg_data.port_id
+        skey = message.msg_data.port_id
         for panel_switch in self.switches:
             pkey = panel_switch.key
             panel_item = None
@@ -314,9 +368,9 @@ class PanelPage(ttk.Frame):
             stype = None
             if skey == pkey:
                 panel_switch.state = Global.UNKNOWN
-                if Synonyms.is_synonym_active(name=message.msg_data.mode):
+                if Synonyms.is_on(name=message.msg_data.mode):
                     panel_switch.state = Global.THROWN
-                if Synonyms.is_synonym_inactive(name=message.msg_data.mode):
+                if Synonyms.is_off(name=message.msg_data.mode):
                     panel_switch.state = Global.CLOSED
                 stype = panel_switch.type
                 # print(">>> switch state:" + str(group)+":"+str(state)+":"+str(type))
@@ -327,7 +381,7 @@ class PanelPage(ttk.Frame):
 
     def __process_a_signal_change(self, message):
         """ a single signal has changed state """
-        skey = message.msg_data.node_id + ":" + message.msg_data.port_id
+        skey = message.msg_data.port_id
         for panel_signal in self.signals:
             pkey = panel_signal.key
             panel_item = None
@@ -346,9 +400,30 @@ class PanelPage(ttk.Frame):
                     panel_item.replace_image(image=new_panel_image)
                     # print(">>>  ... replace signal image")
 
+    def __process_a_route_change(self, message):
+        """ a single route has changed state """
+        skey = message.msg_data.port_id
+        for panel_route in self.routes:
+            pkey = panel_route.key
+            panel_item = None
+            group = Global.ROUTE
+            stype = None
+            if skey == pkey:
+                panel_route.state = Global.UNKNOWN
+                if Synonyms.is_on(name=message.msg_data.mode):
+                    panel_route.state = Global.ON
+                if Synonyms.is_off(name=message.msg_data.mode):
+                    panel_route.state = Global.OFF
+                stype = panel_route.type
+                # print(">>> route state: " + str(group)+" : "+str(panel_route.state)+" : "+str(stype))
+                new_panel_image = self.parent_page.layout_images[group][panel_route.state][stype]
+                panel_item = panel_route.button
+                if panel_item is not None:
+                    panel_item.replace_image(image=new_panel_image)
+
     def __process_a_block_change(self, message):
         """ a single block has changed state """
-        skey = message.msg_data.node_id + ":" + message.msg_data.port_id
+        skey = message.msg_data.block_id
         for panel_block in self.blocks:
             pkey = panel_block.key
             panel_item = None
@@ -370,8 +445,14 @@ class PanelPage(ttk.Frame):
         """ a single locator has changed state """
         # an update of a loco location
         # set the loco in the new block and remove from prev block
-        skey = message.msg_data.node_id + ":" + message.msg_data.port_id
+        # print(">>> locator: "+str(message))
+        skey = message.msg_data.block_id
         text = message.msg_data.dcc_id
+        if text is not None and \
+                isinstance(text, list) and \
+                len(text) > 0:
+            text = text[0]
+        # print(">>> loco: "+str(text))
         for panel_locator in self.locators:
             panel_item = panel_locator.button
             if panel_item is not None:

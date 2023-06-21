@@ -39,7 +39,7 @@ sys.path.append('../../lib')
 
 from utils.global_constants import Global
 from structs.gui_message import GuiMessage
-from components.tk_message import  TkMessage
+from structs.gui_message import  GuiMessageEnvelope
 from components.local_constants import Local
 
 # from image_button import ImageButton
@@ -83,7 +83,7 @@ class ShutdownPage(ttk.Frame):
                 shutdown_message.command =  Global.POWER
                 shutdown_message.sub_command = Global.SHUTDOWN
                 self.parent_node.queue_tk_input( \
-                    TkMessage(msg_type=Global.PUBLISH, msg_data=shutdown_message))
+                    GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=shutdown_message))
 
     def process_output_message(self, message):
         """ process output message """

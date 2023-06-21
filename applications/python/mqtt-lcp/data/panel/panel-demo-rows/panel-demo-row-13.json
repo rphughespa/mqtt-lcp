@@ -1,0 +1,11 @@
+{
+    "row": 13,
+    "cols": [
+       {
+            "col": 7,
+            "port-id": "120w",
+            "image": "signal-left",
+            "type": "signal"
+        }
+    ]
+}

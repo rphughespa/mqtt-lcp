@@ -1,25 +1,63 @@
 {
-    "node-id": "mqtt-i2c",
-    "port-id": "138e",
-    "stop": [
-        [
-            {
-                "node-id": "mqtt-i2c",
-                "port-id": "maryville",
-                "state": "closed"
-            }
-        ],
-        [
-            {
-                "node-id": "mqtt-i2c",
-                "port-id": "maryville",
-                "state": "thrown"
-            },
-            {
-                "node-id": "mqtt-railcom",
-                "port-id": "24",
-                "state": "occupied"
-            }
-        ]
-    ]
+    "group": "signal",
+    "port-id": "131w",
+    "block-id": "27",
+    "direction": "west",
+    "rules": {
+        "clear": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "maryville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-24",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "112w",
+                    "state": "clear"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "maryville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-24",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "112w",
+                    "state": "approach"
+                }
+            ]
+        },
+        "approach": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "maryville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-24",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "112w",
+                    "state": "stop"
+                }
+            ]
+        }
+    }
 }

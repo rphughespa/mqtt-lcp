@@ -27,8 +27,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 """
 
 import sys
+from datetime import datetime
 from tkinter import *
 from tkinter import messagebox
+from tkinter import simpledialog
 # import tkinter as tk
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
@@ -37,9 +39,11 @@ from ttkbootstrap.constants import *
 
 sys.path.append('../../lib')
 
-from structs.gui_message  import GuiMessage
 from utils.global_constants import Global
-from components.tk_message import  TkMessage
+
+from structs.gui_message  import GuiMessage
+from structs.gui_message import  GuiMessageEnvelope
+
 from components.local_constants import Local
 
 # from image_button import ImageButton
@@ -153,31 +157,33 @@ class SystemPage(ttk.Frame):
 
         self.frame.grid(row=0, column=0, rowspan=2, sticky=(NW))
 
+        self.local_hhmm = "0000"
+
     def on_auto_signals_changed(self):
         """ automatic signals change requested  """
         auto_signals = self.AutoSignals.get()
         auto_signals_message = GuiMessage()
-        auto_signals_message.command =  Global.SWITCH
+        auto_signals_message.command =  Global.TOWER
         auto_signals_message.port_id = Global.AUTO_SIGNALS
         if auto_signals == 1:
             auto_signals_message.mode = Global.ON
         else:
             auto_signals_message.mode = Global.OFF
         self.parent_node.queue_tk_input( \
-            TkMessage(msg_type=Global.PUBLISH, msg_data=auto_signals_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=auto_signals_message))
 
     def on_traffic_control_changed(self):
         """ traffic control change requested  """
         traffic_control = self.TrafficControl.get()
         traffic_control_message = GuiMessage()
-        traffic_control_message.command =  Global.SWITCH
+        traffic_control_message.command =  Global.TOWER
         traffic_control_message.port_id = Global.TRAFFIC
         if traffic_control == 1:
             traffic_control_message.mode = Global.ON
         else:
             traffic_control_message.mode = Global.OFF
         self.parent_node.queue_tk_input( \
-            TkMessage(msg_type=Global.PUBLISH, msg_data=traffic_control_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=traffic_control_message))
 
     def on_track_power_changed(self):
         """ track power change requested  """
@@ -190,7 +196,7 @@ class SystemPage(ttk.Frame):
         else:
             power_message.mode = Global.OFF
         self.parent_node.queue_tk_input( \
-            TkMessage(msg_type=Global.PUBLISH, msg_data=power_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=power_message))
 
     def on_fastclock_pause_clicked(self):
         """ fatclock pause key clicked """
@@ -198,7 +204,7 @@ class SystemPage(ttk.Frame):
         fastclock_message.command =  Global.FASTCLOCK
         fastclock_message.mode = Global.PAUSE
         self.parent_node.queue_tk_input( \
-            TkMessage(msg_type=Global.PUBLISH, msg_data=fastclock_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=fastclock_message))
         messagebox.showinfo(message=Local.MSG_FASTCLOCK_PAUSED)
 
     def on_fastclock_run_clicked(self):
@@ -207,17 +213,27 @@ class SystemPage(ttk.Frame):
         fastclock_message.command =  Global.FASTCLOCK
         fastclock_message.mode = Global.RUN
         self.parent_node.queue_tk_input( \
-            TkMessage(msg_type=Global.PUBLISH, msg_data=fastclock_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=fastclock_message))
         messagebox.showinfo(message=Local.MSG_FASTCLOCK_RUNNING)
 
     def on_fastclock_reset_clicked(self):
         """ fastclock reset key clicked """
-        fastclock_message = GuiMessage()
-        fastclock_message.command =  Global.FASTCLOCK
-        fastclock_message.mode = Global.RESET
-        self.parent_node.queue_tk_input( \
-            TkMessage(msg_type=Global.PUBLISH, msg_data=fastclock_message))
-        messagebox.showinfo(message=Local.MSG_FASTCLOCK_RESET)
+        new_time = simpledialog.askinteger("Reset Fastclock", "Enter new Fastclock time. \n (HHMM)",
+                                        initialvalue=int(self.local_hhmm), \
+                                        minvalue=0, maxvalue=2400,
+                                        parent=self)
+        valid_time = self.__validate_time_input(new_time)
+        if valid_time is None:
+            messagebox.showerror(title="Invalid Time", \
+                                 message="Time entered is not valid format.\nMust be 24 hr format HHMM")
+        else:
+            fastclock_message = GuiMessage()
+            fastclock_message.command =  Global.FASTCLOCK
+            fastclock_message.mode = Global.RESET
+            fastclock_message.value = valid_time
+            self.parent_node.queue_tk_input( \
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=fastclock_message))
+            messagebox.showinfo(message=Local.MSG_FASTCLOCK_RESET)
 
     def on_shutdown_clicked(self):
         """ shutdown key clicked """
@@ -227,7 +243,7 @@ class SystemPage(ttk.Frame):
             shutdown_message.command =  Global.NODE
             shutdown_message.mode = Global.SHUTDOWN
             self.parent_node.queue_tk_input( \
-                TkMessage(msg_type=Global.PUBLISH, msg_data=shutdown_message))
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=shutdown_message))
 
     def process_output_message(self, message):
         """ process output message """
@@ -244,3 +260,42 @@ class SystemPage(ttk.Frame):
                 self.track_power = True
             else:
                 self.track_power = False
+        if message.msg_type == Global.TOWER:
+            if message.msg_data.port_id == Global.TRAFFIC:
+                if message.msg_data.mode == Global.ON:
+                    self.TrafficControl.set(1)
+                else:
+                    self.TrafficControl.set(0)
+            elif message.msg_data.port_id == Global.AUTO_SIGNALS:
+                if message.msg_data.mode == Global.ON:
+                    self.AutoSignals.set(1)
+                else:
+                    self.AutoSignals.set(0)
+        if message.msg_type == Global.TIME:
+            date_time = message.msg_data.get(Global.DATETIME, "0T00:00")
+            # datetime is iso datetime YYYYYY-MM-DDTHH:SS:ms
+            date_time_object = datetime.fromisoformat(date_time)
+            hour = str(date_time_object.hour)
+            if len(hour) < 2:
+                hour = "0"+hour
+            mins = str(date_time_object.minute)
+            if len(mins) < 2:
+                mins = "0"+mins
+            self.local_hhmm = hour+mins
+
+
+#
+# private functions
+#
+
+    def __validate_time_input(self, new_time):
+        """ validate the new time entered: 00000 thru 2400"""
+        valid_time = None
+        if new_time in range (2401):
+            time = "0000"+ str(new_time)  # pad front with zeros
+            time = time[-4:] # pull out right most digits
+            hour = time[0:2]
+            mins = time[2:4]
+            if int(hour) < 25 and int(mins) < 60:
+                valid_time = hour + ":"+ mins
+        return valid_time

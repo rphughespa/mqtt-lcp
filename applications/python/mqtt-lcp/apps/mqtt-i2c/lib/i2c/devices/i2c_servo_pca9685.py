@@ -108,8 +108,10 @@ class I2cServoPca9685(I2cBaseDevice):
     def __read(self, reg):
         """ Read an unsigned byte from the I2C device """
         result = self.i2c_bus.read_byte_data(self.i2c_address, reg)
-        # self.log_debug("I2C: Device 0x%02X returned 0x%02X from reg 0x%02X" % (self.i2c_address, result & 0xFF, reg))
-        self.log_debug("I2C: Device 0x{self.i2c_address:02X} returned 0x{result & 0xFF02X} from reg 0x{reg:02X}")
+        # self.log_debug("I2C: Device 0x%02X returned 0x%02X "+\
+        #       "from reg 0x%02X" % (self.i2c_address, result & 0xFF, reg))
+        self.log_debug("I2C: Device 0x{self.i2c_address:02X} "+\
+                       " returned 0x{result & 0xFF02X} from reg 0x{reg:02X}")
         return result
 
     def __setPWMFreq(self, freq):

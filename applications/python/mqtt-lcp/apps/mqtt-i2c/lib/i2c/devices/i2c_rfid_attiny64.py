@@ -2,7 +2,8 @@
 # ic2_rfid_attiny64.py
 """
 
-I2cRfidAttiny64 - low level hardware driver fot a rdif reader connected to i2c using the attiny64 circuit device
+I2cRfidAttiny64 - low level hardware driver fot a
+        rdif reader connected to i2c using the attiny64 circuit device
 
 
     supports sparkfun qwiic rfid reader

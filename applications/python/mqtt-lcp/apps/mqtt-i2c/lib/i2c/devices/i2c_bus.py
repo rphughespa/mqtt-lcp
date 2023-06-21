@@ -30,7 +30,7 @@ import sys
 sys.path.append('../../lib')
 
 import time
-# import os
+
 
 from smbus2 import SMBus
 from utils.global_constants import Global

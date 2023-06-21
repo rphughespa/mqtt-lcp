@@ -81,17 +81,17 @@ class JsonUtils(object):
         print("Parse: "+str(file_name))
         if file_name.endswith(".json"):
             # name is a single file, not a folder, parse it
-            json_parsed = self.__parse_one_json_file(file_name)
+            json_parsed = self.parse_one_json_file(file_name)
         else:
             # file name is a folder
             config_dir = os.listdir(file_name)
             #print(">>> config dir: "+str(config_dir))
             if "config.json" not in config_dir:
-                print("!!! Error: Config,json not found in "+str(file_name))
+                print("!!! Error: Config.json not found in "+str(file_name))
             else:
-                config_file_name = file_name + "/" +"config.json"
+                config_file_name = os.path.join(file_name, "config.json")
                 # print(">>> Parsing: config file: "+ str(config_file_name))
-                json_parsed = self.__parse_one_json_file(config_file_name)
+                json_parsed = self.parse_one_json_file(config_file_name)
                 #print(">>> json parsed: "+str(json_parsed))
                 print("config dir: "+str(config_dir))
                 for jfile in config_dir:
@@ -100,19 +100,17 @@ class JsonUtils(object):
                                 jfile.endswith(".json") and \
                                 jfile.startswith(Global.DEVICE) :
                         #print("parse sub file: "+str(jfile))
-                        io_parsed = self.__parse_one_json_file(file_name+"/"+jfile)
+                        io_parsed = self.parse_one_json_file(
+                                os.path.join(file_name, jfile))
                         if not isinstance(io_parsed,list):
                             io_parsed = [io_parsed]
                         for device_item in io_parsed:
-                            json_parsed[Global.CONFIG][Global.IO][Global.IO_DEVICES].append(device_item)
+                            json_parsed[Global.CONFIG][Global.IO]\
+                                [Global.IO_DEVICES].append(device_item)
         #print(">>> json_parsed: "+str(json_parsed))
         return json_parsed
 
-    #
-    # private functions
-    #
-
-    def __parse_one_json_file(self, file_name):
+    def parse_one_json_file(self, file_name):
         """ read and parse a json file """
         json_parsed = None
         json_lines = self.__load_file(file_name, "")
@@ -124,6 +122,12 @@ class JsonUtils(object):
             print(" ... " + str(ex))
             print(" ... " + str(json_lines))
         return json_parsed
+
+    #
+    # private functions
+    #
+
+
 
     def __load_file(self, file_name, indent):
         """ load a file for all file in a folder """

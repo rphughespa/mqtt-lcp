@@ -146,9 +146,9 @@ class AppProcess(BaseMqttProcess):
                 self.turntable_is_busy = True
                 self.current_request = msg_body
                 if self.last_port_request is not None:
-                    self.__publish_unknown_data_message(msg_body, Global.THROWN)
+                    self.__publish_data_message(msg_body, reported=msg_body.mqtt_desired)
                 else:
-                    self.__publish_unknown_data_message(msg_body)
+                    self.__publish_data_message(msg_body, reported=Global.UNKNOWN)
                 self.send_after(self.turntable_busy_send_after_message)
                 msg_consummed = True
         return msg_consummed
@@ -192,7 +192,7 @@ class AppProcess(BaseMqttProcess):
                             None, reported)
                 self.current_request = None
 
-    def __publish_unknown_data_message(self, msg_body, reported=Global.UNKNOWN):
+    def __publish_data_message(self, msg_body, reported=Global.UNKNOWN):
         """ publish a busy data message """
         if self.switch_topic is not None and msg_body is not None:
             data_msg_body = copy.deepcopy(msg_body)
@@ -223,7 +223,7 @@ class AppProcess(BaseMqttProcess):
                 # print("inv item: " + str(config_item))
                 track = config_item.io_address
                 desired = msg_body.mqtt_desired
-                print(">>> track/end/desired: "+str(track) + " ... "+str(desired))
+                self.log_info("Rotate: "+str(desired)+" to "+str(track))
                 if msg_body.mqtt_port_id == Global.HOME:
                     command = "!HOME"
                 elif desired == Global.HEAD:
@@ -231,14 +231,13 @@ class AppProcess(BaseMqttProcess):
                 elif desired == Global.TAIL:
                     command = "!TRACK " + str(track) + " T"
                 if self.last_port_request is not None:
-                    self.__publish_unknown_data_message(self.last_port_request, Global.UNKNOWN)
+                    self.__publish_data_message(self.last_port_request, reported=Global.UNKNOWN)
                 self.last_port_request = msg_body
         return command
 
     def __publish_all_tracks_inactive_messages(self):
         """ notify all subscribes that no track is active """
         for _key,item in self.io_config.io_device_map.items():
-            print(">>> track port: " + str(item.mqtt_port_id))
             data_msg_body = IoData()
             data_msg_body.mqtt_message_root = Global.SWITCH
             data_msg_body.mqtt_port_id = item.mqtt_port_id

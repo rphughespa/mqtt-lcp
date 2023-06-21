@@ -2,7 +2,8 @@
 # i2c_mux_tca9548a.py
 """
 
-    I2CMuxTca9548 - low level hardware driver for a I2C multiplexer based on the tca9548 circuit device
+    I2CMuxTca9548 - low level hardware driver for an
+        I2C multiplexer based on the tca9548 circuit device
 
 The MIT License (MIT)
 

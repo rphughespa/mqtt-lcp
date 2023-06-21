@@ -1,0 +1,21 @@
+[
+    {
+        "node-id": "mqtt-tower",
+        "port-id": "siding-25",
+        "description": "Siding 25",
+        "switch": [
+            {
+                "node-id": "mqtt-dev-proto",
+                "port-id": "oak",
+                "command-topic": "cmd/mqtt-lcp/switch/mqtt-dev-proto/oak/req",
+                "desired": "throw"
+            },
+            {
+                "node-id": "mqtt-dev-proto",
+                "port-id": "maryville",
+                "command-topic": "cmd/mqtt-lcp/switch/mqtt-dev-proto/marysille/req",
+                "desired": "throw"
+            }
+        ]
+    }
+]

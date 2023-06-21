@@ -1,0 +1,65 @@
+[
+    {
+        "io-address": 221,
+        "io-sub-address": 1,
+        "io-device": "block",
+        "io-device-type": "sensor",
+        "port-id": "block-21",
+        "block-id": "21",
+        "description": "occupancy detector block 21"
+    },
+    {
+        "io-address": 222,
+        "io-sub-address": 1,
+        "io-device": "block",
+        "io-device-type": "sensor",
+        "port-id": "block-22",
+        "block-id": "22",
+        "description": "occupancy detector block 22"
+    },
+    {
+        "io-address": 223,
+        "io-sub-address": 1,
+        "io-device": "block",
+        "io-device-type": "sensor",
+        "port-id": "block-23",
+        "block-id": "23",
+        "description": "occupancy detector block 23"
+    },
+    {
+        "io-address": 224,
+        "io-sub-address": 1,
+        "io-device": "block",
+        "io-device-type": "sensor",
+        "port-id": "block-24",
+        "block-id": "24",
+        "description": "occupancy detector block 24"
+    },
+    {
+        "io-address": 225,
+        "io-sub-address": 1,
+        "io-device": "block",
+        "io-device-type": "sensor",
+        "port-id": "block-25",
+        "block-id": "25",
+        "description": "occupancy detector block 25"
+    },
+    {
+        "io-address": 226,
+        "io-sub-address": 1,
+        "io-device": "block",
+        "io-device-type": "sensor",
+        "port-id": "block-26",
+        "block-id": "26",
+        "description": "occupancy detector block 26"
+    },
+    {
+        "io-address": 227,
+        "io-sub-address": 1,
+        "io-device": "block",
+        "io-device-type": "sensor",
+        "port-id": "block-27",
+        "block-id": "27",
+        "description": "occupancy detector block 27"
+    }
+]

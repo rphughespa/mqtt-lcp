@@ -1,0 +1,39 @@
+{
+    "row": 8,
+    "cols": [
+        {
+            "col": 1,
+            "block-id": "24",
+            "image": "vertical",
+            "type": "block"
+        },
+        {
+            "col": 4,
+            "port-id": "111e",
+            "image": "signal-right",
+            "type": "signal"
+        },
+        {
+            "col": 6,
+            "block-id": "22",
+            "type": "locator"
+        },
+        {
+            "col": 8,
+            "block-id": "station",
+            "type": "locator"
+        },
+        {
+            "col": 11,
+            "port-id": "122e",
+            "image": "signal-right",
+            "type": "signal"
+        },
+        {
+            "col": 12,
+            "block-id": "26",
+            "image": "vertical",
+            "type": "block"
+        }
+    ]
+}

@@ -7,7 +7,7 @@
 
 The MIT License (MIT)
 
-Copyright  2021 richard p hughes
+Copyright  2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -111,22 +111,33 @@ class Dashboard(object):
     def update_node_state(self, node_id, new_state, new_timestamp):
         """ update the state of a node, add node if not present  """
         node_activated = False
+        dashboard_changed = False
         dashboard_node = self.nodes.get(node_id, None)
         if dashboard_node is None:
+            dashboard_changed = True
             dashboard_node = NodeData()
             dashboard_node.node_id = node_id
             self.nodes.update({node_id: dashboard_node})
-        if dashboard_node.state != Global.ACTIVE and \
-                new_state == Global.ACTIVE:
+        if dashboard_node.state != Global.ON and \
+                new_state == Global.ON:
             node_activated = True
+        if dashboard_node.state != new_state:
+            dashboard_changed = True
         dashboard_node.state = new_state
         dashboard_node.timestamp = new_timestamp
-        return node_activated
+        return (node_activated, dashboard_changed)
 
     def timeout_nodes(self, timeout_milliseconds):
         """ mark nodes as ERROR if they have not pinged since this time """
+        dashboard_changed = False
         if self.nodes is not None:
             for _node_key, node_data in self.nodes.items():
-                # print(">>> timeout: " + str(node_data.timestamp) + " ... " + str(timeout_milliseconds))
+                # print(">>> timeout: " + str(node_data.timestamp) + \
+                #   " ... " + str(timeout_milliseconds))
+                new_state = node_data.state
                 if node_data.timestamp < timeout_milliseconds:
-                    node_data.state = Global.ERROR
+                    new_state = Global.ERROR
+                if new_state != node_data.state:
+                    node_data.state = new_state
+                    dashboard_changed = True
+        return dashboard_changed

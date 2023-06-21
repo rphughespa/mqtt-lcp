@@ -59,11 +59,11 @@ class I2cPortExpander(I2cBaseDriver):
                 i2c_address=self.io_devices.io_address,
                 i2c_bus=i2c_bus,
                 log_queue=log_queue)
-        elif self.io_devices.io_device == Global.PORT_EXPANDER_RELAY_QUAD:
-            self.device_driver = I2cPortExpanderRelayAttiny84(
-                i2c_address=self.io_devices.io_address,
-                i2c_bus=i2c_bus,
-                log_queue=log_queue)
+        #elif self.io_devices.io_device == Global.PORT_EXPANDER_RELAY_QUAD:
+        #    self.device_driver = I2cPortExpanderRelayAttiny84(
+        #        i2c_address=self.io_devices.io_address,
+        #        i2c_bus=i2c_bus,
+        #        log_queue=log_queue)
         else:
             # print(">>> init port expander")
             self.device_driver = I2cPortExpanderMcp23017(
@@ -239,6 +239,12 @@ class I2cPortExpander(I2cBaseDriver):
         elif signal_type == Global.POSITION:
             # use 4 consecutive pins for the signal: clear, approach, stop, center light
             number_of_pins = 4
+        elif signal_type == Global.RGB:
+            # use 4 consecutive pins for the signal: clear, approach, stop, center light
+            number_of_pins = 3
+        elif signal_type == Global.FLASHER:
+            # use 4 consecutive pins for the signal: clear, approach, stop, center light
+            number_of_pins = 2
         for out_pin in range(0, number_of_pins):
             selected_pin = base_pin + out_pin
             #print(">>> pins: "+str(base_pin) +" ... "+str(out_pin))
@@ -264,7 +270,7 @@ class I2cPortExpander(I2cBaseDriver):
         data_reported = None
         return_message = "Unknown request: " + str(message.mqtt_desired)
         desired = message.mqtt_desired
-        # print(">>> "+str(desired))
+        respond_to = message.mqtt_respond_to
         if desired in (Global.ON, Global.OFF, Global.CLEAR, Global.APPROACH,
                        Global.STOP):
             sub_dev = self.port_map.get(message.mqtt_port_id, None)
@@ -274,7 +280,6 @@ class I2cPortExpander(I2cBaseDriver):
             else:
                 blink = sub_dev.blink
                 signal_type = sub_dev.dev_sub_type
-                # print(">>> "+str(signal_type))
                 selected_pins = []
                 if signal_type == Global.SINGLE:
                     if blink != 0:
@@ -284,6 +289,18 @@ class I2cPortExpander(I2cBaseDriver):
                     if process_this_message:
                         selected_pins = self.__set_single_signal_pins(
                             sub_dev, desired)
+                elif signal_type == Global.FLASHER:
+                    if blink != 0:
+                        (process_this_message, send_after_message) = \
+                            self.__create_signal_blink_send_after_message(
+                                message, blink)
+                    if process_this_message:
+                        # print(">>> flash:"+str(message.mqtt_respond_to))
+                        selected_pins = self.__set_flasher_signal_pins(
+                            sub_dev, desired, respond_to)
+                elif signal_type in (Global.RGB):
+                    selected_pins = self.__set_rgb_signal_pins(
+                        sub_dev, desired)
                 elif signal_type in (Global.COLOR, Global.POSITION):
                     selected_pins = self.__set_multi_signal_pins(
                         sub_dev, desired)
@@ -292,12 +309,14 @@ class I2cPortExpander(I2cBaseDriver):
                     return_reported = desired
                 else:
                     return_reported = None
+                # print(">>> return reported: "+str(return_reported))
                 return_message = None
         #print(">>> 2: " + str(sub_dev.send_sensor_message))
         if return_reported is not None and \
                 return_reported != Global.ERROR and \
                 sub_dev.send_sensor_message:
             data_reported = return_reported
+        # print(">>> done: "+str(return_reported)+" : "+str(data_reported))
         return (return_reported, return_message, data_reported,
                 send_after_message)
 
@@ -310,6 +329,46 @@ class I2cPortExpander(I2cBaseDriver):
             signal_pins.append((sub_dev.base_pin, True, pulse))
         else:
             signal_pins.append((sub_dev.base_pin, False, 0))
+        return signal_pins
+
+    def __set_flasher_signal_pins(self, sub_dev, desired, respond_to):
+        """ set multiple pins for a flasher """
+        signal_pins = []
+        base_pin = sub_dev.base_pin
+        if desired in (0, Global.OFF, False):
+            if respond_to != Global.BLINK:
+                signal_pins.append((base_pin, False, 0))
+                signal_pins.append((base_pin + 1, False, 0))
+            else:
+                # we are flashing, reveerse lights
+                signal_pins.append((base_pin, False, 0))
+                signal_pins.append((base_pin + 1, True, 0))
+        elif desired in (1, Global.ON, True):
+            signal_pins.append((base_pin, True, 0))
+            signal_pins.append((base_pin + 1, False, 0))
+        return signal_pins
+
+    def __set_rgb_signal_pins(self, sub_dev, desired):
+        """ set pins for color or position multi lamp signal """
+        # assumes lamps are in order: red, green, blue
+        signal_pins = []
+        base_pin = sub_dev.base_pin
+        number_of_pins = sub_dev.number_of_pins
+        if desired == Global.OFF:
+            for p in range(base_pin, base_pin + number_of_pins):
+                signal_pins.append((p, False, 0))
+        elif desired == Global.CLEAR:
+            signal_pins.append((base_pin, False, 0))
+            signal_pins.append((base_pin + 1, True, 0))
+            signal_pins.append((base_pin + 2, False, 0))
+        elif desired == Global.APPROACH:
+            signal_pins.append((base_pin, True, 0))
+            signal_pins.append((base_pin + 1, True, 0))
+            signal_pins.append((base_pin + 2, False, 0))
+        elif desired == Global.STOP:
+            signal_pins.append((base_pin, True, 0))
+            signal_pins.append((base_pin + 1, False, 0))
+            signal_pins.append((base_pin + 2, False, 0))
         return signal_pins
 
     def __set_multi_signal_pins(self, sub_dev, desired):
@@ -360,9 +419,9 @@ class I2cPortExpander(I2cBaseDriver):
                     desired = Global.ON
                 else:
                     desired = Global.OFF
-            if Synonyms.is_synonym_activate(message.mqtt_desired):
+            if Synonyms.is_on(message.mqtt_desired):
                 desired = Global.ON
-            elif Synonyms.is_synonym_deactivate(desired):
+            elif Synonyms.is_off(desired):
                 desired = Global.OFF
             if desired in (Global.ON, Global.OFF):
                 # pulse pins on rather than continous
@@ -423,7 +482,7 @@ class I2cPortExpander(I2cBaseDriver):
         port_id = message.mqtt_port_id
         process_this_message = False
         if message.mqtt_respond_to == Global.BLINK:
-            # message is a blink, is port still allowed to blink
+            # message is a blink send after, is port still allowed to blink
             if port_id in self.send_after_port_queue:
                 # ok, allow the blink
                 process_this_message = True

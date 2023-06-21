@@ -37,9 +37,12 @@ from ttkbootstrap.constants import *
 
 sys.path.append('../../lib')
 
-from structs.gui_message  import GuiMessage
+
 from utils.global_constants import Global
-from components.tk_message import  TkMessage
+
+from structs.gui_message  import GuiMessage
+from structs.gui_message import  GuiMessageEnvelope
+
 from components.local_constants import Local
 
 # from image_button import ImageButton
@@ -112,7 +115,7 @@ class SystemPage(ttk.Frame):
         else:
             power_message.mode = Global.OFF
         self.parent_node.queue_tk_input( \
-            TkMessage(msg_type=Global.PUBLISH, msg_data=power_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=power_message))
 
     def on_shutdown_clicked(self):
         """ shutdown key clicked """
@@ -122,7 +125,7 @@ class SystemPage(ttk.Frame):
             shutdown_message.command =  Global.NODE
             shutdown_message.mode = Global.SHUTDOWN
             self.parent_node.queue_tk_input( \
-                TkMessage(msg_type=Global.PUBLISH, msg_data=shutdown_message))
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=shutdown_message))
 
     def process_output_message(self, message):
         """ process output message """

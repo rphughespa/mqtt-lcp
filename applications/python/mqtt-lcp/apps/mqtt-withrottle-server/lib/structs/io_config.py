@@ -23,6 +23,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
+
 import os
 import sys
 
@@ -33,12 +34,13 @@ if p not in sys.path:
     sys.path.append(p)
 
 from utils.global_constants import Global
-
+from utils.compass_points import CompassPoints
 from structs.io_data import IoData
 
 
 class IoConfig(object):
     """ Data class for IO Config data """
+
     def __init__(self, config=None, log_queue=None):
         self.config = config
         self.log_queue = log_queue
@@ -72,10 +74,10 @@ class IoConfig(object):
                     devices_config = self.config[Global.CONFIG][Global.IO][
                         Global.IO_DEVICES]
 
-        #print(">>> devices: "+str(devices_config))
+        # print(">>> devices: "+str(devices_config))
         if devices_config is not None:
             devices = self.__parse_devices_config(devices_config)
-            #print(">>> devices 2: "+str(devices))
+            # print(">>> devices 2: "+str(devices))
             if devices:
                 self.io_device_map = devices
 
@@ -85,14 +87,14 @@ class IoConfig(object):
         if isinstance(devices_config, list):
             devices = {}
             for dev_config in devices_config:
-                #print(">>> io config: "+str(dev_config))
+                # print(">>> io config: "+str(dev_config))
                 new_dev = self.__parse_one_dev_config(dev_config)
                 if new_dev is not None:
                     if new_dev.io_device_key not in devices:
                         devices[new_dev.io_device_key] = new_dev
                     else:
-                        self.__log_warning("Configuration error: Duplicate device address: " + \
-                                 str(new_dev.io_device_key))
+                        self.__log_warning("Configuration error: Duplicate device address: " +
+                                           str(new_dev.io_device_key))
         return devices
 
     def __parse_one_dev_config(self, dev_config):
@@ -103,9 +105,17 @@ class IoConfig(object):
         io_mux_address = dev_config.get(Global.IO_MUX_ADDRESS, None)
         io_device = dev_config.get(Global.IO_DEVICE, None)
         io_device_type = dev_config.get(Global.IO_DEVICE_TYPE, None)
+        io_metadata = dev_config.get(Global.IO_METADATA, None)
         io_port_id = dev_config.get(Global.PORT_ID, None)
+        if io_port_id is not None:
+            # make sure port id is a string
+            io_port_id = str(io_port_id)
+        io_block_id = dev_config.get(Global.BLOCK_ID, None)
+        if io_block_id is not None:
+            io_block_id = str(io_block_id)
+        io_direction = dev_config.get(Global.DIRECTION, None)
         okk = self.__check_config(io_device, io_device_type, io_address, io_port_id,
-                                  io_sub_address, dev_config)
+                                  io_sub_address, io_direction, dev_config)
         if okk:
             io_dev_key = str(io_address)
             if io_mux_address is not None:
@@ -120,13 +130,19 @@ class IoConfig(object):
             io_data.io_sub_address = io_sub_address
             io_data.io_device = io_device
             io_data.io_device_type = io_device_type
-            io_data.io_mux_address = dev_config.get(Global.IO_MUX_ADDRESS,
-                                                    None)
+            io_data.io_mux_address = \
+                dev_config.get(Global.IO_MUX_ADDRESS, None)
             io_data.mqtt_message_root = dev_config.get(
                 Global.MESSAGE + "-" + Global.ROOT, None)
             io_data.mqtt_port_id = dev_config.get(Global.PORT_ID, None)
+            if io_data.mqtt_port_id is not None:
+                # make sure port id is a string
+                io_data.mqtt_port_id = str(io_data.mqtt_port_id)
             # ">>>>>> : "+str(io_data.mqtt_port_id))
             io_data.mqtt_description = dev_config.get(Global.DESCRIPTION, None)
+            io_data.mqtt_block_id = io_block_id
+            io_data.mqtt_direction = io_direction
+            io_data.mqtt_metadata = io_metadata
             send_sensor_message = \
                 dev_config.get(Global.SEND + "-" +
                                Global.SENSOR + "-" + Global.MESSAGE, Global.NO)
@@ -135,7 +151,7 @@ class IoConfig(object):
             io_data.io_metadata = dev_config.get(Global.IO_METADATA, None)
             io_sub_devices = dev_config.get(Global.IO_SUB_DEVICES, None)
             if isinstance(io_sub_devices, list):
-                #print("[[" + str(type(io_sub_devices))+"]]")
+                # print("[[" + str(type(io_sub_devices))+"]]")
                 sub_devices = {}
                 for sub_dev_config in io_sub_devices:
                     sub_dev_config[Global.IO_DEVICE] = io_data.io_device
@@ -150,9 +166,8 @@ class IoConfig(object):
     def __is_valid_io_device_type(self, dev_type):
         """ if the device type valid """
         return dev_type in (Global.BLOCK, Global.DCC_ACCESSORY, Global.ENCODER,
-                            Global.LOCATOR, Global.MULTIPLE,
+                            Global.LOCATOR, Global.MULTIPLE, Global.ROUTE,
                             Global.PORT_EXPANDER, Global.PORT_EXPANDER_RELAY,
-                            Global.PORT_EXPANDER_RELAY_QUAD,
                             Global.RAILCOM, Global.RFID, Global.SENSOR,
                             Global.SERVO, Global.SERVO_CONTROLLER,
                             Global.SIGNAL, Global.SWITCH, Global.DISPLAY,
@@ -171,15 +186,15 @@ class IoConfig(object):
     def __add_port_to_map(self, port_id, key):
         if port_id is not None:
             if port_id in self.io_port_map:
-                self.__log_warning("Configuration error: duplicate item with same port: ["+\
-                            str(port_id)+"]")
+                self.__log_warning("Configuration error: duplicate item with same port: [" +
+                                   str(port_id)+"]")
             else:
                 self.io_port_map[port_id] = key
-                self.__log_debug("I2C Device: " + str(key) +\
-                            " : " + str(port_id))
+                self.__log_debug("I2C Device: " + str(key) +
+                                 " : " + str(port_id))
 
     def __check_config(self, io_device, io_device_type, io_address, io_port_id,
-                       io_sub_address, dev_config):
+                       io_sub_address, io_direction, dev_config):
         okk = True
         if io_address is None and io_sub_address is None:
             self.__log_warning(
@@ -205,9 +220,15 @@ class IoConfig(object):
                 str(dev_config))
             okk = False
         if io_port_id is not None:
-            if " " in io_port_id:
+            if " " in str(io_port_id):
                 self.__log_warning(
                     "Configuration error, port_id contain spaces: " +
+                    str(dev_config))
+                okk = False
+        if io_direction is not None:
+            if not CompassPoints.is_valid(io_direction):
+                self.__log_warning(
+                    "Configuration error, direction is not valid: " +
                     str(dev_config))
                 okk = False
         return okk
@@ -219,7 +240,7 @@ class IoConfig(object):
         else:
             print(">>> warning: " + message)
 
-    #def __log_info(self, message):
+    # def __log_info(self, message):
     #    """ log a info message """
     #    if self.log_queue is not None:
     #        self.log_queue.put((Global.LOG_LEVEL_INFO, message))

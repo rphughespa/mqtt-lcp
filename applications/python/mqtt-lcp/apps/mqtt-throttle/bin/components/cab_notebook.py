@@ -50,14 +50,16 @@ from ttkbootstrap.constants import *
 
 sys.path.append('../../lib')
 
-from structs.gui_message import GuiMessage
 from utils.global_constants import Global
+
+from structs.gui_message import GuiMessage
+from structs.gui_message import GuiMessageEnvelope
+
 
 from components.image_clickable import ImageClickable
 from components.locos_notebook import LocosNotebook
 from components.functions_page import FunctionsPage
 from components.controls_page import ControlsPage
-from components.tk_message import TkMessage
 from components.local_constants import Local
 
 
@@ -75,7 +77,7 @@ class CabNotebook(ttk.Frame):
         self.parent_node = parent_node
         self.cab_id = cab_id
         self.lead_loco = None
-        self.loco_cab_signals = {}
+        self.loco_cab_signal_aspect = Global.APPROACH
         self.locos_selected_list = []
         self.locos_available_list = []
         self.locos_roster_map = {}
@@ -178,15 +180,12 @@ class CabNotebook(ttk.Frame):
             self.build_roster_display_list(message.msg_data)
             self.build_display_lists()
             self.refresh_all_pages()
-        elif message.msg_type == Global.SIGNAL:
-            # print(">>> cab signal: " + str(message.msg_data.dcc_id) + \
-            #     ": " + str(message.msg_data.mode))
-            self.loco_cab_signals[message.msg_data.dcc_id] = \
-                message.msg_data.mode
-            if self.lead_loco is not None:
-                if message.msg_data.dcc_id == self.lead_loco:
-                    # our lead loco has a new cab signal
-                    self.controls_page.refresh_page()
+        elif message.msg_type == Global.CAB_SIGNAL:
+            #print(">>> cab signal: " +str(message.msg_data.dcc_id) +\
+            #        " : "+str(message.msg_data.mode))
+            if self.lead_loco == message.msg_data.dcc_id:
+                self.loco_cab_signal_aspect = message.msg_data.mode
+                self.controls_page.refresh_page()
         elif message.msg_type == Global.REFRESH:
             self.build_display_lists()
             self.refresh_all_pages()
@@ -214,7 +213,7 @@ class CabNotebook(ttk.Frame):
         acquire_message.dcc_id = dcc_id
         acquire_message.cab_id = self.cab_id
         self.parent_node.queue_tk_input(
-            TkMessage(msg_type=Global.PUBLISH, msg_data=acquire_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=acquire_message))
 
     def publish_steal_request(self, dcc_id):
         """ send steal requested """
@@ -224,7 +223,7 @@ class CabNotebook(ttk.Frame):
         steal_message.dcc_id = dcc_id
         steal_message.cab_id = self.cab_id
         self.parent_node.queue_tk_input(
-            TkMessage(msg_type=Global.PUBLISH, msg_data=steal_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=steal_message))
 
     def publish_release_request(self, dcc_id):
         """ send acquire requested """
@@ -234,7 +233,7 @@ class CabNotebook(ttk.Frame):
         release_message.dcc_id = dcc_id
         release_message.cab_id = self.cab_id
         self.parent_node.queue_tk_input(
-            TkMessage(msg_type=Global.PUBLISH, msg_data=release_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=release_message))
 
     def publish_speed_request(self):
         """ send speed requested  for all locos selected """
@@ -246,7 +245,7 @@ class CabNotebook(ttk.Frame):
         speed_message.cab_id = self.cab_id
         speed_message.speed = self.loco_current_speed
         self.parent_node.queue_tk_input(
-            TkMessage(msg_type=Global.PUBLISH, msg_data=speed_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=speed_message))
 
     def publish_direction_request(self):
         """ send speed requested  for all locos selected """
@@ -265,7 +264,7 @@ class CabNotebook(ttk.Frame):
                     else:
                         direction_message.direction = Global.FORWARD
                 self.parent_node.queue_tk_input(
-                    TkMessage(msg_type=Global.PUBLISH, msg_data=direction_message))
+                    GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=direction_message))
 
     def publish_function_request(self, function_id):
         """ send speed requested  for all locos selected """
@@ -340,7 +339,7 @@ class CabNotebook(ttk.Frame):
 
             # locos_image_path = image_path + "/" + Global.LOCOS + \
             #    "/" + signal_type + "/" + Global.CAB
-            locos_image_path = image_path + "/" + Global.LOCOS
+            locos_image_path = os.path.join(image_path, Global.LOCOS)
             self.loco_blank_image = ImageClickable.load_image(
                 locos_image_path+"/blank.png")
 
@@ -350,8 +349,8 @@ class CabNotebook(ttk.Frame):
             for file in files:
                 loco_name = os.path.basename(file)
                 loco_image_file_path = os.path.join(locos_image_path, file)
-                # print(">>> loco: "+str(loco_image_file_path) +
-                #      "..." + str(loco_name))
+                #print(">>> loco: "+str(loco_image_file_path) +
+                #     "..." + str(loco_name))
                 self.loco_images_map[loco_name] = ImageClickable.load_image(
                     loco_image_file_path)
 
@@ -365,7 +364,7 @@ class CabNotebook(ttk.Frame):
         function_message.function = func
         function_message.mode = mode
         self.parent_node.queue_tk_input(
-            TkMessage(msg_type=Global.PUBLISH, msg_data=function_message))
+            GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=function_message))
 
     def __process_steal_needed(self, loco_id):
         """ a steal needed response received, process it """

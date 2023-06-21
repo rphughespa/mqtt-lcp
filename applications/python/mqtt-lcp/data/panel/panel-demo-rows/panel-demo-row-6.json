@@ -1,0 +1,29 @@
+{
+    "row": 6,
+    "cols": [
+        {
+            "col": 1,
+            "block-id": "24",
+            "image": "vertical",
+            "type": "block"
+        },
+        {
+            "col": 2,
+            "port-id": "132e",
+            "image": "signal-left",
+            "type": "signal"
+        },
+        {
+            "col": 9,
+            "port-id": "141e",
+            "image": "signal-left",
+            "type": "signal"
+        },
+        {
+            "col": 12,
+            "block-id": "26",
+            "image": "vertical",
+            "type": "block"
+        }
+    ]
+}

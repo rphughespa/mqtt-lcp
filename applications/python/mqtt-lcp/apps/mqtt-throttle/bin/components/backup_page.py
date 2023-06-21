@@ -36,7 +36,7 @@ from ttkbootstrap.dialogs.dialogs import Messagebox
 sys.path.append('../../lib')
 
 # from utils.global_constants import Global
-from components.tk_message import  TkMessage
+from structs.gui_message import  GuiMessageEnvelope
 from components.local_constants import Local
 
 # from image_button import ImageButton
@@ -74,7 +74,7 @@ class BackupPage(ttk.Frame):
         if button_text == Local.BACKUP:
             okk = Messagebox.okcancel(message=Local.MSG_BACKUP_CONFIRM)
             if okk is True:
-                self.parent_node.queue_tk_input(TkMessage(msg_type=Local.TOWER, data_type=Local.BACKUP))
+                self.parent_node.queue_tk_input(GuiMessageEnvelope(msg_type=Local.TOWER, data_type=Local.BACKUP))
 
     def process_output_message(self, message):
         """ process output message """

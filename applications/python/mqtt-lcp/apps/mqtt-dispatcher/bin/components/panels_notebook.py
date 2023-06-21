@@ -26,6 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 
+
 import os
 import sys
 # import copy
@@ -39,20 +40,20 @@ from ttkbootstrap.constants import *
 sys.path.append('../../lib')
 
 # from structs.gui_message import GuiMessage
-from utils.global_constants import Global
 
-from components.image_clickable import ImageClickable
-from components.panel_page import PanelPage
-# from components.tk_message import TkMessage
+# from structs.gui_message import GuiMessageEnvelope
 # from components.local_constants import Local
-
 
 
 # from image_button import ImageButton
 
+from utils.global_constants import Global
 
-IMAGE_WIDTH = 48 # 64
-IMAGE_HEIGHT = 24 # 32
+from components.panel_page import PanelPage
+from components.image_clickable import ImageClickable
+
+IMAGE_WIDTH = 48  # 64
+IMAGE_HEIGHT = 24  # 32
 
 
 class PanelsNotebook(ttk.Frame):
@@ -66,7 +67,7 @@ class PanelsNotebook(ttk.Frame):
         self.tower_data = tower_data
         self.layout_images = {}
         self.panels = []
-        self.label = ttk.Label(self, text=Global.PANELS, style="My.TLabel")
+        self.label = ttk.Label(self, text=Global.PANEL, style="My.TLabel")
         self.label.grid(row=0)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -96,9 +97,9 @@ class PanelsNotebook(ttk.Frame):
             for _key, panel in message.msg_data.panels.items():
                 name = str(panel.name)
                 # description = str(panel.description)
-                new_page = PanelPage(self, self.notebook, self.parent_node, \
-                                    self.tower_data, self.layout_images, name, panel.rows,
-                                     callback=self.on_item_clicked, \
+                new_page = PanelPage(self, self.notebook, self.parent_node,
+                                     self.tower_data, self.layout_images, name, panel.rows,
+                                     callback=self.on_item_clicked,
                                      padding=(
                                          0, 0, 0, 0),
                                      borderwidth=1, relief="flat",
@@ -133,6 +134,10 @@ class PanelsNotebook(ttk.Frame):
             self.layout_images[Global.SWITCH] = self.__load_group_state_images(
                 switch_image_path)
 
+            route_image_path = image_path + "/" + Global.PANEL + "/" + Global.ROUTE
+            self.layout_images[Global.ROUTE] = self.__load_group_state_images(
+                route_image_path)
+
             signal_image_path = image_path + "/" + Global.PANEL + \
                 "/" + Global.SIGNAL + "/" + signal_type
             self.layout_images[Global.SIGNAL] = self.__load_group_state_images(
@@ -143,14 +148,14 @@ class PanelsNotebook(ttk.Frame):
         group_images = {}
         # print(">>> group state: " + str(group_folder_path))
         for state_folder in os.listdir(group_folder_path):
-            #print(">>> state folder: " + str(state_folder))
+            # print(">>> state folder: " + str(state_folder))
             state_folder_path = group_folder_path + "/" + state_folder
-            #print(">>> state folder path: "+str(state_folder_path))
+            # print(">>> state folder path: "+str(state_folder_path))
             if os.path.isdir(state_folder_path):
                 state_images = {}
                 for image_name in os.listdir(state_folder_path):
                     image_path = state_folder_path + "/" + image_name
-                    #print(">>> image name: "+str(image_path))
+                    # print(">>> image name: "+str(image_path))
                     if os.path.isfile(image_path):
                         file_image = self.__load_one_image(image_path)
                         # get filename without extension

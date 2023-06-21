@@ -162,17 +162,20 @@ class SwitchProcess(BaseProcess):
             send_message.mode = power_desired
             response = \
                 self.__driver_send_message_and_wait_response(send_message)
-            # print(">>> power response 1: " + str(send_message) + "\n... " + str(response))
+            #print(">>> power response 1: " + str(send_message) + "\n...resp:  " + str(response))
             if not isinstance(response, list):
                 response = [response]
+            #print(">>> power response 1a: " + str(send_message) + "\n... resp: " + str(response))
             for resp in response:
-                # print(">>> power response" + str(response))
-                if isinstance(resp, GuiMessage) and \
-                        resp.command == Global.POWER:
-                    reported = resp.mode
-                    data_reported = reported
-                    message = None
-                    self.__publish_responses(msg_body, reported, message, data_reported)
+                if resp is not None:
+                    #print(">>> power response 2" + str(resp.command) +" : "+str(resp.mode))
+                    if resp.command == Global.POWER:
+                        #print(">>> power response 3: " + str(resp.mode))
+                        reported = resp.mode
+                        data_reported = reported
+                        message = None
+                        #print(">>> power response 4: " + str(data_reported))
+                        self.__publish_responses(msg_body, reported, message, data_reported)
 
     def __parse_mqtt_options_config(self, mqtt_config):
         """ parse time options section of config file """

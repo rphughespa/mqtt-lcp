@@ -34,7 +34,7 @@ from utils.utility import Utility
 from utils.global_constants import Global
 from utils.global_synonyms import Synonyms
 
-from structs.withrottle_const import WithrottleConst
+from utils.withrottle_const import WithrottleConst
 from structs.gui_message import GuiMessage
 from structs.io_data import IoData
 
@@ -120,6 +120,7 @@ class WithrottleDriver(BaseProcess):
         self.roster_locos = []
         self.roster_locos_by_name = {}
         self.cabs = {}
+        self.loco_cab_signals = {}
         self.traffic_control = False
         self.auto_signals = False
 
@@ -147,6 +148,8 @@ class WithrottleDriver(BaseProcess):
             elif msg_type == Global.FASTCLOCK:
                 # receved updated fastclock from tower
                 self.__update_fastclock(msg_body)
+            elif msg_type == Global.CAB_SIGNAL:
+                self.__update_cab_signal(msg_body)
             elif msg_type == Global.SWITCHES:
                 # update the list of switches
                 self.switches = msg_body
@@ -255,14 +258,14 @@ class WithrottleDriver(BaseProcess):
         new_message.name = loco_ident
         self.__send_to_client(new_message)
 
-    def __send_speed_response(self, msg_body):
-        """ send response to throttle for speed commands """
-        # reported is a dictionary, may contains speed
-        cab_id = msg_body.mqtt_cab_id
-        loco_ident = self.__find_loco_ident(cab_id, msg_body.mqtt_loco_id)
-        for key, value in msg_body.mqtt_reported.items():
-            if key == Global.SPEED:
-                self.__send_speed(cab_id, loco_ident, value)
+    #def __send_speed_response(self, msg_body):
+    #    """ send response to throttle for speed commands """
+    #    # reported is a dictionary, may contains speed
+    #    cab_id = msg_body.mqtt_cab_id
+    #    loco_ident = self.__find_loco_ident(cab_id, msg_body.mqtt_loco_id)
+    #    for key, value in msg_body.mqtt_reported.items():
+    #        if key == Global.SPEED:
+    #            self.__send_speed(cab_id, loco_ident, value)
 
     def __send_direction_response(self, msg_body):
         """ send response to throttle for direction commands """
@@ -297,16 +300,16 @@ class WithrottleDriver(BaseProcess):
 
     def __send_switch_response(self, msg_body):
         """ send response to throttle for turnout switch commands """
-        # print(">>> turnout switch: " + str(msg_body))
+        # print(">>> \n\n\n ...turnout switch: " + str(msg_body))
         node_id = msg_body.mqtt_node_id
         port_id = msg_body.mqtt_port_id
         new_message = GuiMessage()
         if port_id == Global.POWER:
             new_message.command = Global.POWER
         elif msg_body.mqtt_port_id == Global.TRAFFIC:
-            self.traffic_control = Synonyms.is_synonym_active(msg_body.mqtt_reported)
+            self.traffic_control = Synonyms.is_on(msg_body.mqtt_reported)
         elif msg_body.mqtt_port_id == Global.AUTO_SIGNALS:
-            self.auto_signals = Synonyms.is_synonym_active(msg_body.mqtt_reported)
+            self.auto_signals = Synonyms.is_on(msg_body.mqtt_reported)
         else:
             new_message.command = Global.SWITCH
             switch = self.__find_switch(node_id, port_id)
@@ -321,7 +324,7 @@ class WithrottleDriver(BaseProcess):
         self.__send_to_client(new_message)
 
     def __find_loco_ident(self, cab_id, dcc_id):
-        """ find a loco ident given can and dcc_id """
+        """ find a loco ident given cab and dcc_id """
         loco_ident = None
         throttle_cab = self.cabs.get(cab_id, None)
         if throttle_cab is not None:
@@ -333,7 +336,7 @@ class WithrottleDriver(BaseProcess):
 
     def __process_input_from_client(self, msg_body):
         """ process inpute from client socket """
-        self.log_info("Rcvd from Client: " + str(msg_body))
+        self.log_debug("Rcvd from Client: " + str(msg_body))
         #print(">>> before decode: " + str(msg_body))
         decoded_message = self.decoder.decode_message(
             msg_body, source="client")
@@ -439,8 +442,8 @@ class WithrottleDriver(BaseProcess):
         new_message.name = "Routes"
         new_message.items = \
             {
-                Global.ACTIVATED: "Activated",
-                Global.DEACTIVATED: "Deactivated"
+                Global.ON: WithrottleConst.ACTIVATED,
+                Global.OFF: WithrottleConst.DEACTIVATED
             }
         self.__send_to_client(new_message)
 
@@ -598,12 +601,12 @@ class WithrottleDriver(BaseProcess):
         new_message.text = message
         self.__send_to_client(new_message)
 
-    def __send_info(self, message):
-        """ send info message to client """
-        new_message = GuiMessage()
-        new_message.command = Global.INFO
-        new_message.text = message
-        self.__send_to_client(new_message)
+    #def __send_info(self, message):
+    #    """ send info message to client """
+    #    new_message = GuiMessage()
+    #    new_message.command = Global.INFO
+    #    new_message.text = message
+    #    self.__send_to_client(new_message)
 
     def __send_speed_step(self, cab_id, loco_ident, step):
         """ send loco speed to client """
@@ -629,7 +632,7 @@ class WithrottleDriver(BaseProcess):
         """ encode and send a command to client """
         #print(">>> new message to send: " + str(new_message))
         encoded_message = self.encoder.encode_message(new_message)
-        self.log_info("Send to Client: " + str(encoded_message))
+        self.log_debug("Send to Client: " + str(encoded_message))
         self.device_queue.put(
             (
                 Global.DEVICE_SEND,
@@ -831,7 +834,7 @@ class WithrottleDriver(BaseProcess):
 
     def __publish_turnout_switch(self, message):
         """ publish a switch request command """
-        # print(">>> switch req: " + str(message))
+        #print(">>> switch req: " + str(message))
         switch_parts = message.port_id.split(WithrottleConst.PORT_SEP)
         if len(switch_parts) > 1:
             node_id = switch_parts[0]
@@ -842,21 +845,31 @@ class WithrottleDriver(BaseProcess):
                 #print(">>> toggle: " + str(message.mode) + " ... " +
                 #   str(switch))
                 desired = message.mode
+                #print(">>> desired: "+str(desired) + " : " + str(switch.mode))
                 if desired == Global.TOGGLE:
                     if switch.mode == Global.CLOSED:
                         desired = Global.THROW
                     else:
                         desired = Global.CLOSE
+                group = Global.SWITCH
+                if node_id ==  Global.ROUTE:
+                    group = Global.ROUTE
+                    if Synonyms.is_off(desired):
+                        desired = Global.OFF
+                    else:
+                        desired = Global.ON
                 # print(">>> switch 2: " + str(switch))
+                topic = switch.command_topic
                 body = IoData()
-                body.mqtt_message_root = Global.SWITCH
-                body.mqtt_node_id = node_id
+                body.mqtt_message_root = group
+                body.mqtt_node_id = self.__get_topic_node_id(topic)
                 body.mqtt_port_id = port_id
                 body.mqtt_desired = desired
+                #print(">>> switch 5: "+str(body))
                 self.app_queue.put((Global.PUBLISH,
                                     {
-                                        Global.SUB: Global.SWITCH,
-                                        Global.TOPIC: switch.command_topic,
+                                        Global.SUB: group,
+                                        Global.TOPIC: topic,
                                         Global.BODY: body
                                     }))
 
@@ -911,6 +924,22 @@ class WithrottleDriver(BaseProcess):
                 break
         return rett
 
+    def __update_cab_signal(self, msg_body):
+        """ send cab signal to withthrottle device """
+        last_signal = self.loco_cab_signals.get(msg_body.mqtt_loco_id, None)
+        if last_signal != msg_body.mqtt_reported:
+            # only process changes in signal aspect for any given loco
+            self.loco_cab_signals.update({msg_body.mqtt_loco_id: msg_body.mqtt_reported})
+            if self.cabs is not None:
+                for _cab_id, cab in self.cabs.items():
+                    if cab.cab_locos is not None:
+                        for _loco_id, loco in cab.cab_locos.items():
+                            if loco.dcc_id == msg_body.mqtt_loco_id:
+                                message = "Cab Signal for Loco " + \
+                                    str(msg_body.mqtt_loco_id) + \
+                                        " is " + msg_body.mqtt_reported.upper()
+                                self.__send_alert(message)
+
     def __update_fastclock(self, msg_body):
         """ update fastclock with data from tower """
         print("... update fastclock")
@@ -930,3 +959,12 @@ class WithrottleDriver(BaseProcess):
                         seconds = Utility.now_seconds()
                     self.fastclock_seconds = int(seconds)
                     self.fastclock_ratio = int(ratio)
+
+    def __get_topic_node_id(self, topic):
+        """ parse out node id from topic """
+        node_id = Global.UNKNOWN
+        if topic is not None:
+            topic_parts = topic.split("/")
+            if len(topic_parts) > 3:
+                node_id = topic_parts[3]
+        return node_id

@@ -117,7 +117,7 @@ class AppProcess(BaseMqttProcess):
                 msg_consummed = True
             elif msg_type == Global.PUBLISH:
                 if msg_body[Global.TYPE] == Global.DATA:
-                    # print(">>> data: " + str(msg_body))
+                    #print(">>> data: " + str(msg_body))
                     self.publish_data_message(msg_body[Global.TOPIC],
                                               msg_body[Global.BODY])
                     msg_consummed = True
@@ -220,9 +220,9 @@ class AppProcess(BaseMqttProcess):
             if dev is not None:
                 port_id = dev.mqtt_port_id
         reported = Global.UNKNOWN
-        if Synonyms.is_synonym_activate(data.mode):
+        if Synonyms.is_on(data.mode):
             reported = Global.OCCUPIED
-        elif Synonyms.is_synonym_deactivate(data.mode):
+        elif Synonyms.is_off(data.mode):
             reported = Global.CLEAR
         topic = self.mqtt_config.publish_topics.get(Global.BLOCK, None)
         if topic is not None:

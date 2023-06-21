@@ -1,0 +1,27 @@
+{
+    "row": 7,
+    "cols": [
+        {
+            "col": 1,
+            "block-id": "24",
+            "image": "vertical",
+            "type": "block"
+        },
+        {
+            "col": 2,
+            "block-id": "24",
+            "type": "locator"
+        },
+        {
+            "col": 11,
+            "block-id": "26",
+            "type": "locator"
+        },
+        {
+            "col": 12,
+            "block-id": "26",
+            "image": "vertical",
+            "type": "block"
+        }
+     ]
+ }

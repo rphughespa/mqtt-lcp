@@ -1,0 +1,35 @@
+{
+    "row": 3,
+    "cols": [
+        {
+            "col": 4,
+            "block-id": "25",
+            "image": "low-slash",
+            "type": "block"
+        },
+        {
+            "col": 5,
+            "block-id": "25",
+            "image": "up-slash",
+            "type": "block"
+        },
+        {
+            "col": 7,
+            "port-id": "140e",
+            "image": "signal-left",
+            "type": "signal"
+        },
+        {
+            "col": 8,
+            "block-id": "25",
+            "image": "up-back-slash",
+            "type": "block"
+        },
+        {
+            "col": 9,
+            "block-id": "25",
+            "image": "low-back-slash",
+            "type": "block"
+        }
+    ]
+}

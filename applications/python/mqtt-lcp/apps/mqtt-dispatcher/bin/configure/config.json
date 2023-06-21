@@ -1,7 +1,7 @@
 {
   "config": {
     "node": {
-      "name": "mqtt-dispatcher"
+      "name": "mqtt-dev-dispatcher"
     },
     "logger": {
       "level": "info",
@@ -17,21 +17,24 @@
         "sub-topics": {
           "self": "cmd/mqtt-lcp/node/**node**/#",
           "broadcast": "cmd/mqtt-lcp/node/all/#",
-          "fastclock": "dt/mqtt-lcp/fastclock/#",
-          "sensor": "dt/mqtt-lcp/sensor/#",
+          "fastclock": "dt/mqtt-lcp/tower/+/fastclock",
+          "block": "dt/mqtt-lcp/block/#",
           "signal": "dt/mqtt-lcp/signal/#",
+          "route": "dt/mqtt-lcp/route/#",
           "switch": "dt/mqtt-lcp/switch/#",
           "locator": "dt/mqtt-lcp/locator/#",
           "cab": "dt/mqtt-lcp/cab/+/**node**",
-          "dashboard": "dt/mqtt-lcp/tower/+/dashboard/#",
-          "inventory": "dt/mqtt-lcp/tower/+/inventory/#"
+          "dashboard": "dt/mqtt-lcp/tower/+/dashboard",
+          "inventory": "dt/mqtt-lcp/tower/+/inventory",
+          "tower": "dt/mqtt-lcp/tower/#"
         },
         "pub-topics": {
           "broadcast": "cmd/mqtt-lcp/node/all",
           "ping": "dt/mqtt-lcp/ping/**node**",
           "sensor": "dt/mqtt-lcp/sensor/**node**",
           "backup": "dt/mqtt-lcp/backup/**node**",
-          "tower": "cmd/mqtt-lcp/tower/mqtt-dev-tower/inventory",
+          "tower": "cmd/mqtt-lcp/tower/mqtt-tower",
+          "fastclock": "cmd/mqtt-lcp/tower/mqtt-tower/fastclock",
           "power": "cmd/mqtt-lcp/switch/mqtt-dcc-command",
           "dcc_command": "cmd/mqtt-lcp/cab/mqtt-dcc-command"
         }

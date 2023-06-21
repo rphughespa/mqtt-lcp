@@ -7,7 +7,7 @@
 
 The MIT License (MIT)
 
-Copyright  2021 richard p hughes
+Copyright  2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -34,10 +34,12 @@ from utils.global_constants import Global
 
 class PanelColData(object):
     """ a column instance of layout panel """
+
     def __init__(self, init_map=None, col=0):
         self.col = col
         self.node_id = None
         self.port_id = None
+        self.block_id = None
         self.image = None
         self.type = None
         self.label = None
@@ -55,6 +57,7 @@ class PanelColData(object):
         self.col = map_body.get(Global.COL, 0)
         self.node_id = map_body.get(Global.NODE_ID, None)
         self.port_id = map_body.get(Global.PORT_ID, None)
+        self.block_id = map_body.get(Global.BLOCK_ID, None)
         self.image = map_body.get(Global.IMAGE, None)
         self.type = map_body.get(Global.TYPE, None)
         self.label = map_body.get(Global.LABEL, None)
@@ -69,6 +72,8 @@ class PanelColData(object):
             emap.update({Global.NODE_ID: self.node_id})
         if self.port_id is not None:
             emap.update({Global.PORT_ID: self.port_id})
+        if self.block_id is not None:
+            emap.update({Global.BLOCK_ID: self.block_id})
         if self.image is not None:
             emap.update({Global.IMAGE: self.image})
         if self.type is not None:
@@ -82,6 +87,7 @@ class PanelColData(object):
 
 class PanelRowData(object):
     """ a row of columns in a layout panel """
+
     def __init__(self, init_map=None, row=0):
         self.row = row
         self.cols = []
@@ -117,6 +123,7 @@ class PanelRowData(object):
 
 class PanelData(object):
     """ a layout panel """
+
     def __init__(self, init_map=None, name=None):
         self.name = name
         self.description = None
@@ -156,6 +163,7 @@ class PanelData(object):
 
 class Panels(object):
     """ a layout """
+
     def __init__(self, init_map=None, name=None):
         self.name = name
         self.description = None
@@ -203,6 +211,6 @@ class Panels(object):
             new_panels = []
             for _key, panel_data in self.panels.items():
                 new_panel = panel_data.encode()
-                new_panels += [new_panel]
+                new_panels.append(new_panel)
             emap.update({Global.PANELS: new_panels})
-        return {Global.PANELS: emap}
+        return {Global.PANEL: emap}

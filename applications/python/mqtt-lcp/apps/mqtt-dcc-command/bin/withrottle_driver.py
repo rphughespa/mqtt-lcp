@@ -80,7 +80,7 @@ class WithrottleDriver(BaseDriver):
         if len(new_message) == 3:
             (msg_type, msg_body, msg_device_identity) = new_message
             if msg_type == Global.DEVICE_INPUT:
-                self.log_info("Rcvd from Server: " + str(msg_device_identity) + ": " + str(msg_body))
+                self.log_debug("Rcvd from Server: " + str(msg_device_identity) + ": " + str(msg_body))
 
         # print(">>> message: " + str(new_message))
         msg_consummed = super().process_message(new_message)

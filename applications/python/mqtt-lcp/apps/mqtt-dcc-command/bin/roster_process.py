@@ -179,10 +179,10 @@ class RosterProcess(BaseProcess):
                                              Global.DATA: None}))
 
     def __check_for_roster_changes(self):
-        """ check for chnages to roster and reload is necessary"""
-        if self.roster_server_host is not None and \
-                self.roster_server_path is not None:
-            self.__import_roster_from_server()
+        """ check for changes to roster and reload is necessary"""
+        #if self.roster_server_host is not None and \
+        #        self.roster_server_path is not None:
+        #    self.__import_roster_from_server()
         return (self.roster_dir_watcher.has_changed() or\
                 self.consists_dir_watcher.has_changed())
 
@@ -223,10 +223,11 @@ class RosterProcess(BaseProcess):
             for file_name  in os.listdir(self.roster_data_path):
                 full_file_name = os.path.join(self.roster_data_path, file_name)
                 # print(">>> roster file: "+str(full_file_name))
-                loco_parsed = self.json_helper.load_and_parse_file(full_file_name)
-                new_loco = LocoData(init_map=loco_parsed)
-                self.roster.locos.update({new_loco.dcc_id: new_loco})
-                self.log_info("Loaded Loco: "+str(new_loco.dcc_id))
+                if ".json" in full_file_name:
+                    loco_parsed = self.json_helper.parse_one_json_file(full_file_name)
+                    new_loco = LocoData(init_map=loco_parsed)
+                    self.roster.locos.update({new_loco.dcc_id: new_loco})
+                    self.log_info("Loaded Loco: "+str(new_loco.dcc_id))
         # print(">>> rosterclass: "+ str(self.roster))
 
     def __load_consists_files(self):
@@ -235,7 +236,8 @@ class RosterProcess(BaseProcess):
             for file_name  in os.listdir(self.consists_data_path):
                 full_file_name = os.path.join(self.consists_data_path, file_name)
                 # print(">>> consists file: "+str(full_file_name))
-                consist_parsed = self.json_helper.load_and_parse_file(full_file_name)
+                if ".json" in full_file_name:
+                    consist_parsed = self.json_helper.parse_one_json_file(full_file_name)
                 new_consist = ConsistData(init_map=consist_parsed)
                 self.roster.consists.update({new_consist.dcc_id: new_consist})
                 self.log_info("Loaded Consist: "+str(new_consist.dcc_id))

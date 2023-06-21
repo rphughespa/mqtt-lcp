@@ -50,6 +50,8 @@ class AppProcess(BaseMqttProcess):
                          in_queue=queues[Global.APPLICATION],
                          mqtt_queue=queues[Global.MQTT],
                          log_queue=queues[Global.LOGGER])
+        self.switch_topic = None
+        self.respond_to_topic = None
         self.log_info("Starting")
 
 
@@ -57,10 +59,23 @@ class AppProcess(BaseMqttProcess):
         """ initialize the process """
         super().initialize_process()
         self.log_info("IoDevices:")
+        (self.switch_topic, self.respond_to_topic) \
+             = self.__parse_mqtt_options_config(self.mqtt_config)
         if self.io_config is not None:
             if self.io_config.io_device_map is not None:
                 for _key, dev in self.io_config.io_device_map.items():
-                    self.log_info("IoDevice: " + str(dev.io_device_type)+" ... " +str(dev.mqtt_port_id))
+                    # init state of device
+                    if dev.io_device_type == Global.BLOCK:
+                        dev.mqtt_reported = Global.CLEAR
+                    elif dev.io_device_type == Global.SWITCH:
+                        dev.mqtt_reported = Global.CLOSED
+                    elif dev.io_device_type == Global.SIGNAL:
+                        dev.mqtt_reported = Global.APPROACH
+                    elif dev.io_device_type == Global.SENSOR:
+                        dev.mqtt_reported = Global.OFF
+                    self.log_info("IoDevice: " + str(dev.io_device_type)+\
+                                  " ... " +str(dev.mqtt_port_id)+" ... "+str(dev.mqtt_reported))
+
 
 
     def process_message(self, new_message=None):
@@ -70,7 +85,7 @@ class AppProcess(BaseMqttProcess):
             self.log_debug("New Message Received: " + str(new_message))
             # print(">>> new message: " + str(new_message))
             if not msg_consummed:
-                self.log_warning("Unknown Message TYpe Received: " +
+                self.log_warning("Unknown Message Type Received: " +
                                  str(new_message))
                 msg_consummed = True
         return msg_consummed
@@ -94,6 +109,8 @@ class AppProcess(BaseMqttProcess):
         msg_consummed = True
         return msg_consummed
 
+
+
     def process_request_signal_message(self, msg_body=None):
         """ process for signal requests """
         self.log_info("signal request: "+str(msg_body.mqtt_port_id)+" ... "+str(msg_body.mqtt_desired))
@@ -101,6 +118,7 @@ class AppProcess(BaseMqttProcess):
         self.__publish_response(msg_body, reported, None, reported)
         msg_consummed = True
         return msg_consummed
+
     #
     # private functions
     #
@@ -117,3 +135,14 @@ class AppProcess(BaseMqttProcess):
                 metadata=metadata,
                 data_reported=data_reported,
                 message_io_data=msg_body)
+
+    def __parse_mqtt_options_config(self, mqtt_config):
+        """ parse options section of config file """
+        switch_topic = mqtt_config.subscribe_topics.get(Global.SWITCH, None)
+        if switch_topic is None:
+            switch_topic = mqtt_config.subscribe_topics.get(Global.SELF, Global.UNKNOWN)
+        switch_topic = switch_topic.replace("/#", "")
+        respond_to_topic = mqtt_config.subscribe_topics.get(
+            Global.SELF, Global.UNKNOWN)
+        respond_to_topic = respond_to_topic.replace("/#", "/res")
+        return (switch_topic, respond_to_topic)

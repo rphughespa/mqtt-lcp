@@ -102,7 +102,8 @@ class SocketClientProcess(BaseProcess):
                         self.client_host)
                 except Exception as exc:
                     self.log_critical("Error: Configuration error: "+\
-                        "Invalid io/network/server/host: {"+str(self.client_host)+"}\n ... "+str(exc))
+                        "Invalid io/network/server/host: {"+\
+                            str(self.client_host)+"}\n ... "+str(exc))
 
             if self.client_ip_address is None:
                 self.log_critical(

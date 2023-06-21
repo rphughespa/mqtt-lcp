@@ -26,22 +26,21 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OFSOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
-
+import time
 import sys
 
 sys.path.append('../lib')
 
-import time
-
-from utils.global_constants import Global
 from utils.global_synonyms import Synonyms
+from utils.global_constants import Global
 
 from structs.io_data import IoData
-from processes.base_mqtt_process import BaseMqttProcess
 
+from processes.base_mqtt_process import BaseMqttProcess
 
 class AppProcess(BaseMqttProcess):
     """ Class that waits for an event to occur """
+
     def __init__(self, events=None, queues=None):
         super().__init__(name="app",
                          events=events,
@@ -98,8 +97,8 @@ class AppProcess(BaseMqttProcess):
                     msg_consummed = True
                 elif msg_body[Global.TYPE] == Global.RESPONSE:
                     # response: " + str(msg_body))
-                    self.publish_response_message(msg_body[Global.REPORTED], \
-                                    msg_body[Global.METADATA], msg_body[Global.BODY])
+                    self.publish_response_message(msg_body[Global.REPORTED],
+                                                  msg_body[Global.METADATA], msg_body[Global.BODY])
                     msg_consummed = True
                 elif msg_body[Global.TYPE] == Global.REQUEST:
                     self.publish_request_message(msg_body[Global.TOPIC],
@@ -133,10 +132,16 @@ class AppProcess(BaseMqttProcess):
         block = data['block']
         port_id = str(block)
         key = self.railcom_map.get(block, None)
+        facing = data['facing']
         if key is not None:
             dev = self.io_config.io_device_map.get(key, None)
-            if dev is not None:
-                port_id = dev.mqtt_port_id
+        if dev is not None:
+            port_id = dev.mqtt_port_id
+            metadata = dev.mqtt_metadata
+            if metadata is not None:
+                metadata_facing = metadata.get(
+                    Global.FACING, {Global.NORMAL: Global.NORMAL, Global.REVERSE: Global.REVERSE})
+                facing = metadata_facing.get(facing, facing)
         body = IoData()
         body.mqtt_message_root = Global.LOCATOR
         body.mqtt_port_id = port_id
@@ -144,7 +149,7 @@ class AppProcess(BaseMqttProcess):
         body.mqtt_reported = data['state']
         body.mqtt_metadata = {
             Global.TYPE: Global.RAILCOM,
-            Global.FACING: data['facing']
+            Global.FACING: facing
         }
         super().publish_sensor_data_message(body)
 
@@ -161,9 +166,9 @@ class AppProcess(BaseMqttProcess):
                 if dev is not None:
                     port_id = dev.mqtt_port_id
             reported = {Global.BLOCK: Global.UNKNOWN}
-            if Synonyms.is_synonym_activate(data['state']):
+            if Synonyms.is_on(data['state']):
                 reported = Global.OCCUPIED
-            elif Synonyms.is_synonym_deactivate(data['state']):
+            elif Synonyms.is_off(data['state']):
                 reported = Global.CLEAR
             body = IoData()
             body.mqtt_message_root = Global.BLOCK

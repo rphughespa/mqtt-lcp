@@ -7,7 +7,7 @@ LocosKeypadPage - Locos Keypad screen
 
 the MIT License (MIT)
 
-Copyright © 2020 richard p hughes
+Copyright © 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -39,7 +39,7 @@ from utils.global_constants import Global
 from structs.gui_message import GuiMessage
 from components.local_constants import Local
 from components.key_pad import KeyPadFrame
-# from components.tk_message import TkMessage
+# from structs.gui_message import GuiMessageEnvelope
 from components.image_button import ImageButton
 
 class LocosKeypadPage(ttk.Frame):
@@ -138,9 +138,9 @@ class LocosKeypadPage(ttk.Frame):
     def on_acquire_clicked(self, _state):
         """ selection clicked """
         #print("Acquire Loco: " + str(self.loco_id))
-        dcc_id = int(self.loco_id)
+        dcc_id = int("0"+str(self.loco_id.strip()))
         self.parent_cab.publish_acquire_request(dcc_id)
-        self.parent_cab.locos_selected_list.append(int(dcc_id))
+        self.parent_cab.locos_selected_list.append(dcc_id)
         loco = self.parent_cab.locos_roster_map.get(dcc_id, None)
         if loco is None:
             # using a loco not in roster, add a temp entry

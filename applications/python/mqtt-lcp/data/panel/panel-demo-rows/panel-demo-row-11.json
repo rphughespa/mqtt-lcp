@@ -1,0 +1,40 @@
+{
+    "row": 11,
+    "cols": [
+        {
+            "col": 4,
+            "block-id": "23",
+            "image": "up-back-slash",
+            "type": "block"
+        },       
+        {
+            "col": 5,
+            "block-id": "23",
+            "image": "low-back-slash",
+            "type": "block"
+        },
+        {
+            "col": 6,
+            "port-id": "110e",
+            "image": "signal-right",
+            "type": "signal"
+        },
+        {
+            "col": 7,
+            "block-id": "23",
+            "type": "locator"
+        },
+        {
+            "col": 8,
+            "block-id": "23",
+            "image": "low-slash",
+            "type": "block"
+        },       
+        {
+            "col": 9,
+            "block-id": "23",
+            "image": "up-slash",
+            "type": "block"
+        }
+    ]
+}

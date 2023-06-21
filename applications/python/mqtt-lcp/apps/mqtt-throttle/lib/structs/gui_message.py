@@ -28,21 +28,22 @@ import sys
 
 sys.path.append('../../lib')
 
+from utils.global_constants import Global
 
-class WiThrottleConst(object):
-    """ data struct for decodec withrottle message """
-    CLOSED = 2
-    THROWN = 4
-    UNKNOWN = 1
-    ACTIVE = 2
-    INACTIVE = 4
-    FORWARD = 1
-    REVERSE = 0
-    MAJOR_SEP = "]\\["
-    MINOR_SEP = "}|{"
-    SUB_SEP = "<;>"
-    PORT_SEP = ":"
 
+
+class GuiMessageEnvelope(object):
+    """ Class for a item in the state collection"""
+
+    def __init__(self, msg_type=Global.TOWER, data_type="", msg_data=None, cab=Global.CAB_ALL):
+        self.msg_type = msg_type  # Global.TOWER, Local.THROTTLE, Local.SENSOR
+        self.data_type = data_type
+        self.cab = cab  # CAB_ALL, CAB_A, CAB_B
+        self.msg_data = msg_data
+
+    def __repr__(self):
+        fdict = repr(self.__dict__)
+        return f"{self.__class__}({fdict})"
 
 class GuiMessage(object):
     """ Data structure used to store decoded gui message """
@@ -58,6 +59,7 @@ class GuiMessage(object):
         self.cab_id = None
         self.dcc_id = None
         self.slot_id = None
+        self.block_id = None
         self.throttle_id = None
         self.command_topic = None
         self.speed = None

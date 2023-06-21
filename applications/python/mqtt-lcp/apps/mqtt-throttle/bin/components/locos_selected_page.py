@@ -7,7 +7,7 @@ LocosListPage - Locos Selected / Consist List screen
 
 the MIT License (MIT)
 
-Copyright © 2020 richard p hughes
+Copyright © 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -44,9 +44,11 @@ sys.path.append('../../lib')
 # from structs.roster import LocoData
 
 from utils.global_constants import Global
+
 from structs.gui_message import GuiMessage
+from structs.gui_message import GuiMessageEnvelope
+
 from components.local_constants import Local
-from components.tk_message import TkMessage
 from components.locos_info_list import LocosInfoList
 from components.image_button import ImageButton
 from components.image_clickable import ImageClickable
@@ -206,7 +208,7 @@ class LocosSelectedPage(ttk.Frame):
                 sel_list[idx-1], sel_list[idx] = sel_list[idx], sel_list[idx-1]
                 self.__clear_top_frame()
                 self.parent_cab.build_display_lists()
-                self.parent_cab.process_output_message(TkMessage(cab=Local.CAB_ALL,
+                self.parent_cab.process_output_message(GuiMessageEnvelope(cab=Global.CAB_ALL,
                         msg_type=Global.REFRESH))
 
     def on_move_down_clicked(self, _state):
@@ -219,7 +221,7 @@ class LocosSelectedPage(ttk.Frame):
                 sel_list[idx], sel_list[idx+1] = sel_list[idx+1], sel_list[idx]
                 self.__clear_top_frame()
                 self.parent_cab.build_display_lists()
-                self.parent_cab.process_output_message(TkMessage(cab=Local.CAB_ALL,
+                self.parent_cab.process_output_message(GuiMessageEnvelope(cab=Global.CAB_ALL,
                         msg_type=Global.REFRESH))
 
     def on_release_clicked(self, _state):

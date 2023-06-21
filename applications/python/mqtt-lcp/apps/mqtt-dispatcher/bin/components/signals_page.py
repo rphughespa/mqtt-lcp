@@ -7,7 +7,7 @@ SignalsPage - Display / change the stat of signals
 
 the MIT License (MIT)
 
-Copyright © 2020 richard p hughes
+Copyright © 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -34,14 +34,16 @@ sys.path.append('../../lib')
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from structs.gui_message import GuiMessage
+
+
 from utils.global_constants import Global
+from structs.gui_message import GuiMessage
+from structs.gui_message import GuiMessageEnvelope
+
 # from utils.global_synonyms import Synonyms
 from components.image_clickable import ImageClickable
 from components.image_button import ImageButton
 from components.signals_info_list import SignalsInfoList
-from components.tk_message import TkMessage
-
 
 # from components.local_constants import Local
 
@@ -80,11 +82,11 @@ class SignalsPage(ttk.Frame):
         self.__load_all_images()
 
         self.top_frame = ttk.Frame(
-            self, width=340, height=64, padding=(2, 2, 2, 2))
+            self, width=340, height=80, padding=(2, 2, 2, 2))
 
         self.top_frame.grid_propagate(False)
 
-        self.signal_frame = ttk.Frame(self.top_frame, relief="raised", width=236,  height=58,
+        self.signal_frame = ttk.Frame(self.top_frame, relief="raised", width=236,  height=76,
                                       padding=(4, 2, 4, 2))
         self.signal_frame.grid_propagate(False)
 
@@ -96,6 +98,11 @@ class SignalsPage(ttk.Frame):
         self.name_label = ttk.Label(self.signal_frame, text="",
                                     width=27, anchor='w')
         self.name_label.grid(row=1, column=0, padx=4)
+
+        self.block_id_label = ttk.Label(self.signal_frame, text="",
+                                    width=27, anchor='w')
+        self.block_id_label.grid(row=2, column=0, padx=4)
+
 
         self.signal_frame.grid(row=0, column=0, sticky=(NW))
 
@@ -117,7 +124,7 @@ class SignalsPage(ttk.Frame):
             self, padding=(2, 2, 2, 2), relief="raised")
 
         self.signals_list = SignalsInfoList(self.list_frame, None,
-                                            width=330, height=220, row_height=80,
+                                            width=330, height=320, row_height=80,
                                             callback=self.on_list_item_clicked)
         self.signals_list.grid(row=0, column=0)
 
@@ -146,7 +153,7 @@ class SignalsPage(ttk.Frame):
             signal_message.text = self.signal.text  # command topic
             signal_message.mode = new_mode
             self.parent_node.queue_tk_input(
-                TkMessage(msg_type=Global.PUBLISH, msg_data=signal_message))
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=signal_message))
 
     def refresh_page(self):
         """ refresh the display page """
@@ -160,18 +167,11 @@ class SignalsPage(ttk.Frame):
     def process_output_message(self, message):
         """ process output message """
         if message.msg_type == Global.SIGNAL:
-            #print(">>> signal.modees page: " + str(message.msg_data))
-            # an update of a single signal.mode state
-            skey = message.msg_data.node_id + ":" + message.msg_data.port_id
-            signal = self.tower_data.signals.get(skey, None)
-            if signal is None:
-                signal = copy.deepcopy(message.msg_data)
-                self.tower_data.signals[skey] = signal
-            if signal is not None:
-                signal.mode = message.msg_data.mode
-                signal = self.__set_signal_image(signal)
-                self.refresh_page()
-
+            if message.msg_data.name == Global.INFO_COMMAND:
+                if message.msg_data.mode == Global.REFRESH:
+                    self.refresh_page()
+            elif message.msg_data is None:
+                self.signal = None
     #
     # private functions
     #
@@ -197,7 +197,13 @@ class SignalsPage(ttk.Frame):
         self.signal = self.tower_data.signals[self.signal_key]
         self.title_label.config(text=self.signal.port_id)
         self.name_label.config(text=self.signal.name)
-        #print(">>> signal mode: " + str(self.signal.mode))
+        block_text = ""
+        if self.signal.block_id is not None or \
+                self.signal.direction is not None:
+            block_text = "Block: " + str(self.signal.block_id) + \
+                ", Direction: "+ str(self.signal.direction)
+        self.block_id_label.config(text=block_text)
+        # print(">>> signal mode: " + str(self.signal))
         if self.signal.mode == Global.APPROACH:
             self.signal_button.replace_image(image=self.signal_approach_image)
         elif self.signal.mode == Global.CLEAR:

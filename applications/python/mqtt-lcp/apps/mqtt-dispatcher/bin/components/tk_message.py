@@ -1,8 +1,8 @@
-# tk_message.py
+# gui_message_envelope.py
 
 """
 
-    tk_message.py - helper class for messages to tk screens
+    gui_message_envelope.py - helper class for messages to tk screens
 
 The MIT License (MIT)
 
@@ -32,13 +32,13 @@ sys.path.append('../../lib')
 from utils.global_constants import Global
 from components.local_constants import Local
 
-class TkMessage(object):
+class GuiMessageEnvelope(object):
     """ Class for a item in the state collection"""
 
-    def __init__(self, msg_type=Global.TOWER, data_type="", msg_data=None, cab=Local.CAB_ALL):
+    def __init__(self, msg_type=Global.TOWER, data_type="", msg_data=None, cab=Global.CAB_ALL):
         self.msg_type = msg_type  # Global.TOWER, Local.THROTTLE, Local.SENSOR
         self.data_type = data_type
-        self.cab = cab  # Local.CAB_ALL, Local.CAB_A, Local.CAB_B
+        self.cab = cab  # Global.CAB_ALL, Global.CAB_A, Global.CAB_B
         self.msg_data = msg_data
 
     def __repr__(self):

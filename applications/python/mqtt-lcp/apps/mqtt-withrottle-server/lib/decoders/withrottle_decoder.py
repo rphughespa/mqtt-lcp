@@ -31,12 +31,12 @@ import sys
 import datetime
 
 sys.path.append('..')
-
-from utils.global_constants import Global
 from utils.utility import Utility
+from utils.global_constants import Global
+from utils.withrottle_const import WithrottleConst
+from structs.gui_message import GuiMessage
 
-from structs.withrottle_const import WithrottleConst
-from lib.structs.gui_message import GuiMessage
+
 
 
 CLOSED = 2
@@ -54,6 +54,7 @@ PORT_SEP = ":"
 
 class WithrottleDecoder:
     """ decode withrottle messages """
+
     def __init__(self, log_queue=None):
         self.log_queue = log_queue
 
@@ -70,14 +71,14 @@ class WithrottleDecoder:
         rett = {Global.COMMAND: Global.UNKNOWN, Global.TEXT: str(message)}
         # print(">>> Decode: " + str(message))
         in_message = message.strip()
-        #print(">>> ... stripped: " + str(in_message))
+        # print(">>> ... stripped: " + str(in_message))
         if in_message:
             command_parts = in_message.split(WithrottleConst.MAJOR_SEP)
             command = command_parts[0].strip()
             del command_parts[0]
-            #self.log_queue.put(Global.LOG_LEVEL_WARNING, "Process Parsed Command[" + \
+            # self.log_queue.put(Global.LOG_LEVEL_WARNING, "Process Parsed Command[" + \
             #       str(command)+"]["+str(command_parts)+"]")
-            #print(">>> ... split: " + str(command)+"]["+str(command_parts)+"]")
+            # print(">>> ... split: " + str(command)+"]["+str(command_parts)+"]")
             first_byte = ""
             if command:
                 first_byte = command[0]
@@ -161,10 +162,10 @@ class WithrottleDecoder:
                 roster_entry_address = roster_entry_parts[1]
             if len(roster_entry_parts) > 2:
                 roster_entry_address_type = roster_entry_parts[2]
-            #self.roster[roster_entry_name] = {
+            # self.roster[roster_entry_name] = {
             #    "address": roster_entry_address,
             #    "address_type": roster_entry_address_type
-            #}
+            # }
             roster_item = GuiMessage()
             roster_item.name = roster_entry_name
             roster_item.dcc_id = int(roster_entry_address)
@@ -193,15 +194,15 @@ class WithrottleDecoder:
 
     def decode_turnouts_command(self, _command, command_parts):
         """ decode turnouts """
-        #PTT]\[Turnouts}|{Turnout]\[Closed}|{2]\[Thrown}|{4
+        # PTT]\[Turnouts}|{Turnout]\[Closed}|{2]\[Thrown}|{4
         turnout_label = Global.TURNOUT
         close_label = Global.UNKNOWN
         throw_label = Global.UNKNOWN
         for turnouts in command_parts:
             turnout_parts = turnouts.split(WithrottleConst.MINOR_SEP)
-            #print(">>> turn sub parts: " + str(turnout_parts))
+            # print(">>> turn sub parts: " + str(turnout_parts))
             part_lower = turnout_parts[1].lower()
-            #print(">>> part lower: " + str(part_lower) + " ... " +
+            # print(">>> part lower: " + str(part_lower) + " ... " +
             #      str(Utility.is_number(part_lower)))
             if part_lower == "turnout":
                 turnout_label = turnout_parts[0]
@@ -232,7 +233,7 @@ class WithrottleDecoder:
             mode = int(mode)
         rmode = Global.UNKNOWN
         if source == Global.SERVER:
-            #server response
+            # server response
             if mode in ["C", WithrottleConst.CLOSED]:
                 rmode = Global.CLOSED
             elif mode in ["T", WithrottleConst.THROWN]:
@@ -250,7 +251,7 @@ class WithrottleDecoder:
         switch_command.command = Global.SWITCH
         switch_command.port_id = turnout
         switch_command.mode = str(rmode)
-        # print(">>> decode switch: " + str(switch_command))
+        #print(">>> decode switch: " + str(switch_command))
         return switch_command
 
     def decode_turnouts_list_command(self, _command, command_parts):
@@ -366,7 +367,7 @@ class WithrottleDecoder:
         consist_addr = id_parts[1]
         consist_id = id_parts[2]
         (consist_addr_id, consist_addr_address_type) = \
-                self.__parse_loco_address(consist_addr)
+            self.__parse_loco_address(consist_addr)
         consist_list = []
         for consist_part in command_parts:
             consist_part_parts = consist_part.split(WithrottleConst.MINOR_SEP)
@@ -532,7 +533,7 @@ class WithrottleDecoder:
         """ decode pannel """
         # ignore, not documented
         panel_command = GuiMessage()
-        panel_command.command = Global.PANELS
+        panel_command.command = Global.PANEL
         panel_command.text = str(command) + " ... " + str(command_parts)
         return panel_command
 
@@ -626,7 +627,8 @@ class WithrottleDecoder:
 
     def __parse_throttle_function_labels(self, command, command_parts):
         """ parse throttle functions labels """
-        # MTLL41<;>]\[Headlight]\[Bell]\[Whistle]\[Short Whistle]\[Steam Release]\[FX5 Light]\[  ... ]\[]\[]\[
+        # MTLL41<;>]\[Headlight]\[Bell]\[Whistle]\[Short Whistle]\[
+        #   Steam Release]\[FX5 Light]\[  ... ]\[]\[]\[
         throttle_cab = command[1]
         throttle_target = command[3:]
         throttle_parts = throttle_target.split(WithrottleConst.SUB_SEP)

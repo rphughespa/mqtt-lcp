@@ -117,11 +117,13 @@ class CabProcess(BaseProcess):
 
     def process_request_cab_message(self, msg_body=None):
         """ process a cab request message """
-        self.log_info("Cab Request: " + str(msg_body.mqtt_desired) + " ... " +
-                      str(msg_body.mqtt_node_id) + " ... " +
-                      str(msg_body.mqtt_throttle_id) + " ... " +
-                      str(msg_body.mqtt_cab_id) + " ... " +
-                      str(msg_body.mqtt_loco_id))
+        if msg_body.mqtt_desired != Global.PING:
+            # only log non "ping" messages
+            self.log_info("Cab Request: " + str(msg_body.mqtt_desired) + " ... " +
+                        str(msg_body.mqtt_node_id) + " ... " +
+                        str(msg_body.mqtt_throttle_id) + " ... " +
+                        str(msg_body.mqtt_cab_id) + " ... " +
+                        str(msg_body.mqtt_loco_id))
         desired = msg_body.mqtt_desired
         reported = Global.ERROR
         message = None
@@ -404,9 +406,9 @@ class CabProcess(BaseProcess):
                     new_function = temp_function
                 #print(">>> function f: " + str(new_function))
                 temp_function_state = desired.get(Global.STATE, None)
-                if Synonyms.is_synonym_activate(temp_function_state):
+                if Synonyms.is_on(temp_function_state):
                     new_function_state = Global.ON
-                elif Synonyms.is_synonym_deactivate(temp_function_state):
+                elif Synonyms.is_off(temp_function_state):
                     new_function_state = Global.OFF
                 #print(">>> function s: " + str(new_function_state))
 
@@ -491,10 +493,12 @@ class CabProcess(BaseProcess):
         body = IoData()
         body.mqtt_message_root = Global.CAB
         body.mqtt_loco_id = loco_id
-        body.mqtt_reported = {Global.DIRECTION: direction}
+        body.mqtt_port_id = Global.DIRECTION
+        body.mqtt_direction = direction
+        body.mqtt_reported = direction
         self.app_queue.put((Global.PUBLISH, {
             Global.TYPE: Global.DATA,
-            Global.TOPIC: self.cab_pub_topic,
+            Global.TOPIC: self.cab_pub_topic +"/"+Global.DIRECTION,
             Global.BODY: body}))
 
 

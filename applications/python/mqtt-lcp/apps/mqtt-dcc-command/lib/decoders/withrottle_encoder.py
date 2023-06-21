@@ -33,7 +33,7 @@ sys.path.append('../../lib')
 
 from utils.global_constants import Global
 from utils.utility import Utility
-from structs.withrottle_const import WithrottleConst
+from utils.withrottle_const import WithrottleConst
 
 
 class WithrottleEncoder:
@@ -201,10 +201,10 @@ class WithrottleEncoder:
         rett = "PRT" + WithrottleConst.MAJOR_SEP
         rett += message.name
         rett += WithrottleConst.MINOR_SEP + "Route"
-        rett += WithrottleConst.MAJOR_SEP + message.items.get(Global.ACTIVATED)
+        rett += WithrottleConst.MAJOR_SEP + message.items.get(Global.ON)
         rett += WithrottleConst.MINOR_SEP + str(WithrottleConst.ACTIVE)
         rett += WithrottleConst.MAJOR_SEP + message.items.get(
-            Global.DEACTIVATED)
+            Global.OFF)
         rett += WithrottleConst.MINOR_SEP + str(WithrottleConst.INACTIVE)
         return rett
 
@@ -460,7 +460,8 @@ class WithrottleEncoder:
 
     def __encode_throttle_function_labels(self, message):
         """ parse throttle functions labels """
-        # MTLL41<;>]\[Headlight]\[Bell]\[Whistle]\[Short Whistle]\[Steam Release]\[FX5 Light]\[  .. ]\[]\[]\[
+        # MTLL41<;>]\[Headlight]\[Bell]\[Whistle]\[
+        # Short Whistle]\[Steam Release]\[FX5 Light]\[  .. ]\[]\[]\[
         loco = message.name
         if message.dcc_id is not None:
             loco = self.__convert_loco_ref(message.dcc_id)

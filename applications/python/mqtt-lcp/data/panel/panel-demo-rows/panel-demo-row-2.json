@@ -1,0 +1,29 @@
+{
+    "row": 2,
+    "cols": [
+        {
+            "col": 5,
+            "block-id": "25",
+            "image": "low-slash",
+            "type": "block"
+        },
+        {
+            "col": 6,
+            "block-id": "25",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 7,
+            "block-id": "25",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 8,
+            "block-id": "25",
+            "image": "low-back-slash",
+            "type": "block"
+        }
+    ]
+}

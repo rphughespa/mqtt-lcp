@@ -76,7 +76,7 @@ class DccppEncoder(object):
         """ encode a power request message """
         rett = "<0>"
         power_mode = message.mode
-        if Synonyms.is_synonym_activate(power_mode):
+        if Synonyms.is_on(power_mode):
             # turn on
             rett = "<1>"
         elif power_mode == Global.REPORT:
@@ -164,7 +164,7 @@ class DccppEncoder(object):
         sub_address = message.sub_address
         switch_mode = message.mode
         mode = "0"
-        if Synonyms.is_synonym_activate(switch_mode):
+        if Synonyms.is_on(switch_mode):
             # turn on
             mode = "1"
         rett = "<a " + str(address) + " " + str(sub_address) + " " + str(

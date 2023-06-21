@@ -2,7 +2,8 @@
 # main.py
 """
 
-main.py - Main module for mqtt-withrottle-server, launches and monitors process mqtt-withrottle-server application
+main.py - Main module for mqtt-withrottle-server, launches and
+    monitors process mqtt-withrottle-server application
 
 The MIT License (MIT)
 

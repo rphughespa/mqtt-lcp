@@ -45,8 +45,8 @@ from utils.utility import Utility
 
 from structs.io_data import IoData
 from structs.inventory import Inventory
-from structs.sensor_states import SensorStates
-from structs.sensor_states import SensorStateData
+from structs.inventory import InventoryData
+
 from structs.gui_message import GuiMessage
 
 from withrottle_driver import WithrottleDriver
@@ -146,9 +146,7 @@ class AppProcess(BaseMqttProcess):
         self.respond_to_topic = None
         self.socket_child_pairs = {}
         self.check_children_delay = MAX_CHECK_CHILD_DELAY
-        self.switches = []
-        self.routes = []
-        self.sensor_states = SensorStates()
+        self.inventory = Inventory()
         self.power_topic = None
         self.traffic_control = False
         self.auto_signals = False
@@ -194,6 +192,12 @@ class AppProcess(BaseMqttProcess):
                             topic=topic,
                             message_io_data=body)
                     msg_consummed = True
+                elif msg_body[Global.SUB] == Global.ROUTE:
+                    topic = msg_body[Global.TOPIC]
+                    body.mqtt_respond_to = None
+                    self.publish_request_message(\
+                            topic=topic,
+                            message_io_data=body)
             elif msg_type == Global.DEVICE_CONNECT:
                 # new client socket connection, start a pairs of processes for in/out
                 self.log_info("New Client Connection from: " +
@@ -274,116 +278,77 @@ class AppProcess(BaseMqttProcess):
                     str(msg_body.mqtt_cab_id) + " ... " +\
                     str(msg_body.mqtt_desired))
 
-    def process_response_switches_message(self, msg_body=None):
-        """ process response switches message """
-        inventory_map = None
-        meta = msg_body.mqtt_metadata
-        if meta is not None:
-            inventory_map = meta.get(Global.INVENTORY, None)
-        if inventory_map is None:
-            # not a inventory response, pass it to super instance
-            self.log_error(
-                "base_cab: No inventory found in tower response: " +
-                str(meta))
-        else:
-            # found an inventory
-            # print(">>> inv map: " + str(inventory_map))
-            inventory = Inventory({Global.INVENTORY: inventory_map})
-            switch_group = inventory.inventory_groups.get(Global.SWITCH, None)
-            self.switches = []
-            if switch_group is not None:
-                # print(">>> group map: " + str(switch_group))
-                for switch in switch_group.inventory_items:
-                    #print(">>> item: " + str(switch.node_id) + \
-                     #   " ... " + str(switch.port_id))
-                    switch_map = GuiMessage()
-                    switch_map.name = switch.node_id + ":" + switch.port_id
-                    switch_map.node_id = switch.node_id
-                    switch_map.port_id = switch.port_id
-                    switch_map.command_topic = switch.command_topic
-                    switch_map.mode = Global.UNKNOWN
-                    self.switches.append(switch_map)
-                    #print(">>> switch: "+ str(switch_map))
-            self.__forward_message_to_all_throttles((Global.SWITCHES, self.switches))
-
     def process_data_switch_message(self, msg_body=None):
         """ process data switch message """
         # print(">>> data switch: " + str(msg_body))
         if msg_body.mqtt_port_id == Global.TRAFFIC:
-            self.traffic_control = Synonyms.is_synonym_active(msg_body.mqtt_reported)
+            self.traffic_control = Synonyms.is_on(msg_body.mqtt_reported)
             self.log_info("Traffic Control: " + str(self.traffic_control))
             # print(">>> traffic: " + str(self.traffic_control))
-            self.publish_tower_report_request(Global.SWITCHES)
-            self.publish_tower_report_request(Global.ROUTES)
+            self.publish_tower_report_request(Global.INVENTORY)
         elif msg_body.mqtt_port_id == Global.AUTO_SIGNALS:
-            self.auto_signals = Synonyms.is_synonym_active(msg_body.mqtt_reported)
+            self.auto_signals = Synonyms.is_on(msg_body.mqtt_reported)
         else:
-            self.__update_sensor_state(msg_body)
+            self.__update_sensor_state(Global.SWITCH, msg_body)
         # forward message to throttles for processing
+        # print(">>> data switch: " + str(msg_body))
         self.__forward_message_to_all_throttles((Global.SWITCH, msg_body))
 
+    def process_data_route_message(self, msg_body=None):
+        """ process data route message """
+        # make a route data message look like a switch data message
+        # print(">>> data route: " + str(msg_body))
+        self.__update_sensor_state(Global.ROUTE, msg_body)
+        # forward message to throttles for processing
+        msg_body.mqtt_node_id = Global.ROUTE # replace actual node id with common "route"
+        if Synonyms.is_on(msg_body.mqtt_reported):
+            msg_body.mqtt_reported = Global.THROWN
+        elif Synonyms.is_off(msg_body.mqtt_reported):
+            msg_body.mqtt_reported = Global.CLOSED
+        else:
+            msg_body.mqtt_reported = Global.UNKNOWN
+        # print(">>> data route: " + str(msg_body))
+        self.__forward_message_to_all_throttles((Global.SWITCH, msg_body))
 
     def process_response_switch_message(self, msg_body=None):
         """ process response switch message """
         # ignore response, act on data sensor
         pass
 
+    def process_data_cab_signal_message(self, msg_body=None):
+        """ process a cab signal message"""
+        self.log_info(Global.RECEIVED+": "+str(msg_body.mqtt_port_id) +\
+                      " ... " + str(msg_body.mqtt_loco_id) + " : " +\
+                        str(msg_body.mqtt_reported))
+        self.__forward_message_to_all_throttles((Global.CAB_SIGNAL, msg_body))
+        return True
+
     def process_data_sensor_message(self, msg_body=None):
         """ process data sensor message """
-        self.__update_sensor_state(msg_body)
+        self.__update_sensor_state(Global.SENSOR, msg_body)
 
     def process_data_roster_message(self, msg_body=None):
         """ process data roster message """
-        self.log_info("roster data received: "+str(msg_body.mqtt_port_id)+" ... "+str(msg_body.mqtt_reported))
+        self.log_info("roster data received: "+ \
+                    str(msg_body.mqtt_port_id)+" ... "+str(msg_body.mqtt_reported))
         if msg_body.mqtt_reported == Global.CHANGED:
             # roster has changed, request the roster
             self.publish_roster_report_request(Global.ROSTER)
         else:
             self.log_unexpected_message(msg_body=msg_body)
 
-    def process_response_routes_message(self, msg_body=None):
-        """ process response switch message """
-        # print(">>> routes: " + str(msg_body))
-        inventory_map = None
-        meta = msg_body.mqtt_metadata
-        if meta is not None:
-            inventory_map = meta.get(Global.INVENTORY, None)
-        if inventory_map is None:
-            # not a inventory response, pass it to super instance
-            self.log_error(
-                "base_cab: No inventory found in tower response: " +
-                str(meta))
-        else:
-            # found an inventory
-            # print(">>> inv map: " + str(inventory_map))
-            inventory = Inventory({Global.INVENTORY: inventory_map})
-            route_group = inventory.inventory_groups.get(Global.ROUTE, None)
-            self.routes = []
-            if route_group is not None:
-                # print(">>> group map: " + str(switch_group))
-                for route in route_group.inventory_items:
-                    #print(">>> item: " + str(route.node_id) + \
-                    #    " ... " + str(route.port_id))
-                    route_map = GuiMessage()
-                    route_map.name = route.node_id + ":" + route.port_id
-                    route_map.node_id = route.node_id
-                    route_map.port_id = route.port_id
-                    route_map.text = route.command_topic
-                    route_map.mode = Global.UNKNOWN
-                    self.routes.append(route_map)
-
     def process_data_signal_message(self, msg_body=None):
         """ process data signal message """
-        self.__update_sensor_state(msg_body)
+        self.__update_sensor_state(Global.SIGNAL, msg_body)
 
     def process_data_block_message(self, msg_body=None):
         """ process data block message """
-        self.__update_sensor_state(msg_body)
+        self.__update_sensor_state(Global.BLOCK, msg_body)
 
     def process_data_locator_message(self, msg_body=None):
         """ process data locator message """
         # forward message to inventory process for processing
-        self.__update_sensor_state(msg_body)
+        self.__update_sensor_state(Global.LOCATOR, msg_body)
 
     def process_data_fastclock_message(self, msg_body=None):
         """ process a fastclock message"""
@@ -391,25 +356,23 @@ class AppProcess(BaseMqttProcess):
         self.__forward_message_to_all_throttles((Global.FASTCLOCK, msg_body))
         return True
 
-    def process_response_states_message(self, msg_body=None):
-        """ process response inventory message """
-        # print(">>> states: " + str(msg_body))
-        states_map = None
+    def process_response_inventory_message(self, msg_body=None):
+        """ process inventory response message """
+        self.log_info(Global.RECEIVED+": "+Global.INVENTORY)
+        inventory_map = None
         meta = msg_body.mqtt_metadata
         if meta is not None:
-            states_map = meta.get(Global.SENSOR_STATES, None)
-        if states_map is None:
-            # not a sensor states response, pass it to super instance
-            self.log_error("No Sensor States found in tower response: " +
+            inventory_map = meta.get(Global.INVENTORY, None)
+        if inventory_map is None:
+            # not a roster response, pass it to super instance
+            self.log_error("No Inventory found in tower response: " +
                            str(meta))
         else:
-            # found sensor state
-            new_sensor_states = SensorStates(
-                {Global.SENSOR_STATES: states_map})
-            for group, items in self.sensor_states.sensor_state_groups.items():
-                for _skey, state in items.sensor_state_items.items():
-                    self.sensor_states.update_sensor_state(group, state)
-        self.sensor_states = new_sensor_states
+            # found an inventory
+            self.inventory = Inventory({Global.INVENTORY: inventory_map})
+            switches = self.__build_switch_route_list()
+            self.__forward_message_to_all_throttles((Global.SWITCHES, switches))
+        return True
 
     def process_data_cab_message(self, msg_body=None):
         """ process data cab message """
@@ -425,7 +388,8 @@ class AppProcess(BaseMqttProcess):
 
     def process_data_tower_message(self, msg_body=None):
         """ process data roster message """
-        self.log_info("tower data received: "+str(msg_body.mqtt_port_id)+" ... "+str(msg_body.mqtt_reported))
+        self.log_info("tower data received: "+ \
+                      str(msg_body.mqtt_port_id)+" ... "+str(msg_body.mqtt_reported))
         if msg_body.mqtt_port_id == Global.INVENTORY and \
                 msg_body.mqtt_reported == Global.CHANGED:
             # inventory has changed, request the inventory
@@ -441,9 +405,7 @@ class AppProcess(BaseMqttProcess):
 
     def __publish_tower_report_requests(self):
         """ request inventory reports from tower """
-        self.publish_tower_report_request(Global.SWITCHES)
-        self.publish_tower_report_request(Global.ROUTES)
-        self.publish_tower_report_request(Global.STATES)
+        self.publish_tower_report_request(Global.INVENTORY)
 
     def __accept_new_client(self, connection_socket):
         now = Utility.now_milliseconds()
@@ -452,13 +414,13 @@ class AppProcess(BaseMqttProcess):
         identity = hex_id[-8:].upper()
         #print(">>> id:" + str(identity) + " ... " + str(hex_id) + " ... " +
         #      str(hex_id8))
-        self.__update_switch_states()
+        switches = self.__build_switch_route_list()
         new_client_socket_pair = ClientSocketPair(identity,
                                                   connection=connection_socket,
                                                   app_queue=self.in_queue,
                                                   log_queue=self.log_queue,
                                                   roster=self.roster,
-                                                  switches=self.switches)
+                                                  switches=switches)
         self.socket_child_pairs[identity] = new_client_socket_pair
         self.__publish_connect(identity)
 
@@ -510,22 +472,58 @@ class AppProcess(BaseMqttProcess):
                     topic=self.cab_topic,
                     message_io_data=body)
 
-    def __update_sensor_state(self, msg_body):
-        """ up the state of a sensor, switch, etc """
-        state_data = SensorStateData()
-        state_data.node_id = msg_body.mqtt_node_id
-        state_data.port_id = msg_body.mqtt_port_id
-        state_data.key = state_data.node_id + ":" + state_data.port_id
-        state_data.reported = msg_body.mqtt_reported
-        state_data.loco_id = [msg_body.mqtt_loco_id
-                              ]  # state loco_id are a list
-        state_data.metdata = msg_body.mqtt_metadata
-        state_data.timestamp = msg_body.mqtt_timestamp
-        if msg_body.mqtt_loco_id is not None:
-            state_data.loco = [msg_body.mqtt_loco_id]
-        #print(">>> update sensor: " + str(state_data))
-        group = msg_body.mqtt_message_root
-        self.sensor_states.update_sensor_state(group, state_data)
+    def __build_switch_route_list(self):
+        """ build a list of switches and routes"""
+        switches = []
+        switches = self.__build_switch_list(switches)
+        switches = self.__build_route_list(switches)
+        return switches
+
+    def __build_route_list(self, switches):
+        """ build a list of routes """
+        route_group = self.inventory.inventory_groups.get(Global.ROUTE, None)
+        if route_group is not None:
+            # print(">>> group map: " + str(switch_group))
+            for _k, route in route_group.inventory_items.items():
+                #print(">>> item: " + str(switch.node_id) + \
+                    #   " ... " + str(switch.port_id))
+                route_map = GuiMessage()
+                route_map.node_id = Global.ROUTE  # replace actual node id with a common "route"
+                route_map.port_id = route.port_id
+                route_map.name = route_map.node_id +":"+route_map.port_id
+                route_map.command_topic = route.command_topic
+                reported = Global.UNKNOWN
+                if Synonyms.is_on(route.reported):
+                    reported = Global.THROWN
+                elif Synonyms.is_off(route.reported):
+                    reported = Global.CLOSED
+                route_map.mode =  reported
+                switches.append(route_map)
+        return switches
+
+    def __build_switch_list(self, switches):
+        """ build a list of switches """
+        switch_group = self.inventory.inventory_groups.get(Global.SWITCH, None)
+        if switch_group is not None:
+            # print(">>> group map: " + str(switch_group))
+            for _k, switch in switch_group.inventory_items.items():
+                #print(">>> item: " + str(switch.node_id) + \
+                    #   " ... " + str(switch.port_id))
+                switch_map = GuiMessage()
+                switch_map.name = switch.key
+                switch_map.node_id = switch.node_id
+                switch_map.port_id = switch.port_id
+                switch_map.command_topic = switch.command_topic
+                switch_map.mode = switch.reported
+                switches.append(switch_map)
+        return switches
+
+
+    def __update_sensor_state(self, group_id, msg_body):
+        """ update the state of a sensor, switch, etc """
+        item = InventoryData()
+        item.parse_mqtt_message(msg_body)
+        self.inventory.update_sensor_state(group_id, item)
 
     def __forward_message_to_all_throttles(self, message):
         """ forward a message to all throttles """
@@ -542,23 +540,3 @@ class AppProcess(BaseMqttProcess):
         else:
             self.log_debug("Message for client not deliverable: " + \
                 str(identity) + " ... " + str(message))
-
-    def __update_switch_states(self):
-        switch_group_states = \
-                self.sensor_states.sensor_state_groups.get(Global.SWITCH, None)
-        if switch_group_states is not None:
-            for switch in self.switches:
-                key = switch.node_id + ":" + switch.port_id
-                state_item = switch_group_states.sensor_state_items.get(
-                    key, None)
-                if state_item is not None:
-                    switch.mode = state_item.reported
-
-    def __find_switch_topic(self, node_id, port_id):
-        topic = None
-        for switch in self.switches:
-            if switch.node_id == node_id and \
-                    switch.port_id == port_id:
-                topic = switch.command_topic
-                break
-        return topic

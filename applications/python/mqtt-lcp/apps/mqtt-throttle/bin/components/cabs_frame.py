@@ -50,13 +50,13 @@ class CabsFrame(ttk.Frame):
         self.parent_node = parent_node
         self.cab_frame_a = None
         self.cab_frame_b = None
-        self.cab_frame_a = CabNotebook(self, self.parent_node, Local.CAB_A,
+        self.cab_frame_a = CabNotebook(self, self.parent_node, Global.CAB_A,
                         padding=(2, 2, 2, 2),
                         borderwidth=5, relief="flat")
         self.cab_frame_a.grid(row=0, column=0, sticky=(NW))
         self.columnconfigure(0, weight=1)
         if self.parent_node.screensize != Global.SMALL:
-            self.cab_frame_b = CabNotebook(self, self.parent_node, Local.CAB_B,
+            self.cab_frame_b = CabNotebook(self, self.parent_node, Global.CAB_B,
                             padding=(2, 2, 2, 2),
                             borderwidth=5, relief="flat")
             self.cab_frame_b.grid(row=0, column=1, sticky=(NW))
@@ -66,14 +66,14 @@ class CabsFrame(ttk.Frame):
 
     def process_output_message(self, message):
         """ process output message """
-        if ((message.cab == Local.CAB_ALL) and
+        if ((message.cab == Global.CAB_ALL) and
                 (message.msg_type == Global.ROSTER)):
             #if self.locos_images is None:
             #    self.load_locos_images()
             #self.load_roster_images(message)
             pass
-        if message.cab in [Local.CAB_A, Local.CAB_ALL]:
+        if message.cab in [Global.CAB_A, Global.CAB_ALL]:
             self.cab_frame_a.process_output_message(message)
         if self.cab_frame_b is not None:
-            if message.cab in [Local.CAB_B, Local.CAB_ALL]:
+            if message.cab in [Global.CAB_B, Global.CAB_ALL]:
                 self.cab_frame_b.process_output_message(message)

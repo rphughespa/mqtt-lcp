@@ -7,7 +7,7 @@ MessageFrame - Message Frame screen
 
 the MIT License (MIT)
 
-Copyright © 2021 richard p hughes
+Copyright © 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -26,7 +26,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 """
 import sys
-
+from datetime import datetime
 
 # import tkinter as tk
 import ttkbootstrap as ttk
@@ -60,16 +60,20 @@ class MessageFrame(ttk.Frame):
             # print(">>> fastclock: " + str(message.msg_data))
             date_time = message.msg_data.get(Global.DATETIME, "0T00:00")
             # datetime is iso datetime YYYYYY-MM-DDTHH:SS:ms
-            splits = date_time.split("T")
-            if len(splits) > 1:
-                time = splits[1]
-                HHMM = time[0:5]
-                self.fast_label.configure(text="Fast: " +HHMM)
+            date_time_object = datetime.fromisoformat(date_time)
+            hour = str(date_time_object.hour)
+            mins = str(date_time_object.minute)
+            if len(mins) < 2:
+                mins = "0"+mins
+            hhmm = hour+":"+mins
+            self.fast_label.configure(text="Fast: " +hhmm)
         elif message.msg_type == Global.TIME:
             date_time = message.msg_data.get(Global.DATETIME, "0T00:00")
             # datetime is iso datetime YYYYYY-MM-DDTHH:SS:ms
-            splits = date_time.split("T")
-            if len(splits) > 1:
-                time = splits[1]
-                HHMM = time[0:5]
-                self.local_label.configure(text="Local: "+HHMM)
+            date_time_object = datetime.fromisoformat(date_time)
+            hour = str(date_time_object.hour)
+            mins = str(date_time_object.minute)
+            if len(mins) < 2:
+                mins = "0"+mins
+            hhmm = hour+":"+mins
+            self.local_label.configure(text="Local: "+hhmm)

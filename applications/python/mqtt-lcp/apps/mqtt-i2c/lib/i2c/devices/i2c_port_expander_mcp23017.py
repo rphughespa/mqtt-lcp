@@ -349,7 +349,8 @@ class I2cPortExpanderMcp23017(I2cBaseDevice):
             self.i2c_address, selected_register, 1)
         new_register_value = BitUtils.set_a_bit(current_register_value[0],
                                                 selected_bit)
-        # print(">>> "+str(selected_register) + " ... "+str(current_register_value[0])+" ... "+str(new_register_value))
+        # print(">>> "+str(selected_register) + " ... "+ \
+        #   str(current_register_value[0])+" ... "+str(new_register_value))
         self.i2c_bus.write_i2c_block_data(self.i2c_address, selected_register,
                                           [new_register_value])
 
@@ -360,7 +361,8 @@ class I2cPortExpanderMcp23017(I2cBaseDevice):
             self.i2c_address, selected_register, 1)
         new_register_value = BitUtils.clear_a_bit(current_register_value[0],
                                                   selected_bit)
-        # print(">>> "+str(selected_register) + " ... "+str(current_register_value[0])+" ... "+str(new_register_value))
+        # print(">>> "+str(selected_register) + " ... "+ \
+        #   str(current_register_value[0])+" ... "+str(new_register_value))
         self.i2c_bus.write_i2c_block_data(self.i2c_address, selected_register,
                                           [new_register_value])
 

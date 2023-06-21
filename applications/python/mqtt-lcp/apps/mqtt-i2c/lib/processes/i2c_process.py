@@ -3,7 +3,8 @@
 """
 
 
-I2cProcess - interface to devices on an I2C bus.  Devices tio be used are are specified in the config file
+I2cProcess - interface to devices on an I2C bus.
+    Devices tio be used are are specified in the config file
 
 The MIT License (MIT)
 
@@ -92,12 +93,12 @@ class I2cProcess(BaseProcess):
                 self.log_queue.put((Global.LOG_LEVEL_ERROR, message))
             else:
                 print("IoConfig: Error: " + message)
-        self.i2c_devices_found = self.__scan_i2c_addresses()
+        self.i2c_devices_detected = self.__scan_i2c_addresses()
         self.i2c_bus = I2cBus(self.io_config.i2c_bus_number, self.log_queue)
         time.sleep(2)  # wait for i2c bus to "settle"
         self.log_info("... I2C Devices ...")
         self.log_info("I2c Bus: " + str(self.io_config.i2c_bus_number))
-        self.log_info("I2C Devices: " + str(self.i2c_devices_found))
+        self.log_info("I2C Devices: " + str(self.i2c_devices_detected))
         if self.io_config.io_device_map is not None:
             self.__build_drivers_maps()
         else:
@@ -164,34 +165,33 @@ class I2cProcess(BaseProcess):
             # print(">>> send_after i2c_process: " +
             #     str(send_after_message.topic))
             self.send_after(send_after_message)
-        else:
-            # only send response when device io is finished
-            if response_reported is not None:
-                respond_to = message.mqtt_respond_to
-                response = IoData()
-                response.mqtt_message_root = message.mqtt_message_root
-                response.mqtt_version = message.mqtt_version
-                response.mqtt_session_id = message.mqtt_session_id
-                response.mqtt_port_id = message.mqtt_port_id
-                response.mqtt_desired = message.mqtt_desired
-                response.mqtt_reported = response_reported
-                if error_msg is not None:
-                    response.mqtt_metadata = {Global.MESSAGE: str(error_msg)}
-                    self.device_errors -= 1
-                    if self.device_errors < 1:
-                        # too many errors, quit
-                        self.events[Global.SHUTDOWN].set()
-            if data_reported is not None:  # and mqtt-send-sensor-message:
-                data_response = IoData()
-                data_response.mqtt_message_root = message.mqtt_message_root
-                data_response.mqtt_port_id = message.mqtt_port_id
-                data_response.mqtt_reported = data_reported
-            if response is not None or data_response is not None:
-                self.send_to_application((Global.RESPONSE, {
-                    Global.RESPOND_TO: respond_to,
-                    Global.RESPONSE: response,
-                    Global.DATA: data_response
-                }))
+        # only send response when device io is finished
+        if response_reported is not None:
+            respond_to = message.mqtt_respond_to
+            response = IoData()
+            response.mqtt_message_root = message.mqtt_message_root
+            response.mqtt_version = message.mqtt_version
+            response.mqtt_session_id = message.mqtt_session_id
+            response.mqtt_port_id = message.mqtt_port_id
+            response.mqtt_desired = message.mqtt_desired
+            response.mqtt_reported = response_reported
+            if error_msg is not None:
+                response.mqtt_metadata = {Global.MESSAGE: str(error_msg)}
+                self.device_errors -= 1
+                if self.device_errors < 1:
+                    # too many errors, quit
+                    self.events[Global.SHUTDOWN].set()
+        if data_reported is not None:  # and mqtt-send-sensor-message:
+            data_response = IoData()
+            data_response.mqtt_message_root = message.mqtt_message_root
+            data_response.mqtt_port_id = message.mqtt_port_id
+            data_response.mqtt_reported = data_reported
+        if response is not None or data_response is not None:
+            self.send_to_application((Global.RESPONSE, {
+                Global.RESPOND_TO: respond_to,
+                Global.RESPONSE: response,
+                Global.DATA: data_response
+            }))
 
 
     def __perform_async_io(self):
@@ -205,7 +205,8 @@ class I2cProcess(BaseProcess):
                 device_object = self.i2c_device_driver_map.get(
                     device_object_key, None)
                 if device_object is None:
-                    self.log_error("IO Device not found for: : [" + str(self.__get_linenumber())+"] : " \
+                    self.log_error("IO Device not found for: : [" \
+                                   + str(self.__get_linenumber())+"] : " \
                                    + str(key) + " .{}.. "+str(device_object_key))
                                    # + " [" + str(hex(int(device_object_key))) + "]")
                     self.device_errors -= 1
@@ -235,7 +236,8 @@ class I2cProcess(BaseProcess):
                 device_object = self.i2c_device_driver_map.get(
                     device_key, None)
                 if device_object is None:
-                    self.log_error("IO Device not found for: : [" + str(self.__get_linenumber())+"] : "
+                    self.log_error("IO Device not found for: : [" \
+                                   + (self.__get_linenumber())+"] : "
                                    + str(key) + " .[]. "+str(device_key) )
                                    # + " [" + str(hex(device_key)) + "]")
                     self.device_errors -= 1
@@ -326,11 +328,11 @@ class I2cProcess(BaseProcess):
             dev_object = I2cPortExpander(io_devices=device,
                                          i2c_bus=self.i2c_bus,
                                          log_queue=self.log_queue)
-        elif device_type == Global.PORT_EXPANDER_RELAY_QUAD:
-            # print(">>> port relay quad found")
-            dev_object = I2cPortExpander(io_devices=device,
-                                         i2c_bus=self.i2c_bus,
-                                         log_queue=self.log_queue)
+        #elif device_type == Global.PORT_EXPANDER_RELAY_QUAD:
+        #    # print(">>> port relay quad found")
+        #    dev_object = I2cPortExpander(io_devices=device,
+        #                                 i2c_bus=self.i2c_bus,
+        #                                 log_queue=self.log_queue)
         elif device_type == Global.SERVO_CONTROLLER:
             dev_object = I2cServoController(io_devices=device,
                                         i2c_bus=self.i2c_bus,
@@ -363,6 +365,7 @@ class I2cProcess(BaseProcess):
         """ detect devices the i2c bus """
         # depends on external "i2cdetect
         #  ... sudo apt install i2c-tools "
+        rett = None
         if isinstance(self.io_config.i2c_bus_number, int):
             cmd_out_file = "/var/tmp/i2cdetect.txt"
             command = "i2cdetect -y " + str(self.io_config.i2c_bus_number) + \
@@ -382,4 +385,4 @@ class I2cProcess(BaseProcess):
             rett = []
             for addr in i2c_address_list:
                 rett.append(int(addr,16))
-            return rett
+        return rett

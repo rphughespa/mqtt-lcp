@@ -1,7 +1,7 @@
 {
     "config": {
         "node": {
-            "name": "mqtt-dev-tower"
+            "name": "mqtt-tower"
         },
         "logger": {
             "level": "info",
@@ -16,7 +16,7 @@
                 "ping": 10,
                 "sub-topics": {
                     "broadcast": "cmd/mqtt-lcp/node/all/#",
-                    "inventory": "cmd/mqtt-lcp/tower/**node**/inventory/#",
+                    "tower": "cmd/mqtt-lcp/tower/**node**/#",
                     "route": "cmd/mqtt-lcp/route/**node**/#",
                     "ping": "dt/mqtt-lcp/ping/#",
                     "backup": "dt/mqtt-lcp/backup/#",
@@ -25,6 +25,7 @@
                     "locator": "dt/mqtt-lcp/locator/#",
                     "switch": "dt/mqtt-lcp/switch/#",
                     "signal": "dt/mqtt-lcp/signal/#",
+                    "cab": "dt/mqtt-lcp/cab/#",
                     "self": "cmd/mqtt-lcp/node/**node**/#"
                 },
                 "pub-topics": {
@@ -32,19 +33,28 @@
                     "fastclock": "dt/mqtt-lcp/tower/**node**/fastclock",
                     "dashboard": "dt/mqtt-lcp/tower/**node**/dashboard",
                     "switch": "dt/mqtt-lcp/switch/**node**",
-                    "tower": "cmd/mqtt-lcp/tower",
+                    "tower": "dt/mqtt-lcp/tower/**node**",
+                    "route": "dt/mqtt-lcp/route/**node**",
                     "node": "cmd/mqtt-lcp/node",
-                    "inventory": "dt/mqtt-lcp/tower/**node**/inventory"
+                    "inventory": "dt/mqtt-lcp/tower/**node**/inventory",
+                    "cab-signal": "dt/mqtt-lcp/tower/**node**/cab-signal"
                 }
             }
         },
         "options": {
+            "control": {
+                "admin-nodes": [
+                    "mqtt-dev-dispatcher"
+                ],
+                "traffic": "off",
+                "auto-signals": "on"
+            },
             "backup-path": "/home/pi/mqtt-lcp/backups",
             "data-path": "/home/pi/mqtt-lcp/data",
             "time": {
                 "dashboard": {
-                    "timeout": 45,
-                    "interval": 10
+                    "timeout": 15,
+                    "interval": 5
                 },
                 "fastclock": {
                     "ratio": 4,

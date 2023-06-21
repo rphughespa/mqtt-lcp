@@ -39,38 +39,20 @@ class Synonyms(object):
         pass
 
     @classmethod
-    def is_synonym_active(cls, name=None):
-        """ checks for synonyms of 'thrown' """
-        syn = False
-        if name in [Global.THROWN, Global.OPENED, Global.ON, Global.ACTIVE,
-                    "1", 1]:
-            syn = True
-        return syn
+    def is_on(cls, name):
+        """ is value a synonym for on """
+        rett = False
+        if name in (Global.THROWN, Global.THROW, Global.ON, "1", 1, True):
+            rett = True
+        return rett
 
     @classmethod
-    def is_synonym_activate(cls, name=None):
-        """ checks for synonyms of 'throw' """
-        syn = False
-        if name in [Global.THROW, Global.OPEN, Global.ON, Global.ACTIVATE,
-                    "1", 1]:
-            syn = True
-        return syn
-
-    @classmethod
-    def is_synonym_inactive(cls, name=None):
-        """ check for synonyms of 'closed' """
-        syn = False
-        if name in [Global.CLOSED, Global.OFF, Global.INACTIVE, "0", 0]:
-            syn = True
-        return syn
-
-    @classmethod
-    def is_synonym_deactivate(cls, name=None):
-        """ check for synonyms of 'close' """
-        syn = False
-        if name in [Global.CLOSE, Global.OFF, Global.DEACTIVATE, "0", 0]:
-            syn = True
-        return syn
+    def is_off(cls, name):
+        """ is value a synonym for off """
+        rett = False
+        if name in (Global.CLOSED, Global.CLOSE, Global.OFF, "0", 0, False):
+            rett = True
+        return rett
 
     @classmethod
     def desired_to_reported(cls, desired=None):
@@ -80,22 +62,32 @@ class Synonyms(object):
             reported = Global.THROWN
         if desired == Global.CLOSE:
             reported = Global.CLOSED
-        if desired == Global.OPEN:
-            reported = Global.OPENED
-        if desired == Global.ACTIVATE:
-            reported = Global.ACTIVATED
-        if desired == Global.DEACTIVATE:
-            reported = Global.DEACTIVATED
+        return reported
+
+    @classmethod
+    def reverse(cls, desired=None):
+        """ convert synonyms to opposite """
+        reported = desired
+        if desired == Global.THROW:
+            reported = Global.CLOSE
+        if desired == Global.THROWN:
+            reported = Global.CLOSED
+        if desired == Global.ON:
+            reported = Global.OFF
+        if desired == Global.OFF:
+            reported = Global.ON
+        if desired == Global.ON:
+            reported = Global.OFF
         if desired == Global.CONNECT:
-            reported = Global.CONNECTED
+            reported = Global.DISCONNECT
         if desired == Global.DISCONNECT:
-            reported = Global.DISCONNECTED
-        if desired == Global.ACQUIRE:
-            reported = Global.ACQUIRED
-        if desired == Global.PAUSE:
-            reported = Global.PAUSED
+            reported = Global.CONNECT
+        if desired == Global.STOP:
+            reported = Global.RUN
         if desired == Global.RUN:
-            reported = Global.RUNNING
+            reported = Global.STOP
+        if desired == Global.ACQUIRE:
+            reported = Global.RELEASE
         if desired == Global.RELEASE:
-            reported = Global.RELEASED
+            reported = Global.ACQUIRE
         return reported

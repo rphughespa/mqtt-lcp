@@ -24,17 +24,16 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
-
-
 import sys
 from copy import deepcopy
 import json
 
 sys.path.append('../../lib')
 
-from utils.global_constants import Global
 from utils.utility import Utility
-#import time
+from utils.global_constants import Global
+
+# import time
 
 
 class IoData(object):
@@ -52,7 +51,6 @@ class IoData(object):
         self.io_mux_address = None
         self.io_sub_devices = None
         self.io_metadata = None
-        self.io_blocks = None
         self.mqtt_major_category = None
         self.mqtt_message_category = None
         self.mqtt_topic = None
@@ -63,6 +61,8 @@ class IoData(object):
         self.mqtt_throttle_id = None
         self.mqtt_cab_id = None
         self.mqtt_loco_id = None
+        self.mqtt_block_id = None
+        self.mqtt_direction = None
         self.mqtt_identity = None
         self.mqtt_type = None
         # send sensor message if messaging for a switch
@@ -71,8 +71,11 @@ class IoData(object):
         self.mqtt_desired = None
         self.mqtt_reported = None
         self.mqtt_respond_to = None
+        self.mqtt_publisher = None
         self.mqtt_session_id = None
         self.mqtt_description = None
+        self.mqtt_block_id = None
+        self.mqtt_direction = None
         self.data_topic = None
         self.mqtt_version = None
         self.mqtt_command_topic = None
@@ -101,7 +104,8 @@ class IoData(object):
         if body_map is not None:
             if not isinstance(body_map, dict):
                 # opps, mqtt bost is a value, not a map, build a amp for it
-                body_map = {Global.UNKNOWN: {Global.STATE: {Global.DESIRED: body_map}}}
+                body_map = {Global.UNKNOWN: {
+                    Global.STATE: {Global.DESIRED: body_map}}}
             # get root key of dict
             mroot = list(body_map.keys())[0]
             mbody = body_map[mroot]
@@ -117,6 +121,8 @@ class IoData(object):
                     Global.THROTTLE_ID, None)
                 new_io_data.mqtt_cab_id = mbody.get(Global.CAB_ID, None)
                 new_io_data.mqtt_loco_id = mbody.get(Global.LOCO_ID, None)
+                new_io_data.mqtt_block_id = mbody.get(Global.BLOCK_ID, None)
+                new_io_data.mqtt_direction = mbody.get(Global.DIRECTION, None)
                 new_io_data.mqtt_identity = mbody.get(Global.IDENTITY, None)
                 new_io_data.mqtt_session_id = mbody.get(
                     Global.SESSION_ID, None)
@@ -124,6 +130,8 @@ class IoData(object):
                 new_io_data.mqtt_timestamp = mbody.get(Global.TIMESTAMP, None)
                 new_io_data.mqtt_respond_to = mbody.get(
                     Global.RESPOND_TO, None)
+                new_io_data.mqtt_publisher = mbody.get(
+                    Global.PUBLISHER, None)
                 new_io_data.mqtt_metadata = mbody.get(Global.METADATA, None)
                 if ((new_io_data.mqtt_metadata is not None)
                         and (isinstance(new_io_data.mqtt_metadata, dict))):
@@ -186,8 +194,11 @@ class IoData(object):
         new_io_data.mqtt_throttle_id = body_map.get(Global.THROTTLE_ID, None)
         new_io_data.mqtt_cab_id = body_map.get(Global.CAB_ID, None)
         new_io_data.mqtt_loco_id = body_map.get(Global.LOCO_ID, None)
+        new_io_data.mqtt_block_id = body_map.get(Global.BLOCK_ID, None)
+        new_io_data.mqtt_direction = body_map.get(Global.DIRECTION, None)
         new_io_data.mqtt_identity = body_map.get(Global.IDENTITY, None)
         new_io_data.mqtt_respond_to = body_map.get(Global.RESPOND_TO, None)
+        new_io_data.mqtt_publisher = body_map.get(Global.PUBLISHER, None)
         new_io_data.mqtt_session_id = body_map.get(Global.SESSION_ID, None)
         new_io_data.mqtt_version = body_map.get(Global.VERSION, None)
         new_io_data.mqtt_data_topic = None
@@ -250,6 +261,10 @@ class IoData(object):
             body_map.update({Global.CAB_ID: self.mqtt_cab_id})
         if self.mqtt_loco_id is not None:
             body_map.update({Global.LOCO_ID: self.mqtt_loco_id})
+        if self.mqtt_block_id is not None:
+            body_map.update({Global.BLOCK_ID: self.mqtt_block_id})
+        if self.mqtt_direction is not None:
+            body_map.update({Global.DIRECTION: self.mqtt_direction})
         if self.mqtt_identity is not None:
             body_map.update({Global.IDENTITY: self.mqtt_identity})
         if self.mqtt_desired is not None or self.mqtt_reported is not None:
@@ -261,6 +276,8 @@ class IoData(object):
             body_map.update({Global.STATE: state_map})
         if self.mqtt_respond_to is not None:
             body_map.update({Global.RESPOND_TO: self.mqtt_respond_to})
+        if self.mqtt_publisher is not None:
+            body_map.update({Global.PUBLISHER: self.mqtt_publisher})
         if self.mqtt_session_id is not None:
             body_map.update({Global.SESSION_ID: self.mqtt_session_id})
         if self.mqtt_version is not None:
@@ -307,6 +324,10 @@ class IoData(object):
             body_map.update({Global.CAB_ID: self.mqtt_cab_id})
         if self.mqtt_loco_id is not None:
             body_map.update({Global.LOCO_ID: self.mqtt_loco_id})
+        if self.mqtt_block_id is not None:
+            body_map.update({Global.BLOCK_ID: self.mqtt_block_id})
+        if self.mqtt_direction is not None:
+            body_map.update({Global.DIRECTION: self.mqtt_direction})
         if self.mqtt_identity is not None:
             body_map.update({Global.IDENTITY: self.mqtt_identity})
         if self.mqtt_description is not None:
@@ -328,7 +349,8 @@ class IoData(object):
 
     @classmethod
     def convert_inventory_maps_to_lists(cls, inventory_maps=None):
-        """ convert a map of maps of inventory iodata structs to a map of lists of plain inventory maps """
+        """ convert a map of maps of inventory iodata structs
+            to a map of lists of plain inventory maps """
         inventory_list = []
         for _i, (_k, value) in enumerate(inventory_maps.items()):
             inventory_list.append(value.encode_inventory_map())
@@ -399,6 +421,8 @@ class IoData(object):
             category = Global.MQTT_REQUEST_FASTCLOCK
         elif self.mqtt_message_root == Global.SWITCH:
             category = Global.MQTT_REQUEST_SWITCH
+        elif self.mqtt_message_root == Global.ROUTE:
+            category = Global.MQTT_REQUEST_ROUTE
         elif self.mqtt_message_root == Global.SENSOR:
             category = Global.MQTT_REQUEST_SENSOR
         elif self.mqtt_message_root == Global.SIGNAL:
@@ -434,16 +458,10 @@ class IoData(object):
                 category = Global.MQTT_RESPONSE_TOWER
             elif port_id == Global.INVENTORY:
                 category = Global.MQTT_RESPONSE_INVENTORY_REPORT
-            elif port_id == Global.PANELS:
+            elif port_id == Global.PANEL:
                 category = Global.MQTT_RESPONSE_PANELS_REPORT
-            elif port_id == Global.STATES:
-                category = Global.MQTT_RESPONSE_STATES_REPORT
-            elif port_id == Global.SWITCHES:
-                category = Global.MQTT_RESPONSE_SWITCHES_REPORT
-            elif port_id == Global.SIGNALS:
-                category = Global.MQTT_RESPONSE_SIGNALS_REPORT
-            elif port_id == Global.ROUTES:
-                category = Global.MQTT_RESPONSE_ROUTES_REPORT
+            elif port_id == Global.DASHBOARD:
+                category = Global.MQTT_RESPONSE_DASHBOARD_REPORT
             elif port_id == Global.FASTCLOCK:
                 category = Global.MQTT_RESPONSE_FASTCLOCK
             else:
@@ -454,6 +472,10 @@ class IoData(object):
             category = Global.MQTT_RESPONSE_DCC_COMMAND
         elif self.mqtt_message_root == Global.SWITCH:
             category = Global.MQTT_RESPONSE_SWITCH
+        elif self.mqtt_message_root == Global.SIGNAL:
+            category = Global.MQTT_RESPONSE_SIGNAL
+        elif self.mqtt_message_root == Global.ROUTE:
+            category = Global.MQTT_RESPONSE_ROUTE
         elif self.mqtt_message_root == Global.SENSOR:
             category = Global.MQTT_RESPONSE_SENSOR
         elif self.mqtt_message_root == Global.CAB:
@@ -477,8 +499,8 @@ class IoData(object):
             category = Global.MQTT_DATA_LOCATOR
         elif self.mqtt_message_root == Global.SWITCH:
             category = Global.MQTT_DATA_SWITCH
-        elif self.mqtt_message_root == Global.FASTCLOCK:
-            category = Global.MQTT_DATA_FASTCLOCK
+        elif self.mqtt_message_root == Global.ROUTE:
+            category = Global.MQTT_DATA_ROUTE
         elif self.mqtt_message_root == Global.BACKUP:
             category = Global.MQTT_DATA_BACKUP
         elif self.mqtt_message_root == Global.CAB:

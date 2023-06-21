@@ -1,7 +1,7 @@
 {
     "config": {
         "node": {
-            "name": "mqtt-dev-dcc-command"
+            "name": "mqtt-dcc-command"
         },
         "logger": {
             "level": "info",

@@ -1,0 +1,75 @@
+{
+    "group": "signal",
+    "port-id": "132e",
+    "block-id": "24",
+    "direction": "east",
+    "rules": {
+        "clear": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "maryville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-27",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "141e",
+                    "state": "clear"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "maryville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-27",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "141e",
+                    "state": "approach"
+                }
+            ]
+        },
+        "approach": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "maryville",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-27",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "141e",
+                    "state": "stop"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "maryville",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-25",
+                    "state": "clear"
+                }
+            ]
+        }
+    }
+}

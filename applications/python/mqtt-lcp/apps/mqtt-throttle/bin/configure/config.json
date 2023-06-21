@@ -17,20 +17,22 @@
         "sub-topics": {
           "self": "cmd/mqtt-lcp/node/**node**/#",
           "broadcast": "cmd/mqtt-lcp/node/all/#",
-          "fastclock": "dt/mqtt-lcp/fastclock/#",
+          "fastclock": "dt/mqtt-lcp/tower/+/fastclock",
+          "cab-signal": "dt/mqtt-lcp/tower/+/cab-signal",
           "sensor": "dt/mqtt-lcp/sensor/#",
           "signal": "dt/mqtt-lcp/signal/#",
           "switch": "dt/mqtt-lcp/switch/#",
+          "route": "dt/mqtt-lcp/route/#",
           "locator": "dt/mqtt-lcp/locator/#",
           "cab": "dt/mqtt-lcp/cab/+/**node**",
           "roster": "dt/mqtt-lcp/roster/#",
-          "inventory": "dt/mqtt-lcp/tower/+/inventory/#"
+          "inventory": "dt/mqtt-lcp/tower/+/inventory"
         },
         "pub-topics": {
           "ping": "dt/mqtt-lcp/ping/**node**",
           "sensor": "dt/mqtt-lcp/sensor/**node**",
           "backup": "dt/mqtt-lcp/backup/**node**",
-          "tower": "cmd/mqtt-lcp/tower/mqtt-dev-tower/inventory",
+          "tower": "cmd/mqtt-lcp/tower/mqtt-tower/inventory",
           "power": "cmd/mqtt-lcp/switch/mqtt-dcc-command",
           "roster": "cmd/mqtt-lcp/roster/mqtt-dcc-command",
           "cab": "cmd/mqtt-lcp/cab/mqtt-dcc-command"

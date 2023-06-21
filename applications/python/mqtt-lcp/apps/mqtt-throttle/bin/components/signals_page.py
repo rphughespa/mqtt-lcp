@@ -7,7 +7,7 @@ SignalsPage - Display / change the stat of signals
 
 the MIT License (MIT)
 
-Copyright © 2020 richard p hughes
+Copyright © 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -34,13 +34,17 @@ sys.path.append('../../lib')
 import ttkbootstrap as ttk
 from ttkbootstrap.constants import *
 
-from structs.gui_message import GuiMessage
+
 from utils.global_constants import Global
 # from utils.global_synonyms import Synonyms
+
+from structs.gui_message import GuiMessage
+from structs.gui_message import GuiMessageEnvelope
+
 from components.image_clickable import ImageClickable
 from components.image_button import ImageButton
 from components.signals_info_list import SignalsInfoList
-from components.tk_message import TkMessage
+
 
 
 # from components.local_constants import Local
@@ -146,7 +150,7 @@ class SignalsPage(ttk.Frame):
             signal_message.text = self.signal.text  # command topic
             signal_message.mode = new_mode
             self.parent_node.queue_tk_input(
-                TkMessage(msg_type=Global.PUBLISH, msg_data=signal_message))
+                GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=signal_message))
 
     def refresh_page(self):
         """ refresh the display page """
@@ -163,14 +167,21 @@ class SignalsPage(ttk.Frame):
             #print(">>> signal.modees page: " + str(message.msg_data))
             # an update of a signle signal.mode state
             skey = message.msg_data.node_id + ":" + message.msg_data.port_id
-            signal = self.tower_data.signals.get(skey, None)
-            if signal is None:
-                signal = copy.deepcopy(message.msg_data)
-                self.tower_data.signals[skey] = signal
-            if signal is not None:
-                signal.mode = message.msg_data.mode
-                signal = self.__set_signal_image(signal)
+            if message.msg_data is None:
+                # clear out signals table
+                self.tower_data.signalss = {}
+                self.signal = None
                 self.refresh_page()
+            else:
+                signal = self.tower_data.signals.get(skey, None)
+                if signal is None:
+                    signal = copy.deepcopy(message.msg_data)
+                    self.tower_data.signals[skey] = signal
+                    self.refresh_page()
+                else:
+                    signal.mode = message.msg_data.mode
+                    signal = self.__set_signal_image(signal)
+                    self.refresh_page()
 
     #
     # private functions

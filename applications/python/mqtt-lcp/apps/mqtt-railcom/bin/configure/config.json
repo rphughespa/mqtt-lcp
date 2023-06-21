@@ -30,52 +30,7 @@
         "usb-product-id": 51152,
         "serial-mode": "char"
       },
-      "io-devices": [
-        {
-          "io-address": 103,
-          "io-sub-address": 1,
-          "io-device": "block",
-          "io-device-type": "sensor",
-          "port-id": "siding-north-block",
-          "description": "siding north block",
-          "io-metadata": {
-            "type": "block"
-          }
-        },
-        {
-          "io-address": 104,
-          "io-sub-address": 1,
-          "io-device": "block",
-          "io-device-type": "sensor",
-          "port-id": "siding_south-block",
-          "description": "siding south block",
-          "io-metadata": {
-            "type": "block"
-          }
-        },
-        {
-          "io-address": 103,
-          "io-sub-address": 2,
-          "io-device": "railcom",
-          "io-device-type": "sensor",
-          "port-id": "siding-north-locator",
-          "description": "siding north locator",
-          "io-metadata": {
-            "type": "railcom"
-          }
-        },
-        {
-          "io-address": 104,
-          "io-sub-address": 2,
-          "io-device": "railcom",
-          "io-device-type": "sensor",
-          "port-id": "siding_south-locator",
-          "description": "siding south locator",
-          "io-metadata": {
-            "type": "railcom"
-          }
-        }
-      ]
+      "io-devices": []
     }
   }
 }

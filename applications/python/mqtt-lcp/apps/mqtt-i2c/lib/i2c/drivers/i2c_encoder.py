@@ -3,7 +3,8 @@
 """
 
 I2cEncoder.py - Thin wrapper around a low level I2C device driver.
-            Adds some business logic for using the device in conjunction wirh MQTT based applications.
+            Adds some business logic for using the device in c
+            onjunction wirh MQTT based applications.
 
 
 

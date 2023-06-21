@@ -1,0 +1,75 @@
+{
+    "group": "signal",
+    "port-id": "142w",
+    "block-id": "26",
+    "direction": "west",
+    "rules": {
+        "clear": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "oak",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-27",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "131w",
+                    "state": "clear"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "oak",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-27",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "131w",
+                    "state": "approach"
+                }
+            ]
+        },
+        "approach": {
+            "1": [
+                {
+                    "group": "switch",
+                    "port-id": "oak",
+                    "state": "closed"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-27",
+                    "state": "clear"
+                },
+                {
+                    "group": "signal",
+                    "port-id": "131w",
+                    "state": "stop"
+                }
+            ],
+            "2": [
+                {
+                    "group": "switch",
+                    "port-id": "oak",
+                    "state": "thrown"
+                },
+                {
+                    "group": "block",
+                    "port-id": "block-25",
+                    "state": "clear"
+                }
+            ]
+        }
+    }
+}

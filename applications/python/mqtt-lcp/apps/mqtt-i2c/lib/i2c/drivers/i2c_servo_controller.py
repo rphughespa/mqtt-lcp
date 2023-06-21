@@ -4,6 +4,17 @@
 
     I2cServoController.py - helper class to process i2c servo controller devices
 
+    This module moves the servo in "slow motion".  That is, the servo is repeatedly requested
+    to rotate in small increments until the desired angle is achieved.  There is a small delay
+    between movement requests.
+
+    Since the request to move a servo may take a bit of time (several seconds)  the app publishes
+    a data "busy" message when the movement begins.  The typical "thrown", "closed" type of
+    message response are sent after the movements are completed.
+
+    If a request is received to move a servo while the servo is already engaged is fullfilling
+    a previoud request, the new request will rejected and a response of "busy" will be published.
+
 
 The MIT License (MIT)
 
@@ -134,71 +145,104 @@ class I2cServoController(I2cBaseDriver):
 
     def __send_request_to_switch(self, message):
         """ send the request to the switch"""
+        respond_to = message.mqtt_respond_to
+        port_id = message.mqtt_port_id
         data_reported = None
         return_reported = Global.ERROR
         return_message = "Unknown request: " + str(message.mqtt_desired)
         send_after_message = None
         sub_dev = self.port_map.get(message.mqtt_port_id, None)
-        if sub_dev is None:
-            return_message = "Unknown Port ID: " + \
-            str(message.mqtt_port_id)
-        else:
-            desired = message.mqtt_desired
-            if desired == Global.THROW:
-                if sub_dev.state == Global.OFF:
-                    desired = Global.ON
-                else:
-                    desired = Global.OFF
-            if Synonyms.is_synonym_activate(message.mqtt_desired):
-                desired = Global.ON
-            elif Synonyms.is_synonym_deactivate(desired):
-                desired = Global.OFF
-            if desired in (Global.ON, Global.OFF):
-                start_pos = sub_dev.close
-                end_pos = sub_dev.open
-                if desired == Global.OFF:
-                    start_pos = sub_dev.open
-                    end_pos = sub_dev.close
-                if message.mqtt_metadata is not None:
-                    start_pos = message.mqtt_metadata.get("start_pos", start_pos)
-                    end_pos = message.mqtt_metadata.get("end_pos", end_pos)
-                send_after_message = self.__move_servo(message, sub_dev.base_pin, start_pos, end_pos)
+        if message.mqtt_reported == Global.SERVO:
+            send_after_message = self.__move_servo(message, sub_dev)
+            if send_after_message is None:
+                # movement is finsihed
+                # remove port from map to stop
+                if port_id in self.send_after_port_queue:
+                    del self.send_after_port_queue[port_id]
                 return_reported = Synonyms.desired_to_reported(
                     message.mqtt_desired)
+                if sub_dev.send_sensor_message:
+                    data_reported = return_reported
                 sub_dev.state = return_reported
                 self.port_map.update({message.mqtt_port_id: sub_dev})
                 return_message = None
-        if return_reported != Global.ERROR and sub_dev.send_sensor_message:
-            data_reported = return_reported
-        if message.mqtt_respond_to is None:
-            return_reported = None
-            data_reported = None
+            else:
+                data_reported = None
+                return_reported = None
+                return_message = None
+        else:
+            # start a new request
+            if sub_dev is None:
+                return_message = "Unknown Port ID: " + \
+                str(message.mqtt_port_id)
+            else:
+                desired = message.mqtt_desired
+                if desired == Global.TOGGLE:
+                    if sub_dev.state == Global.OFF:
+                        desired = Global.ON
+                    else:
+                        desired = Global.OFF
+                if Synonyms.is_on(desired):
+                    desired = Global.ON
+                elif Synonyms.is_off(desired):
+                    desired = Global.OFF
+                if desired in (Global.ON, Global.OFF):
+                    if port_id in self.send_after_port_queue:
+                        # device is busy
+                        return_reported = Global.BUSY
+                        return_message = "Error: Device is Busy"
+                    else:
+                        self.send_after_port_queue[port_id] = port_id
+                        data_reported = Global.BUSY
+                        start_pos = sub_dev.close
+                        end_pos = sub_dev.open
+                        if desired == Global.OFF:
+                            start_pos = sub_dev.open
+                            end_pos = sub_dev.close
+                        if message.mqtt_metadata is not None:
+                            start_pos = message.mqtt_metadata.get("start_pos", start_pos)
+                            end_pos = message.mqtt_metadata.get("end_pos", end_pos)
+                        send_after_message = \
+                                self.__build_send_after_message(message, start_pos, end_pos)
+                        if sub_dev.send_sensor_message:
+                            data_reported = Global.BUSY
+                        return_reported = None
+                        return_message = None
         return (return_reported, return_message, data_reported,
                 send_after_message)
 
-    def __move_servo(self,message, base_pin, start_pos, end_pos):
+    def __move_servo(self,message, sub_dev):
         """ move a server to a desired position """
         # only move one increment at a time,
         # then do a  sendafter message
         # to be notified to do the next increment
-        # repeat cycle until servo move is done
+        # repeat cycle until servo movement is done
         # this prevents one servo move from
         # blocking the i2c bus for long periods
         send_after_message = None
+        start_pos = message.mqtt_metadata.get("start_pos", sub_dev.open)
+        end_pos = message.mqtt_metadata.get("end_pos", sub_dev.close)
         incr = 2
         if end_pos < start_pos:
-            incr = -1
+            incr = 0 - incr
         if abs(end_pos - start_pos) != 0:
             start_pos += incr
             if incr > 0 and start_pos > end_pos:
                 start_pos = end_pos
             elif incr < 0 and start_pos < end_pos:
                 start_pos = end_pos
-            self.device_driver.move_servo(base_pin, start_pos)
-            servo_io_data = copy.deepcopy(message)
-            servo_io_data.mqtt_respond_to = Global.SERVO
-            servo_io_data.mqtt_metadata = {"start_pos": start_pos, "end_pos": end_pos}
-            send_after_message =\
-                    SendAfterMessage(Global.IO_REQUEST, \
-                            servo_io_data, 50)  # delay in milisecs
+            self.device_driver.move_servo(sub_dev.base_pin, start_pos)
+            send_after_message = \
+                    self.__build_send_after_message(message, start_pos, end_pos)
+        return send_after_message
+
+    def __build_send_after_message(self, message, start_pos, end_pos):
+        """ build a send after message that will trigger
+          the actual servo movements when received """
+        servo_io_data = copy.deepcopy(message)
+        servo_io_data.mqtt_reported = Global.SERVO
+        servo_io_data.mqtt_metadata = {"start_pos": start_pos, "end_pos": end_pos}
+        send_after_message = \
+                SendAfterMessage(Global.IO_REQUEST, \
+                servo_io_data, 50)  # delay in milisecs
         return send_after_message

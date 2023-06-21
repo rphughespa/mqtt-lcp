@@ -40,12 +40,12 @@ from utils.global_constants import Global
 from utils.utility import Utility
 
 from structs.gui_message import GuiMessage
+from structs.gui_message import GuiMessageEnvelope
 
 from processes.base_process import BaseProcess
 from processes.base_process import SendAfterMessage
 
 from dispatcher_thread import DispatcherThread
-from components.tk_message import TkMessage
 
 class DispatcherProcess(BaseProcess):
     """ Class that waits for an event to occur """
@@ -144,8 +144,8 @@ class DispatcherProcess(BaseProcess):
         local_time_epoch = Utility.now_seconds()
         local_time = datetime.datetime.fromtimestamp( \
                 local_time_epoch).isoformat()
-        time_msg_body = TkMessage(msg_type=Global.TIME, \
-                            cab=Global.ALL,
+        time_msg_body = GuiMessageEnvelope(msg_type=Global.TIME, \
+                            cab=Global.CAB_ALL,
                             msg_data={Global.DATETIME: local_time})
         # print("Time: "+str(time_msg_body))
         self.send_message_to_tk(time_msg_body)

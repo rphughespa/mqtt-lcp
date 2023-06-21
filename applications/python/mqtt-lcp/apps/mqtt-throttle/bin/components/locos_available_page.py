@@ -7,7 +7,7 @@ LocosAvailablePage - Locos available, not selected for consist screen
 
 the MIT License (MIT)
 
-Copyright © 2020 richard p hughes
+Copyright © 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -39,7 +39,7 @@ sys.path.append('../../lib')
 from utils.global_constants import Global
 from components.local_constants import Local
 
-# from components.tk_message import TkMessage
+# from structs.gui_message import GuiMessageEnvelope
 from components.locos_info_list import LocosInfoList
 # from select_list_data import SelectListData
 # from key_pad import KeyPadFrame

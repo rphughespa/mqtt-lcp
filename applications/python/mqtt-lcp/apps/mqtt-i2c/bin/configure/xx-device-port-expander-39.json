@@ -1,0 +1,88 @@
+{
+	"io-device": "port-expander",
+	"io-device-type": "multiple",
+	"io-address": 39,
+	"io-sub-devices": [
+		{
+			"io-sub-address": 13,
+			"io-device-type": "signal",
+			"port-id": "130w-39",
+			"description": "130w",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"signal-type": "rgb"
+			}
+		},
+		{
+			"io-sub-address": 9,
+			"io-device-type": "signal",
+			"port-id": "121e-39",
+			"description": "121e",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"signal-type": "position"
+			}
+		},
+		{
+			"io-sub-address": 6,
+			"io-device-type": "signal",
+			"port-id": "112e-39",
+			"description": "112e",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"signal-type": "color"
+			}
+		},
+		{
+			"io-sub-address": 4,
+			"io-device-type": "signal",
+			"port-id": "flash",
+			"description": "flash",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"signal-type": "flasher",
+				"blink": 500
+			}
+		},
+		{
+			"io-sub-address": 3,
+			"io-device-type": "signal",
+			"port-id": "blink",
+			"description": "blink",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"signal-type": "single",
+				"blink": 500
+			}
+		},
+		{
+			"io-sub-address": 2,
+			"io-device-type": "signal",
+			"port-id": "single",
+			"description": "single",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"signal-type": "single"
+			}
+		},
+		{
+			"io-sub-address": 1,
+			"io-device-type": "sensor",
+			"port-id": "mill-siding-sensor-39",
+			"description": "Steel Mill Siding 39",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"report": {
+					"on": "clicked"
+				}
+			}
+		},
+		{
+			"io-sub-address": 0,
+			"io-device-type": "sensor",
+			"port-id": "lumber-siding-sensor-39",
+			"description": "Lumber Siding",
+			"send-sensor-message": "yes"
+		}
+	]
+}

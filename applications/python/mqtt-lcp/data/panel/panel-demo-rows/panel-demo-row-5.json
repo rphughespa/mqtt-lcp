@@ -1,0 +1,77 @@
+{
+    "row": 5,
+    "cols": [
+        {
+            "col": 1,
+            "block-id": "24",
+            "image": "low-slash",
+            "type": "block"
+        },
+        {
+            "col": 2,
+            "block-id": "24",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 3,
+            "port-id": "maryville",
+            "image": "turn-left-up",
+            "type": "switch"
+        },
+        {
+            "col": 4,
+            "block-id": "27",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 5,
+            "block-id": "27",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 6,
+            "block-id": "27",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 7,
+            "block-id": "27",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 8,
+            "block-id": "27",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 9,
+            "block-id": "27",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 10,
+            "port-id": "oak",
+            "image": "turn-right-up",
+            "type": "switch"
+        },
+        {
+            "col": 11,
+            "block-id": "26",
+            "image": "horizontal",
+            "type": "block"
+        },
+        {
+            "col": 12,
+            "block-id": "26",
+            "image": "low-back-slash",
+            "type": "block"
+        }
+    ]
+}

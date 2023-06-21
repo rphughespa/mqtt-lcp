@@ -7,7 +7,7 @@ DashboardPage - Display / change the state of Dashboard of computers and apps
 
 the MIT License (MIT)
 
-Copyright © 2020 richard p hughes
+Copyright © 2023 richard p hughes
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software
 and associated documentation files (the “Software”), to deal in the Software without restriction,
@@ -25,6 +25,7 @@ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 """
+import os
 import sys
 import copy
 
@@ -40,13 +41,15 @@ sys.path.append('../../lib')
 
 from utils.global_synonyms import Synonyms
 from utils.global_constants import Global
+
 from structs.gui_message import GuiMessage
+from structs.gui_message import GuiMessageEnvelope
 
 from components.local_constants import Local
 from components.dashboard_info_list import DashboardInfoList
 from components.image_button import ImageButton
 from components.image_clickable import ImageClickable
-from components.tk_message import TkMessage
+
 
 
 
@@ -71,12 +74,9 @@ class DashboardPage(ttk.Frame):
         self.dashboard_computers = {}
         self.dashboard_apps = {}
 
-        self.info_unknown_image = ImageClickable.load_image(
-            "img/info/info-unknown.png")
-        self.info_error_image = ImageClickable.load_image(
-            "img/info/info-red.png")
-        self.info_ok_image = ImageClickable.load_image(
-            "img/info/info-green.png")
+        self.info_unknown_image = None
+        self.info_error_image = None
+        self.info_ok_image = None
 
         self.__load_all_images()
 
@@ -119,12 +119,12 @@ class DashboardPage(ttk.Frame):
             self, padding=(2, 2, 2, 2), relief="raised")
 
         self.dashboard_computers_list = DashboardInfoList(self.list_frame, None,
-                                                          width=330, height=220, row_height=80,
+                                                          width=330, height=320, row_height=80,
                                                           callback=self.on_list_item_clicked)
         self.dashboard_computers_list.grid(row=0, column=0)
 
         self.dashboard_apps_list = DashboardInfoList(self.list_frame, None,
-                                                     width=330, height=220, row_height=80,
+                                                     width=330, height=320, row_height=80,
                                                      callback=None)
         self.dashboard_apps_list.grid(row=0, column=1)
 
@@ -149,7 +149,7 @@ class DashboardPage(ttk.Frame):
                 dashboard_message.node_id = self.dashboard.node_id
                 dashboard_message.mode = Global.REBOOT
                 self.parent_node.queue_tk_input(
-                    TkMessage(msg_type=Global.PUBLISH, msg_data=dashboard_message))
+                    GuiMessageEnvelope(msg_type=Global.PUBLISH, msg_data=dashboard_message))
 
     def refresh_page(self):
         """ refresh the display page """
@@ -174,9 +174,9 @@ class DashboardPage(ttk.Frame):
                 for key, received_dashboard in nodes.items():
                     dashboard = copy.deepcopy(received_dashboard)
                     dashboard.image = self.info_unknown_image
-                    if Synonyms.is_synonym_active(name=dashboard.state):
+                    if Synonyms.is_on(name=dashboard.state):
                         dashboard.image = self.info_ok_image
-                    if Synonyms.is_synonym_inactive(name=dashboard.state):
+                    if Synonyms.is_off(name=dashboard.state):
                         dashboard.image = self.info_error_image
                     skey = key
                     if Global.SUPERVISOR.lower() in skey.lower():
@@ -221,11 +221,11 @@ class DashboardPage(ttk.Frame):
                 self.signal_type = self.parent_node.config[Global.CONFIG][
                     Global.OPTIONS][Global.SIGNAL + "-" + Global.TYPE]
 
-        info_image_path = self.image_path + "/" + Global.INFO
+        info_image_path = os.path.join(self.image_path, Global.INFO)
 
         self.info_unknown_image = ImageClickable.load_image(
-            info_image_path + "/info-unknown.png")
+            os.path.join(info_image_path, "info-unknown.png"))
         self.info_error_image = ImageClickable.load_image(
-            info_image_path + "/info-red.png")
+            os.path.join(info_image_path, "info-red.png"))
         self.info_ok_image = ImageClickable.load_image(
-            info_image_path + "/info-green.png")
+            os.path.join(info_image_path, "info-green.png"))

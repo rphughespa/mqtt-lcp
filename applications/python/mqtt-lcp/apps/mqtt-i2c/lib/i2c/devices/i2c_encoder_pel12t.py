@@ -2,10 +2,12 @@
 # # ic2_encoder_pel12t.py
 """
 
-iI2cEncoderPel12t - low level hardware driver fot a rotary encoder connected to i2c using the pel12t circuit device
+iI2cEncoderPel12t - low level hardware driver fot a rotary encoder
+    connected to i2c using the pel12t circuit device
 
-The knob can be rotated continuosly clockwise or counter clockwise with 24 clicks (detents) in a 360 degree rotation.
-THe knob can also be pressed to generate a "click" of "button pressed" event.
+The knob can be rotated continuosly clockwise or counter
+clockwise with 24 clicks (detents) in a 360 degree rotation.
+The knob can also be pressed to generate a "click" of "button pressed" event.
 Lastly, the shaft of the knob has a RGB led below it that can add color to the shaft.
 
 Sold by Sparkfun as their Qwiic Twist - RGB Rotary Encoder Breakout
@@ -252,7 +254,8 @@ class I2cEncoderPel12t(I2cBaseDevice):
 
     def __graduated_rgb(self, value, steps, begin_red, begin_green, begin_blue,
                         end_red, end_green, end_blue):
-        # calulate rgb color values based on a sliding scale between a start brightness and an ending brightness
+        # calulate rgb color values based on a sliding
+        # scale between a start brightness and an ending brightness
         # Graduated RGB colors
         percent = value / steps
         red_value = self.__gradulated_color(percent, begin_red, end_red)

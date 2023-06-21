@@ -248,16 +248,13 @@ class ControlsPage(ttk.Frame):
                 self.power_decrease.set_normal()
                 self.power_slider.configure(state='normal')
                 self.power_level.configure(state='normal')
-                loco_cab_signal_state = \
-                    self.parent_cab.loco_cab_signals.get(
-                        self.parent_cab.lead_loco, None)
                 self.cab_signal.set_normal()
-                if loco_cab_signal_state is None:
+                if self.parent_cab.loco_cab_signal_aspect is None:
                     self.cab_signal.replace_image(
                         image=self.signal_approach_image)
-                elif loco_cab_signal_state == Global.STOP:
+                elif self.parent_cab.loco_cab_signal_aspect == Global.STOP:
                     self.cab_signal.replace_image(image=self.signal_stop_image)
-                elif loco_cab_signal_state == Global.CLEAR:
+                elif self.parent_cab.loco_cab_signal_aspect == Global.CLEAR:
                     self.cab_signal.replace_image(
                         image=self.signal_clear_image)
                 else:
@@ -354,11 +351,11 @@ class ControlsPage(ttk.Frame):
                                                 style="link", \
                                                 command=self.on_decrease_clicked)
 
-            self.forward_button = ImageToggleButton(self.direction_frame, width=80, height=40,
+            self.forward_button = ImageToggleButton(self.direction_frame, width=40, height=40,
                                                     compound=CENTER,
-                                                    image_file=buttons_image_path + "/triangle-forward.png",
-                                                    on_image_file=buttons_image_path + "/triangle-forward-on.png",
-                                                    image_width=75, image_height=27,
+                                                    image_file=buttons_image_path + "/triangle-forward-up.png",
+                                                    on_image_file=buttons_image_path + "/triangle-forward-up-on.png",
+                                                    image_width=27, image_height=27,
                                                     # style="link",
                                                     command=self.on_forward_clicked)
 
@@ -369,10 +366,10 @@ class ControlsPage(ttk.Frame):
                                            style="link",
                                            padding=(3, 1, 1, 1))
 
-            self.reverse_button = ImageToggleButton(self.direction_frame, width=80, height=40,
-                                                    compound=CENTER, image_width=75, image_height=27,
-                                                    image_file=buttons_image_path+"/triangle-reverse.png",
-                                                    on_image_file=buttons_image_path+"/triangle-reverse-on.png",\
+            self.reverse_button = ImageToggleButton(self.direction_frame, width=40, height=40,
+                                                    compound=CENTER, image_width=27, image_height=27,
+                                                    image_file=buttons_image_path+"/triangle-reverse-down.png",
+                                                    on_image_file=buttons_image_path+"/triangle-reverse-down-on.png",\
                                                     # style="link",
                                                     command=self.on_reverse_clicked)
 

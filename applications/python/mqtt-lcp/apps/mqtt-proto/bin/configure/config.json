@@ -24,7 +24,9 @@
           "ping": "dt/mqtt-lcp/ping/**node**",
           "sensor": "dt/mqtt-lcp/sensor/**node**",
           "signal": "dt/mqtt-lcp/signal/**node**",
-          "switch": "dt/mqtt-lcp/switch/**node**"
+          "switch": "dt/mqtt-lcp/switch/**node**",
+          "block": "dt/mqtt-lcp/block/**node**",
+          "locator": "dt/mqtt-lcp/locator/**node**"
         }
       },
       "io-devices": []

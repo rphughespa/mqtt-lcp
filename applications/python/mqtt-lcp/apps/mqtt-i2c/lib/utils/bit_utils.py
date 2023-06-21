@@ -33,7 +33,6 @@ sys.path.append('../../lib')
 
 import binascii
 
-
 class BitUtils(object):
     """ help class for bit operations """
     def __init__(self):

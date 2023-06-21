@@ -30,19 +30,20 @@ import sys
 
 sys.path.append('../../lib')
 
-from structs.io_data import IoData
-from structs.mqtt_config import MqttConfig
-from structs.roster import Roster
-from utils.global_constants import Global
-from utils.global_synonyms import Synonyms
-from utils.utility import Utility
 
-from processes.base_process import BaseProcess
+from utils.utility import Utility
+from utils.global_synonyms import Synonyms
+from utils.global_constants import Global
+from structs.roster import Roster
+from structs.mqtt_config import MqttConfig
+from structs.io_data import IoData
 from processes.base_process import SendAfterMessage
+from processes.base_process import BaseProcess
 
 
 class BaseMqttProcess(BaseProcess):
     """ base class for mqtt app processes """
+
     def __init__(self,
                  name=None,
                  events=None,
@@ -87,12 +88,11 @@ class BaseMqttProcess(BaseProcess):
         self.ping_time = self.__parse_ping_time(self.config)
         if self.ping_time > 0:
             self.ping_send_after_message = \
-                    SendAfterMessage(Global.PING, None,
-                        self.ping_time * 1000)
+                SendAfterMessage(Global.PING, None,
+                                 self.ping_time * 1000)
             # print(">>> starting ping loop: " + str(self.ping_time))
             self.send_after(self.ping_send_after_message)
             self.publish_ping_message()
-
 
     def preprocess_message(self, new_message):
         """ pre process a received message """
@@ -112,7 +112,7 @@ class BaseMqttProcess(BaseProcess):
         if not msg_consummed:
             (msg_type, _msg_body) = new_message
             if msg_type == Global.PING:
-                #print(">>> ping...")
+                # print(">>> ping...")
                 self.send_after(self.ping_send_after_message)
                 self.publish_ping_message()
                 msg_consummed = True
@@ -128,39 +128,48 @@ class BaseMqttProcess(BaseProcess):
         now = Utility.now_milliseconds()
         topic = self.mqtt_config.publish_topics.get(Global.PING,
                                                     Global.UNKNOWN)
-        body = IoData()
-        body.mqtt_message_root = Global.PING
-        body.mqtt_node_id = self.__get_topic_node_id(topic)
-        body.mqtt_reported = Global.PING
-        body.mqtt_version = "1.0"
-        body.mqtt_timestamp = now
-        body.mqtt_metadata = metadata
-        self.publish_message(topic, body)
+        if topic is None:
+            self.log_error(
+                "base_mqtt: Topic missing in request, cannot send:\n" +
+                str(Global.PING))
+        else:
+            body = IoData()
+            body.mqtt_message_root = Global.PING
+            body.mqtt_node_id = self.__get_topic_node_id(topic)
+            body.mqtt_reported = Global.PING
+            body.mqtt_version = "1.0"
+            body.mqtt_timestamp = now
+            body.mqtt_metadata = metadata
+            self.publish_message(topic, body)
 
     def publish_request_message(self, topic=None, message_io_data=None):
-        """ format and publish an mqtt response message """
+        """ format and publish an mqtt request message """
         if topic is None:
             self.log_error(
                 "base_mqtt: Topic missing in request, cannot send:\n" +
                 str(message_io_data))
-        now = Utility.now_milliseconds()
-        body = IoData()
-        body.mqtt_message_root = message_io_data.mqtt_message_root
-        body.mqtt_node_id = message_io_data.mqtt_node_id
-        if body.mqtt_node_id is None:
-            body.mqtt_node_id = self.__get_topic_node_id(topic)
-        body.mqtt_port_id = message_io_data.mqtt_port_id
-        body.mqtt_respond_to = message_io_data.mqtt_respond_to
-        body.mqtt_throttle_id = message_io_data.mqtt_throttle_id
-        body.mqtt_cab_id = message_io_data.mqtt_cab_id
-        body.mqtt_loco_id = message_io_data.mqtt_loco_id
-        body.mqtt_identity = message_io_data.mqtt_identity
-        body.mqtt_desired = message_io_data.mqtt_desired
-        body.mqtt_timestamp = now
-        body.mqtt_session_id = "req:" + str(body.mqtt_timestamp)
-        body.mqtt_version = "1.0"
-        body.mqtt_metadata = message_io_data.mqtt_metadata
-        self.publish_message(topic, body)
+        else:
+            now = Utility.now_milliseconds()
+            body = IoData()
+            body.mqtt_message_root = message_io_data.mqtt_message_root
+            body.mqtt_node_id = message_io_data.mqtt_node_id
+            if body.mqtt_node_id is None:
+                body.mqtt_node_id = self.__get_topic_node_id(topic)
+            body.mqtt_port_id = message_io_data.mqtt_port_id
+            body.mqtt_respond_to = message_io_data.mqtt_respond_to
+            body.mqtt_throttle_id = message_io_data.mqtt_throttle_id
+            body.mqtt_cab_id = message_io_data.mqtt_cab_id
+            body.mqtt_loco_id = message_io_data.mqtt_loco_id
+            body.mqtt_identity = message_io_data.mqtt_identity
+            body.mqtt_desired = message_io_data.mqtt_desired
+            body.mqtt_timestamp = now
+            body.mqtt_session_id = "req:" + str(body.mqtt_timestamp)
+            body.mqtt_version = "1.0"
+            body.mqtt_metadata = message_io_data.mqtt_metadata
+            self.log_info("Request: "+str(message_io_data.mqtt_message_root) + \
+                          " : "+str(message_io_data.mqtt_port_id)+ \
+                          " : "+str(message_io_data.mqtt_desired))
+            self.publish_message(topic, body)
 
     def publish_response_message(self,
                                  reported=None,
@@ -201,15 +210,18 @@ class BaseMqttProcess(BaseProcess):
 
     def publish_sensor_data_message(self, msg_body):
         """ publish a sensor type data mqtt message """
-        #self.log_info("base_mqtt: Send_sensor data message: " +
-        ##              str(msg_body.mqtt_port_id) + " ... " +
-        #              str(msg_body.mqtt_reported))
-        #now = Utility.now_milliseconds()
-        topic = self.mqtt_config.publish_topics.get(msg_body.mqtt_message_root, None)
+        self.log_info("base_mqtt: Publish sensor data message: " +
+                str(msg_body.mqtt_message_root) +" : "+ \
+                str(msg_body.mqtt_port_id) + " ... " + \
+                str(msg_body.mqtt_reported))
+        # now = Utility.now_milliseconds()
+        topic = self.mqtt_config.publish_topics.get(
+            msg_body.mqtt_message_root, None)
         if topic is None:
             topic = self.mqtt_config.publish_topics.get(Global.SENSOR, None)
         if topic is not None:
             topic += "/" + msg_body.mqtt_port_id
+            #print(">>> pub data: "+str(topic))
             self.publish_data_message(topic, msg_body)
 
     def publish_data_message(self, topic, msg_body):
@@ -218,12 +230,13 @@ class BaseMqttProcess(BaseProcess):
             self.log_error(
                 "base_mqtt: Topic not specified on publish data:\n" +
                 str(msg_body.mqtt_reported))
-        now = Utility.now_milliseconds()
-        msg_body.mqtt_node_id = self.node_name
-        msg_body.mqtt_version = "1.0"
-        msg_body.mqtt_timestamp = now
-        # print(">>> data: " + str(topic))
-        self.publish_message(topic, msg_body)
+        else:
+            now = Utility.now_milliseconds()
+            msg_body.mqtt_node_id = self.node_name
+            msg_body.mqtt_version = "1.0"
+            msg_body.mqtt_timestamp = now
+            # print(">>> data: " + str(topic))
+            self.publish_message(topic, msg_body)
 
     def update_sensor_inventory_reported(self,
                                          port_id=None,
@@ -243,7 +256,7 @@ class BaseMqttProcess(BaseProcess):
                     sensor.mqtt_timestamp = timestamp
                     self.io_config.io_device_map[key] = sensor
 
-    def get_sensor_inventory_state(self,port_id=None):
+    def get_sensor_inventory_state(self, port_id=None):
         """ get state of a sensor in inventory """
         state = None
         if port_id is not None and \
@@ -274,31 +287,26 @@ class BaseMqttProcess(BaseProcess):
         sensor_topic = self.mqtt_config.publish_topics.get(Global.SENSOR, None)
         inventory_meta = []
         for dev in device_list:
-            #print("\n\n>>> dev: "+str(dev))
-            #print(">>> ... stypes: "+str(stypes))
+            # print("\n\n>>> dev: "+str(dev))
+            # print(">>> ... stypes: "+str(stypes))
             if dev.io_device_type == Global.SENSOR:
                 if dev.io_device in stypes:
                     sensor = {}
                     sensor.update({Global.NODE_ID: self.node_name})
-                    if dev.mqtt_port_id is not None:
-                        sensor.update({Global.PORT_ID: dev.mqtt_port_id})
-                    if dev.mqtt_reported is not None:
-                        sensor.update({Global.REPORTED: dev.mqtt_reported})
-                    if dev.mqtt_timestamp is not None:
-                        sensor.update({Global.TIMESTAMP: dev.mqtt_timestamp})
-                    if dev.mqtt_description is not None:
-                        sensor.update(
-                            {Global.DESCRIPTION: dev.mqtt_description})
+                    sensor = self.__build_common_metadata(sensor, dev)
                     if dev.mqtt_data_topic is not None:
                         sensor.update({
                             Global.DATA + "-" + Global.TOPIC:
                             dev.mqtt_data_topic
                         })
-                    elif sensor_topic is not None:
-                        sensor.update({
-                            Global.DATA + "-" + Global.TOPIC:
-                            sensor_topic + "/" + dev.mqtt_port_id
-                        })
+                    else:
+                        data_topic = self.mqtt_config.publish_topics.get(
+                            dev.io_device, sensor_topic)
+                        if data_topic is not None:
+                            sensor.update({
+                                Global.DATA + "-" + Global.TOPIC:
+                                data_topic + "/" + dev.mqtt_port_id
+                            })
                     # print(">>> sensor: "+str(sensor))
                     inventory_meta.append(sensor)
         return inventory_meta
@@ -306,21 +314,16 @@ class BaseMqttProcess(BaseProcess):
     def build_switches_metadata(self, device_list):
         """ format inventory switch data for inventory reporting """
         inventory_meta = []
-        sensor_topic = self.mqtt_config.publish_topics.get(Global.SENSOR, None)
+        sensor_topic = self.mqtt_config.publish_topics.get(Global.SWITCH, None)
         switch_topic = self.mqtt_config.subscribe_topics.get(
             Global.SWITCH, None)
         for dev in device_list:
             # print("\n\n\n>>> dev: "+str(key))
             if dev.io_device_type == Global.SWITCH:
-                #print(">>> ... dev: "+str(dev))
+                # print(">>> ... dev: "+str(dev))
                 switch = {}
                 switch.update({Global.NODE_ID: self.node_name})
-                if dev.io_blocks is not None:
-                    switch.update({Global.BLOCKS: dev.io_blocks})
-                if dev.mqtt_port_id is not None:
-                    switch.update({Global.PORT_ID: dev.mqtt_port_id})
-                if dev.mqtt_description is not None:
-                    switch.update({Global.DESCRIPTION: dev.mqtt_description})
+                switch = self.__build_common_metadata(switch, dev)
                 if dev.mqtt_data_topic is not None:
                     switch.update({
                         Global.DATA + "_" + Global.TOPIC:
@@ -346,10 +349,49 @@ class BaseMqttProcess(BaseProcess):
                 inventory_meta.append(switch)
         return inventory_meta
 
+    def build_routes_metadata(self, device_list):
+        """ format inventory route data for inventory reporting """
+        inventory_meta = []
+        sensor_topic = self.mqtt_config.publish_topics.get(Global.ROUTE, None)
+        route_topic = self.mqtt_config.subscribe_topics.get(
+            Global.ROUTE, None)
+        for dev in device_list:
+            # print("\n\n\n>>> dev: "+str(key))
+            if dev.io_device_type == Global.ROUTE:
+                # print(">>> ... dev: "+str(dev))
+                route = {}
+                route.update({Global.NODE_ID: self.node_name})
+                route = self.__build_common_metadata(route, dev)
+                if dev.mqtt_data_topic is not None:
+                    route.update({
+                        Global.DATA + "_" + Global.TOPIC:
+                        dev.mqtt_data_topic
+                    })
+                elif sensor_topic is not None:
+                    route.update({
+                        Global.DATA + "-" + Global.TOPIC:
+                        sensor_topic + "/" + dev.mqtt_port_id
+                    })
+                if dev.mqtt_roster_topic is not None:
+                    route.update({
+                        Global.ROSTER + "_" + Global.TOPIC:
+                        dev.mqtt_roster_topic
+                    })
+                elif route_topic is not None:
+                    sw_topic = route_topic.replace("/#", "")
+                    route.update({
+                        Global.COMMAND + "-" + Global.TOPIC:
+                        sw_topic + "/" + dev.mqtt_port_id + "/req"
+                    })
+
+                inventory_meta.append(route)
+        return inventory_meta
+
+
     def build_signals_metadata(self, device_list):
         """ format inventory signal data for inventory reporting """
-        #print(">>> sub topics: "+str(self.mqtt_config.subscribe_topics))
-        sensor_topic = self.mqtt_config.publish_topics.get(Global.SENSOR, None)
+        # print(">>> sub topics: "+str(self.mqtt_config.subscribe_topics))
+        sensor_topic = self.mqtt_config.publish_topics.get(Global.SIGNAL, None)
         roster_topic = self.mqtt_config.publish_topics.get(Global.ROSTER, None)
         signal_topic = self.mqtt_config.subscribe_topics.get(
             Global.SIGNAL, None)
@@ -358,12 +400,7 @@ class BaseMqttProcess(BaseProcess):
             if dev.io_device_type == Global.SIGNAL:
                 signal = {}
                 signal.update({Global.NODE_ID: self.node_name})
-                if dev.io_blocks is not None:
-                    signal.update({Global.BLOCKS: dev.io_blocks})
-                if dev.mqtt_port_id is not None:
-                    signal.update({Global.PORT_ID: dev.mqtt_port_id})
-                if dev.mqtt_description is not None:
-                    signal.update({Global.DESCRIPTION: dev.mqtt_description})
+                signal = self.__build_common_metadata(signal, dev)
                 if dev.mqtt_data_topic is not None:
                     signal.update({
                         Global.DATA + "_" + Global.TOPIC:
@@ -400,7 +437,7 @@ class BaseMqttProcess(BaseProcess):
         elif major_category == Global.MQTT_DATA:
             self.parse_mqtt_data_message(msg_body=msg_body)
         else:
-            self.parse_mqtt_other_message(msg_body=msg_body)
+            self.process_mqtt_other_message(msg_body=msg_body)
 
     def parse_mqtt_request_message(self, msg_body=None):
         """ parse mqtt request message """
@@ -422,6 +459,8 @@ class BaseMqttProcess(BaseProcess):
             self.process_request_fastclock_message(msg_body=msg_body)
         elif category == Global.MQTT_REQUEST_SIGNAL:
             self.process_request_signal_message(msg_body=msg_body)
+        elif category == Global.MQTT_REQUEST_ROUTE:
+            self.process_request_route_message(msg_body=msg_body)
         elif category == Global.MQTT_REQUEST_SWITCH:
             self.process_request_switch_message(msg_body=msg_body)
         elif category == Global.MQTT_REQUEST_SENSOR:
@@ -434,7 +473,6 @@ class BaseMqttProcess(BaseProcess):
     def parse_mqtt_response_message(self, msg_body=None):
         """ parse mqtt response message """
         category = msg_body.mqtt_message_category
-        #print(">>> response category: "+str(category))
         if category == Global.MQTT_RESPONSE_NODE:
             self.process_response_node_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_TOWER:
@@ -445,10 +483,14 @@ class BaseMqttProcess(BaseProcess):
             self.process_response_inventory_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_PANELS_REPORT:
             self.process_response_panels_message(msg_body=msg_body)
+        elif category == Global.MQTT_RESPONSE_DASHBOARD_REPORT:
+            self.process_response_dashboard_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_STATES_REPORT:
             self.process_response_states_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_SWITCHES_REPORT:
             self.process_response_switches_message(msg_body=msg_body)
+        elif category == Global.MQTT_RESPONSE_SENSORS_REPORT:
+            self.process_response_sensors_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_ROUTES_REPORT:
             self.process_response_routes_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_SIGNALS_REPORT:
@@ -467,6 +509,8 @@ class BaseMqttProcess(BaseProcess):
             self.process_response_signal_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_SENSOR:
             self.process_response_sensor_message(msg_body=msg_body)
+        elif category == Global.MQTT_RESPONSE_ROUTE:
+            self.process_response_route_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_TRACK:
             self.process_response_track_message(msg_body=msg_body)
         elif category == Global.MQTT_RESPONSE_CAB:
@@ -488,16 +532,21 @@ class BaseMqttProcess(BaseProcess):
             self.process_data_block_message(msg_body=msg_body)
         elif category == Global.MQTT_DATA_LOCATOR:
             self.process_data_locator_message(msg_body=msg_body)
-        elif category == Global.MQTT_DATA_FASTCLOCK:
-            self.process_data_fastclock_message(msg_body=msg_body)
         elif category == Global.MQTT_DATA_DASHBOARD:
             self.process_data_dashboard_message(msg_body=msg_body)
         elif category == Global.MQTT_DATA_ROSTER:
             self.process_data_roster_message(msg_body=msg_body)
         elif category == Global.MQTT_DATA_TOWER:
-            self.process_data_tower_message(msg_body=msg_body)
+            if msg_body.mqtt_port_id == Global.FASTCLOCK:
+                self.process_data_fastclock_message(msg_body=msg_body)
+            elif msg_body.mqtt_port_id == Global.CAB_SIGNAL:
+                self.process_data_cab_signal_message(msg_body=msg_body)
+            else:
+                self.process_data_tower_message(msg_body=msg_body)
         elif category == Global.MQTT_DATA_SWITCH:
             self.process_data_switch_message(msg_body=msg_body)
+        elif category == Global.MQTT_DATA_ROUTE:
+            self.process_data_route_message(msg_body=msg_body)
         elif category == Global.MQTT_DATA_BACKUP:
             self.process_data_backup_message(msg_body=msg_body)
         elif category == Global.MQTT_DATA_CAB:
@@ -505,7 +554,8 @@ class BaseMqttProcess(BaseProcess):
         else:
             self.process_data_message(msg_body=msg_body)
 
-    # the following "process... " functions are expected to be overridden in derived classes, as needed
+    # the following "process... " functions are expected
+    # to be overridden in derived classes, as needed
 
     def process_request_shutdown_message(self, _msg_body=None):
         """ process request shutdown message """
@@ -529,11 +579,11 @@ class BaseMqttProcess(BaseProcess):
 
     def process_request_tower_message(self, msg_body=None):
         """ process request tower message """
-        #report_desired = msg_body.get_desired_value_by_key(Global.REPORT)
-        self.log_info("Tower Request: " + str(msg_body.mqtt_port_id) + \
+        # report_desired = msg_body.get_desired_value_by_key(Global.REPORT)
+        self.log_info("Tower Request: " + str(msg_body.mqtt_port_id) +
                       " ... " + str(msg_body.mqtt_desired))
         if msg_body.mqtt_port_id == Global.INVENTORY and \
-            msg_body.mqtt_desired == Global.REPORT:
+                msg_body.mqtt_desired == Global.REPORT:
             self.report_inventory(msg_body=msg_body)
         else:
             self.log_unexpected_message(msg_body=msg_body)
@@ -558,7 +608,23 @@ class BaseMqttProcess(BaseProcess):
         """ process request signal message """
         self.log_unexpected_message(msg_body=msg_body)
 
+    def process_request_route_message(self, msg_body=None):
+        """ process request route message """
+        self.log_unexpected_message(msg_body=msg_body)
+
     def process_response_dcc_command_report_message(self, msg_body=None):
+        """ process response dcc command report message """
+        self.log_unexpected_message(msg_body=msg_body)
+
+    def process_response_sensors_message(self, msg_body=None):
+        """ process response sensors message """
+        self.log_unexpected_message(msg_body=msg_body)
+
+    def process_response_route_message(self, msg_body=None):
+        """ process response route message """
+        self.log_unexpected_message(msg_body=msg_body)
+
+    def process_data_route_message(self, msg_body=None):
         """ process response dcc command report message """
         self.log_unexpected_message(msg_body=msg_body)
 
@@ -596,11 +662,11 @@ class BaseMqttProcess(BaseProcess):
 
     def process_response_roster_report_message(self, msg_body=None):
         """ received roster response message """
-        #print(">>> load roster response")
+        # print(">>> load roster response")
         # reported = msg_body.mqtt_reported
-        #print(">>> reported:" + str(reported))
+        # print(">>> reported:" + str(reported))
         if msg_body.mqtt_port_id == Global.ROSTER:
-            #print(">>> process roster metadata")
+            # print(">>> process roster metadata")
             roster_map = None
             meta = msg_body.mqtt_metadata
             if meta is not None:
@@ -608,7 +674,7 @@ class BaseMqttProcess(BaseProcess):
             if roster_map is None:
                 # not a roster response, pass it to super instance
                 self.log_error("base_cab: No roster found in tower response: " +
-                            str(meta))
+                               str(meta))
             else:
                 # found a roster
                 self.roster = Roster({Global.ROSTER: roster_map})
@@ -673,7 +739,7 @@ class BaseMqttProcess(BaseProcess):
 
     def process_data_sensor_message(self, msg_body=None):
         """ process data sensor message """
-        #print(">>> ... unexpected data sensor ...")
+        # print(">>> ... unexpected data sensor ...")
         self.log_unexpected_message(msg_body=msg_body)
 
     def process_data_signal_message(self, msg_body=None):
@@ -681,6 +747,10 @@ class BaseMqttProcess(BaseProcess):
         self.log_unexpected_message(msg_body=msg_body)
 
     def process_data_fastclock_message(self, msg_body=None):
+        """ process data fastclock message """
+        self.log_unexpected_message(msg_body=msg_body)
+
+    def process_data_cab_signal_message(self, msg_body=None):
         """ process data fastclock message """
         self.log_unexpected_message(msg_body=msg_body)
 
@@ -724,7 +794,8 @@ class BaseMqttProcess(BaseProcess):
         """ request report from tower """
         now = Utility.now_milliseconds()
         topic = self.mqtt_config.publish_topics.get(Global.TOWER,
-                                                    Global.UNKNOWN) + "/req"
+                                                    Global.UNKNOWN)
+        topic = topic + "/" + report_desired +"/req"
         body = IoData()
         body.mqtt_message_root = Global.TOWER
         body.mqtt_node_id = self.__get_topic_node_id(topic)
@@ -735,32 +806,38 @@ class BaseMqttProcess(BaseProcess):
         body.mqtt_session = "REQ:" + str(now)
         body.mqtt_version = "1.0"
         body.mqtt_timestamp = now
-        #print(">>> pub reg: " + str(body))
-        #print(">>>    ... : " + str(topic))
+        # print(">>> pub reg: " + str(body))
+        # print(">>>    ... : " + str(topic))
         self.publish_message(topic, body)
 
     def publish_roster_report_request(self, _report_desired):
         """ request roster from dcc_command """
-        #print(">>> request roster")
+        # print(">>> request roster")
         now = Utility.now_milliseconds()
         topic = self.mqtt_config.publish_topics.get(Global.ROSTER,
                                                     Global.UNKNOWN) + "/req"
+        resp_topic =self.mqtt_config.fixed_subscribe_topics.get(
+            Global.SELF)
+        if resp_topic is None:
+            self.log_error("!!! Request sent with no Respond-To: Roster Request")
+        else:
+            resp_topic = resp_topic + "/res"
         body = IoData()
         body.mqtt_message_root = Global.ROSTER
         body.mqtt_node_id = self.__get_topic_node_id(topic)
         body.mqtt_port_id = Global.ROSTER
         body.mqtt_desired = Global.REPORT
-        body.mqtt_respond_to = self.mqtt_config.fixed_subscribe_topics.get(
-            Global.SELF) + "/res"
+        body.mqtt_respond_to = resp_topic
         body.mqtt_session = "REQ:" + str(now)
         body.mqtt_version = "1.0"
         body.mqtt_timestamp = now
-        #print(">>> pub reg: " + str(body))
-        #print(">>>    ... : " + str(topic))
+        # print(">>> pub reg: " + str(body))
+        # print(">>>    ... : " + str(topic))
         self.publish_message(topic, body)
 
     def publish_message(self, topic, body):
         """ publish an mqtt message """
+        body.mqtt_publisher = self.node_name
         message = (topic, body)
         if self.log_level == Global.LOG_LEVEL_DEBUG:
             self.log_debug("Publish MQTT: " + str(topic) + str(body))
@@ -782,7 +859,8 @@ class BaseMqttProcess(BaseProcess):
         """ response to an inventory request message """
         # print(">>> inv requested")
         if self.log_level == Global.LOG_LEVEL_DEBUG:
-            self.log_debug("base_mqtt: Handle :report_inventory: " + str(msg_body))
+            self.log_debug(
+                "base_mqtt: Handle :report_inventory: " + str(msg_body))
 
         metadata = {}
         device_list = []
@@ -811,10 +889,37 @@ class BaseMqttProcess(BaseProcess):
         signals = self.build_signals_metadata(device_list)
         if signals:
             metadata.update({Global.SIGNAL: signals})
+
+        routes = self.build_routes_metadata(device_list)
+        if routes:
+            metadata.update({Global.ROUTE: routes})
+
         # print(">>> inv reported: " + str(metadata))
         self.publish_response_message(reported=Global.REPORT,
                                       metadata={Global.INVENTORY: metadata},
                                       message_io_data=msg_body)
+
+#
+#   private functions
+#
+
+    def __build_common_metadata(self, meta, dev):
+        """ build common meta elements """
+        if dev.mqtt_port_id is not None:
+            meta.update({Global.PORT_ID: dev.mqtt_port_id})
+        if dev.mqtt_block_id is not None:
+            meta.update({Global.BLOCK_ID: dev.mqtt_block_id})
+        if dev.mqtt_direction is not None:
+            meta.update({Global.DIRECTION: dev.mqtt_direction})
+        if dev.mqtt_description is not None:
+            meta.update({Global.DESCRIPTION: dev.mqtt_description})
+        if dev.mqtt_reported is not None:
+            meta.update({Global.REPORTED: dev.mqtt_reported})
+        if dev.mqtt_timestamp is not None:
+            meta.update({Global.TIMESTAMP: dev.mqtt_timestamp})
+        if dev.mqtt_metadata is not None:
+            meta.update({Global.METADATA: dev.mqtt_metadata})
+        return meta
 
     def __flatten_device_map(self, device_map):
         """ create a flat list of devices and sub devices """
