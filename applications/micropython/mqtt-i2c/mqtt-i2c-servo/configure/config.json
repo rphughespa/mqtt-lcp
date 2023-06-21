@@ -6,8 +6,8 @@
     "io": {
       "network": {
         "wifi": {
-          "ssid": "xx-ssid",
-          "password": "xx-passwd",
+          "ssid": "i4567",
+          "password": "idingbat",
           "hostname": "mqtt-i2c-servo"
         }
       },

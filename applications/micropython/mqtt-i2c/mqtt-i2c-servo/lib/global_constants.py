@@ -284,6 +284,7 @@ class Global(object):
     PREV = "prev"
     PRODUCT = "product"
     PUBLISH = "pub"
+    PUBLISHER = "publisher"
     PUBLIST_DATA = "pub_data"
     PUB_TOPICS = "pub-topics"
     PULSE = "pulse"

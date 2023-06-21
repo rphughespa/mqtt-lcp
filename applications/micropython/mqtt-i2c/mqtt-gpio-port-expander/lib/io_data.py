@@ -72,6 +72,7 @@ class IoData(object):
         self.mqtt_desired = None
         self.mqtt_reported = None
         self.mqtt_respond_to = None
+        self.mqtt_publisher = None
         self.mqtt_session_id = None
         self.mqtt_description = None
         self.mqtt_block_id = None
@@ -117,6 +118,7 @@ class IoData(object):
             self.mqtt_desired = existing_obj.mqtt_desired
             self.mqtt_reported = existing_obj.mqtt_reported
             self.mqtt_respond_to = existing_obj.mqtt_respond_to
+            self.mqtt_publisher = existing_obj.mqtt_publisher
             self.mqtt_session_id = existing_obj.mqtt_session_id
             self.mqtt_description = existing_obj.mqtt_description
             self.data_topic = existing_obj.data_topic
@@ -176,6 +178,8 @@ class IoData(object):
                 new_io_data.mqtt_timestamp = mbody.get(Global.TIMESTAMP, None)
                 new_io_data.mqtt_respond_to = mbody.get(
                     Global.RESPOND_TO, None)
+                new_io_data.mqtt_publisher = mbody.get(
+                    Global.PUBLISHER, None)
                 new_io_data.mqtt_metadata = mbody.get(Global.METADATA, None)
                 if ((new_io_data.mqtt_metadata is not None)
                         and (isinstance(new_io_data.mqtt_metadata, dict))):
@@ -242,6 +246,7 @@ class IoData(object):
         new_io_data.mqtt_direction = body_map.get(Global.DIRECTION, None)
         new_io_data.mqtt_identity = body_map.get(Global.IDENTITY, None)
         new_io_data.mqtt_respond_to = body_map.get(Global.RESPOND_TO, None)
+        new_io_data.mqtt_publisher = body_map.get(Global.PUBLISHER, None)
         new_io_data.mqtt_session_id = body_map.get(Global.SESSION_ID, None)
         new_io_data.mqtt_version = body_map.get(Global.VERSION, None)
         new_io_data.mqtt_data_topic = None
@@ -319,6 +324,8 @@ class IoData(object):
             body_map.update({Global.STATE: state_map})
         if self.mqtt_respond_to is not None:
             body_map.update({Global.RESPOND_TO: self.mqtt_respond_to})
+        if self.mqtt_publisher is not None:
+            body_map.update({Global.PUBLISHER: self.mqtt_publisher})
         if self.mqtt_session_id is not None:
             body_map.update({Global.SESSION_ID: self.mqtt_session_id})
         if self.mqtt_version is not None:

@@ -202,6 +202,7 @@ class MqttI2cBase:
         """ publish an mqtt message """
         self.led_on()
         if isinstance(body, IoData):
+            body.mqtt_publisher = self.node_name
             encoded_body = body.encode_mqtt_message()
             self.mqtt_client.publish(topic, encoded_body)
         else:
