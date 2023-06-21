@@ -2,6 +2,10 @@
 
 # Release Notes:
 
+## 2023-06-21
+* Added auto signals to MQTT-DISPATCHER
+* Enabled CAB SIgnals in MQTT-DIPATCHER, MQTT-THROTTLE, MQTT-WITHROTTLE-SERVER
+
 ## 2023-04-06
 * Added new mqtt-gpio-port-expander micropython application
 
