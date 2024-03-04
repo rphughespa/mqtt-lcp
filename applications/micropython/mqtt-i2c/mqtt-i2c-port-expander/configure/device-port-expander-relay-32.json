@@ -4,10 +4,30 @@
 	"io-address": 32,
 	"io-sub-devices": [
 		{
+			"io-sub-address": 13,
+			"io-device-type": "signal",
+			"port-id": "130w",
+			"description": "130w",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"signal-type": "rgb"
+			}
+		},
+		{
+			"io-sub-address": 9,
+			"io-device-type": "signal",
+			"port-id": "121e",
+			"description": "121e",
+			"send-sensor-message": "yes",
+			"io-metadata": {
+				"signal-type": "position"
+			}
+		},
+		{
 			"io-sub-address": 6,
 			"io-device-type": "signal",
-			"port-id": "112w",
-			"description": "112w",
+			"port-id": "112e",
+			"description": "112e",
 			"send-sensor-message": "yes",
 			"io-metadata": {
 				"signal-type": "color"
@@ -16,7 +36,7 @@
 		{
 			"io-sub-address": 4,
 			"io-device-type": "signal",
-			"port-id": "flash2",
+			"port-id": "flash",
 			"description": "flash",
 			"send-sensor-message": "yes",
 			"io-metadata": {
@@ -27,7 +47,7 @@
 		{
 			"io-sub-address": 3,
 			"io-device-type": "signal",
-			"port-id": "blink2",
+			"port-id": "blink",
 			"description": "blink",
 			"send-sensor-message": "yes",
 			"io-metadata": {
@@ -38,7 +58,7 @@
 		{
 			"io-sub-address": 2,
 			"io-device-type": "signal",
-			"port-id": "single2",
+			"port-id": "single",
 			"description": "single",
 			"send-sensor-message": "yes",
 			"io-metadata": {
@@ -46,37 +66,23 @@
 			}
 		},
 		{
-			"io-sub-address": 8,
-			"io-device-type": "switch",
-			"port-id": "oak",
-			"description": "Oak Duplex Siding",
+			"io-sub-address": 1,
+			"io-device-type": "sensor",
+			"port-id": "mill-siding-sensor-39",
+			"description": "Steel Mill Siding 39",
 			"send-sensor-message": "yes",
 			"io-metadata": {
-				"x-switch-type": "toggle",
-				"switch-type": "duplex"
+				"report": {
+					"on": "clicked"
+				}
 			}
 		},
 		{
-			"io-sub-address": 10,
-			"io-device-type": "switch",
-			"port-id": "maryville",
-			"description": "Maryville Duplex Siding",
-			"send-sensor-message": "yes",
-			"io-metadata": {
-				"x-switch-type": "toggle",
-				"switch-type": "duplex",
-				"pulse": 100
-			}
-		},
-		{
-			"io-sub-address": 12,
-			"io-device-type": "switch",
-			"port-id": "garland",
-			"description": "Maryville Duplex Siding",
-			"send-sensor-message": "yes",
-			"io-metadata": {
-				"switch-type": "toggle"
-			}
+			"io-sub-address": 0,
+			"io-device-type": "sensor",
+			"port-id": "lumber-siding-sensor-39",
+			"description": "Lumber Siding",
+			"send-sensor-message": "yes"
 		}
 	]
 }
