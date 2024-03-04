@@ -2,7 +2,7 @@
 # main.py
 """
 
-main.py - Main module for mqtt-proto, allows virtual prototyping of signal/switch messaging without actual hardware
+main.py - Main module for mqtt-locator, launches and monitors process for mqtt-locator
 
 The MIT License (MIT)
 
@@ -39,6 +39,7 @@ from processes.log_process import LogProcess
 from processes.mqtt_process import MqttProcess
 from utils.global_constants import Global
 
+from loconet_serial_process import LoconetSerialProcess
 from app_process import AppProcess
 
 class Supervisor(ProcessSupervisor):
@@ -69,6 +70,16 @@ class Supervisor(ProcessSupervisor):
         self.processes.update(
             {Global.MQTT: (self.start_mqtt_process, process_pid)})
 
+    def start_loconet_serial_process(self):
+        """ startloconet serial process"""
+        print("supervisor: ... launching ... loconet serial ")
+        process_pid = LoconetSerialProcess(events=self.events,
+                                           queues=self.queues)
+        process_pid.start()
+        print("supervisor: ... ... launched")
+        self.processes.update(
+            {Global.SERIAL: (self.start_loconet_serial_process, process_pid)})
+
     def start_app_process(self):
         """ start app process """
         print("supervisor: ... launching ... app process")
@@ -83,6 +94,7 @@ class Supervisor(ProcessSupervisor):
         print("supervisor: launches worker processes")
         self.start_log_process()
         self.start_mqtt_process()
+        self.start_loconet_serial_process()
         # allow time for IO processes to startup
         time.sleep(2)
         self.start_app_process()

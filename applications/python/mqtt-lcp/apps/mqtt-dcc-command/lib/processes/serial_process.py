@@ -303,7 +303,7 @@ class SerialProcess(BaseProcess):
                 bytes_read = self.serial_port.read(bytes_avail)
                 self.error_count = 0
                 # message = bytes_read.decode(" ISO-8859-1")
-                # convert bytes to lits of integers
+                # convert bytes to list of integers
                 rett = list(bytes_read)
                 # print(">>> Bytes Read: " + str(rett))
         except IOError as exc:
