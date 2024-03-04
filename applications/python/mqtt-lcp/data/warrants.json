@@ -1,9 +1,0 @@
-{
-    "warrants": {
-        "name": "warrants",
-        "description": "list of warrants",
-        "warrants": [
-            "...": "warrants"
-        ]
-    }
-}

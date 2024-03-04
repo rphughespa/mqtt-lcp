@@ -1,43 +1,59 @@
-Setup RASPBERRY PI install for mqtt-lcp.  
+Setup RASPBERRY PI 4 desktop for mqtt-lcp.  
 
 
 
-These instructions cover setting up a PI computer to run mqtt_lcp applications.  
-specifically installing a desktop version of the 64 bit Raspberry OS Bullseye release.
-
+These instructions cover setting up a PI 4 computer to run mqtt_lcp applications.  
+specifically installing a desktop (version of the 64 bit Raspberry OS Bullseye release.
 A monitor and keyboard are needed for these instructions.  
 After the remote desktop service is install, the monitor and keyboard are
 no longer needed.
 
-These instructions are a bit complicated, but you only need to do them once per PI device type.  
+These instructions are a bit complicated, but you only need to do them once.  
 After you have a working system you can then clone the sdcard to setup other computers.
 
 
-1. Use an imaging tool to write the OS image to an sdcard. The Raspberry Imager tool is revcommened.
+1. Use an imaging tool to write the OS image to an sdcard. 
 
 
 2.  Boot up the PI.  The first boot may take a while to complete,
     After the PI activity light settles down, try loggin in:
 
-	sudo rpi-update
-	reboot
-	sudo apt update
-	sudo apt upgrade
-	sudo rpi-eeprom-update -d -a
-	reboot ...
+	    sudo rpi-update
+	    reboot
+	    sudo apt update
+	    sudo apt upgrade
+	    sudo rpi-eeprom-update -d -a
+	    reboot ...
      
         sudo raspi-config
             - change hostname
             - enable i2c interface (if desired)
             - enable serial (if desired)
 	        - enable ssh (if desired)
+	    - enable x11 (disable WAYLAND)
+
         - when you finish, the pi will reboot   
+
+2.1. Create Virtual ENV for python (optional)
+	python -m venv /home/pi/mqtt-lcp-venv
+
+	Edit the BASHRC to activate the venv
+		nano .bashrc	
+		... add to end of file:	
+		source /home/pi/mqtt-lcp-venv/bin/activate
 
 3.  Add remote desktop
     
     !!! For initial Bulleseye release, see note at end of this document
     sudo apt install xrdp
-   
+
+	Note: On Bookworm, cretain apps like Chromium will not display properly
+	when run remotely.  Adding "--disable-gpu" helps.
+
+    # sudo gpasswd -d pi render
+    # sudo gpasswd -d pi video
+
+      
 
 4.  Install zram swapping
 
@@ -62,8 +78,9 @@ After you have a working system you can then clone the sdcard to setup other com
 		
 
 5.  Add a second suser in case the pi account gets corrupted:
-	sudo adduser admin
-	sudo adduser admin sudo
+		sudo adduser {..new user..}
+		sudo adduser {..new user..} sudo
+
 
 
 
@@ -82,14 +99,14 @@ After you have a working system you can then clone the sdcard to setup other com
 		log into another computer and ping the computer you are
 		configurating:  ping "hostname".local)
 
-7.  If you plan to enable two interfaces on a PI, wired and WiFi, inform the
+7.  If you enable two interfaces on a PI, wired and WiFi, inform the
 	mDNS daemon, Avahi, which interface it should use to publish your host name:
 
 	sudo nano /etc/avahi/avahi-daemon.conf
 		... uncomment the "allow-interfaces" line
 		... set the interface to your ptimary one, use etho for the wired port.
 
-8. If setting up PI with Raspbian and want to use wired ethernet as primary and WIFI as backup:
+8. If setting up PI 4 with Raspbian and want to use wired ethernet as primary and WIFI as backup:
 
 	sudo apt-get install ethtool
 	sudo nano /etc/rc.local
@@ -107,7 +124,7 @@ After you have a working system you can then clone the sdcard to setup other com
 		fi
 
 
-9. MQTT_LCP needs a MQTT message broker.  You only need one on your network.
+9. mqtt_lcp needs a MQTT message broker.  You only need one on your network.
 	If this computer is to be your broker:
 		sudo apt install mosquitto
 		sudo reboot
@@ -150,11 +167,25 @@ After you have a working system you can then clone the sdcard to setup other com
 
 	The message "Hello" should appear on the mosquitto_sub window.
 
-11.5 If installing on Raspberry OS Bullseye lite 32bit (Pi Zero?)
+11.5 If installing on Raspberry Os Bullseye lite 32bit (Pi Zero?)
 
 	sudo apt install libopenjp2-7
-
+	
+11.6 Add .local/bin to path
+    
+    nano .bashrc
+    add to end of file
+        export PATH=$PATH:/home/pi/.local/bin
+    exit and save
+    
 12. Now install python libraries:
+
+	Note: In the Bookworm release of Raspberry OS, using "sudo sudo pip3" 
+	    	no longer works. The default in Bookworm is to use virtual environmenst for Python.
+		If you have elected to not use virtual envisonments, excuting the following 
+		will reenable the old functionality:
+
+		sudo mv /usr/lib/python3.11/EXTERNALLY-MANAGED /usr/lib/python3.11/xxx-EXTERNALLY-MANAGED	
 
 	sudo apt install python3-pip -y
 	sudo pip3 install paho-mqtt
@@ -168,17 +199,32 @@ After you have a working system you can then clone the sdcard to setup other com
 	sudo pip3 install smbus2
 	sudo pip3 install smbus
 	sudo pip3 install requests
-	sudo apt-get install python3-pil.imagetk
+	sudo apt-get install python3-pil.imagetk -y
+
+	
+    	# sudo apt install python3-lgpio -y
     	sudo pip3 install ipykernel
 
 12.1 if running any mqtt-lcp TK gui apps on this computer:
 
-	sudo apt install python3-tk	
-	python3 -m pip install ttkbootstrap
+	sudo apt install python3-tk	-y
+	sudo pip3 install ttkbootstrap
 	
-12.3  If Java is needed:
-	sudo apt install openjdk-11-jre
+12.2 If running PyQT5 Apps:
 
+	sudo apt install python3-pyqt5
+
+	If doing development:
+       		sudo apt-get install qt5-default
+       		sudo apt-get install qtcreator
+
+12.3  If Java is needed:
+	sudo apt install openjdk-11-jre -y
+	# for Bookworm: sudo apt install openjdk-17-jdk
+
+12.4 if Elixir is needed:
+	sudo apt install elixir -y
+	sudo apt install erlang-dev -y
 
 13. For user serial access
 
@@ -190,7 +236,8 @@ After you have a working system you can then clone the sdcard to setup other com
 14. For I2C:
 
 	Enable I2C in raspi-config
-	sudo nano /boot/config.txt, add these lines, save and exit
+	sudo nano /boot/firmware/config.txt 
+		add/change these lines, save and exit
 		dtparam=i2c_arm=on,i2c_arm_baudrate=100000
 		# use 50000 for pi zero
 		# core_freq=250
@@ -199,19 +246,34 @@ After you have a working system you can then clone the sdcard to setup other com
 	i2cdetect -y 1         --- Note: could be 1 or 0
 		--- should run without errorsi2cde
 
-15.  Install handy app that displays info about your computer.  The mqtt-supervisor can
-	include optional information in its ping messages.
+15.  Install handy app that displays info about your computer:
 
-	In the scrips folder of the github repo is a python app named "landscape-sysinfo".
-	FTP this file (FileZilla?) to this new installations Download folder.
-	chmod a+x Downloads/landscape-sysinfo
-	sudo cp Downloads/landscape-sysinfo /usr/bin 
+	cd Downloads
+	git clone https://github.com/jnweiger/landscape-sysinfo-mini.git
+	cd landscape-sysinfo-mini
+	edit landscape-sysinfo.py
+		a. change line 1 from python to python3
+		b. remove import of utmp
+		c. remove utmp_count function
+		d. remove "users=..." line
+		e. remove print line with "Usage of /"
+		f. change remaining print lines to be print(...)
+	execute to command: python3 landscape-sysinfo.py
+	chmod a+x landscape-sysinfo.py
+	execute the command ./landscape-sysinfo.py
+	copy to usr/bin (and drop ".py"):  sudo cp landscape-sysinfo.py /usr/bin/landscape-sysinfo
+	cd ~
 	execute command: landscape-sysinfo
-		- should display info about the computer: mem free, peercent CPU used etc
+
+
+
+
 
 16. Setup logging for mqtt_lcp apps
 
+
     	mkdir /home/pi/mqtt-lcp
+	mkdir /home/pi/mqtt-lcp/apps
 	sudo mkdir /var/log/mqtt-lcp
 	sudo chmod 755 /var/log/mqtt-lcp
 	sudo chown pi /var/log/mqtt-lcp
@@ -233,7 +295,7 @@ After you have a working system you can then clone the sdcard to setup other com
 	--  should run without error...
 
 
-17. If using a software controlled fan, install the software:
+17. If using a software controlled fan install the software:
 	Pimoroni Fan Shim:
 		cd /home/pi/Downloads
 		git clone https://github.com/pimoroni/fanshim-python
@@ -249,33 +311,36 @@ After you have a working system you can then clone the sdcard to setup other com
 		chmod a+x argon1.sh
 		./argon1.sh
 
-18, A few helpful changes to .bashrc
+18, A few helpful chnages to .bashrc
 
 	nano .bashrc	
 	... add to end of file:
 	
 	alias ls='ls --color=none'
 	alias nano='nano -Ynone'
+	
 
 	
 19. Setup supervisor application, mqtt-supervisor. This program allows a reboot or clean shutdown of the computer:
 
 	mkdir /home/pi/mqtt-lcp/apps
-	Using FTP to upload/copy the following from your dev / server computer to the new computer:
-		mqtt-supervisor.tgz to /home/pi/mqtt-lcp/apps
+	Using FTP upload/copy the following from your dev / server computer to the new computer:
+		mqtt-supervisor-yyyy-mm-dd.tgz to /home/pi/mqtt-lcp/apps
 
 	cd /home/pi/mqtt-lcp/apps
-	tar -xzvf mqtt-supervisor.tgz
+	tar -xzvf mqtt-supervisor-yyyy-mm-dd.tgz
 	cd mqtt-supervisor/bin
-	edit configure/config.json as needed
+	edit config.json as needed
 	to run the program: ./mqtt-supervisor
-	type "quit" to end the program
+	tyep "quit" to end the program
 
-	Setup the supervisor app to start at boot.
+	Setup the shutdown app to start at boot.
 		sudo nano /etc/crontab
 		Append to end of file, save and exit:
-	    		@reboot pi sleep 10 && cd /home/pi/mqtt-lcp/apps/mqtt-supervisor/bin && ./mqtt-supervisor &
-	    
+	    @reboot pi sleep 10 && cd /home/pi/mqtt-lcp/apps/mqtt-supervisor/bin && ./mqtt-supervisor &
+	    ... or for elixir apps:
+	    @reboot pi sleep 10 && cd /home/pi/mqtt-lcp/apps/mqtt_supervisor && ./bin/mqtt_supervisor daemon &
+
 	Reboot
 
 	After computer reboots
@@ -316,8 +381,8 @@ After you have a working system you can then clone the sdcard to setup other com
 20. At this point I make a backup copy of the new computer sdcard or emmc.
 	Instructions avail on web.
 
-	
-	sudo dd bs=4M if=/dev/mmcblk0 of=backup_sdcard.img
+	On ubuntu I use:
+		sudo dd bs=4M if=/dev/mmcblk0 of=backup_sdcard.img
 
 
 
@@ -334,8 +399,28 @@ After you have a working system you can then clone the sdcard to setup other com
 	
 	use raspi-config
 
+22.  To setup photo slideshow:
 
-22. note on bullseye release
+    sudo apt install xscreensaver
+    sudo apt install xscreensaver-data-extra
+    sudo apt install xscreensaver-gl
+    sudo apt install xscreensaver-gl-extra
+    
+    ... to setup ...
+    
+    xscreensaver-demo
+    
+    ... to change startups ...
+    
+    sudo  nano /etc/xdg/autostart/mate-screensaver.desktop
+        change: "NoDisplay=" from true to false
+
+   Open  Control Center/Startup Applications
+   Disable Power Management
+   Disable Screensaver
+   Create new Startup item for "/usr/bin/xscreensaver"
+   
+# note on bullseye release
 
 
 	In the Bullseye release of Raspbian OS the window manager, openbox, was
@@ -359,8 +444,8 @@ After you have a working system you can then clone the sdcard to setup other com
 
 
 
-23. notes for vs code for python:
-	use this setting to disable sorting of imports
+# notes for vs code for python:
+	use this setting to disable sor of imports
 	"python.formatting.autopep8Args": ["--ignore","E402"]
 
 
